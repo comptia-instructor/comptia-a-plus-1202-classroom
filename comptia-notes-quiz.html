@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ Notes & Quiz Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050810; --s1:#090c18; --s2:#0d1020; --s3:#111528; --s4:#161c32;
+  --b1:#1e2844; --b2:#273258; --b3:#30406e;
+  --ink:#cdd6f0; --ink2:#6d7ca8; --ink3:#3a4568; --ink4:#222d4c;
+  --acc:#00c8ff; --acc2:#1d4ed8; --acc-l:#dbeafe; --acc-d:rgba(37,99,235,0.1);
+  --grn:#16a34a; --grn-l:#dcfce7; --grn-d:rgba(22,163,74,0.1);
+  --amb:#d97706; --amb-l:#fef3c7; --amb-d:rgba(217,119,6,0.1);
+  --red:#dc2626; --red-l:#fee2e2; --red-d:rgba(220,38,38,0.1);
+  --pur:#7c3aed; --pur-l:#ede9fe; --pur-d:rgba(124,58,237,0.1);
+  --cornell-left:#2563eb; --cornell-line:#d1d5db;
+  --mono:'JetBrains Mono',monospace; --sans:'Barlow',sans-serif;
+  --r:6px; --rl:12px; --rxl:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.6}
+
+/* ── HEADER ── */
+header{background:var(--ink);color:#fff;padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:200}
+.logo-text{font-family:var(--mono);font-size:13px;font-weight:600;color:#60a5fa;letter-spacing:.5px}
+header h1{font-size:14px;font-weight:600;color:#f5f4ef}
+header p{font-size:11px;color:#6b7280;font-family:var(--mono)}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px}
+.mode-pill{display:flex;background:rgba(255,255,255,0.08);border-radius:6px;padding:2px;gap:1px}
+.mpb{padding:5px 14px;border-radius:5px;border:none;background:transparent;color:#9ca3af;font-family:var(--sans);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.mpb.on{background:var(--acc);color:#fff}
+
+/* ── LAYOUT ── */
+main{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 53px)}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--s1);border-right:1px solid var(--b1);padding:16px 0;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.sb-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink4);padding:8px 16px 4px;font-family:var(--mono)}
+.sb-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;transition:all .15s;border-left:2px solid transparent;font-size:12px;color:var(--ink2);font-weight:500}
+.sb-btn:hover{background:var(--s2);color:var(--ink)}
+.sb-btn.active{background:var(--acc-l);border-left-color:var(--acc);color:var(--acc2)}
+.sb-btn.done{color:var(--grn)}
+.sb-btn .sb-check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px}
+.sb-btn.done .sb-check{background:var(--grn);border-color:var(--grn);color:#fff}
+.sb-score{font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto}
+.sb-btn.done .sb-score{color:var(--grn)}
+.sb-divider{height:1px;background:var(--b1);margin:8px 0}
+.sb-search{padding:10px 12px}
+.sb-search input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--ink);font-family:var(--sans);font-size:11px;outline:none;transition:border-color .2s}
+.sb-search input:focus{border-color:var(--acc)}
+.sb-search input::placeholder{color:var(--ink4)}
+
+/* ── CONTENT ── */
+.content{background:var(--bg);overflow-y:auto}
+
+/* ── PANELS ── */
+.panel{display:none;padding:28px;flex-direction:column;gap:20px;max-width:1100px;margin:0 auto}
+.panel.active{display:flex}
+
+/* ── PAGE TITLE ── */
+.page-title{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-title h2{font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-.5px}
+.page-title p{font-size:12px;color:var(--ink3);margin-top:3px;line-height:1.6}
+
+/* ── CORNELL NOTES ── */
+.cornell-wrapper{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+
+/* Cornell header bar */
+.cornell-header{background:var(--ink);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px}
+.cn-chapter{font-family:var(--mono);font-size:10px;color:#60a5fa;letter-spacing:.8px;text-transform:uppercase}
+.cn-title{font-size:14px;font-weight:600;color:#f5f4ef;flex:1}
+.cn-completion{display:flex;align-items:center;gap:8px}
+.cn-pct{font-family:var(--mono);font-size:12px;font-weight:600}
+.cn-ring{width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--grn) calc(var(--p,0) * 1%),rgba(255,255,255,0.15) 0);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);color:#fff;position:relative}
+.cn-ring::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:var(--ink)}
+.cn-ring span{position:relative;z-index:1}
+
+/* Cornell date/topic bar */
+.cornell-meta{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--ink);background:var(--s2)}
+.cm-field{padding:8px 14px;border-right:1px solid var(--b1)}
+.cm-field:last-child{border-right:none}
+.cm-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink4);font-family:var(--mono);margin-bottom:3px}
+.cm-input{width:100%;background:transparent;border:none;color:var(--ink);font-family:var(--sans);font-size:12px;outline:none;font-weight:500}
+.cm-input::placeholder{color:var(--ink4)}
+
+/* Cornell 2-column body */
+.cornell-body{display:grid;grid-template-columns:180px 1fr;min-height:400px}
+
+/* Left column: cue/keywords */
+.cornell-cue{border-right:2px solid var(--cornell-left);padding:0;background:var(--s1)}
+.cue-header{background:var(--acc);color:#fff;padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-family:var(--mono)}
+.cue-body{padding:12px}
+.cue-item{margin-bottom:12px}
+.cue-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink4);font-family:var(--mono);margin-bottom:4px}
+.cue-input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:6px 9px;color:var(--ink);font-family:var(--sans);font-size:11px;resize:none;outline:none;line-height:1.6;transition:border-color .2s;min-height:54px}
+.cue-input:focus{border-color:var(--acc)}
+.cue-input::placeholder{color:var(--ink4);font-style:italic;font-size:10px}
+.add-cue-btn{width:100%;padding:5px;background:var(--acc-l);border:1px dashed var(--acc);border-radius:5px;color:var(--acc2);font-size:10px;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--sans)}
+.add-cue-btn:hover{background:var(--acc-d)}
+
+/* Right column: notes */
+.cornell-notes{padding:0;background:var(--s1);display:flex;flex-direction:column}
+.notes-header{background:var(--s3);padding:8px 16px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3);font-family:var(--mono);border-bottom:1px solid var(--b1)}
+
+/* Note sections */
+.note-section{border-bottom:1px solid var(--cornell-line);padding:14px 16px}
+.note-section:last-child{border-bottom:none}
+.ns-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ns-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.ns-title{font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.3px}
+.ns-req{font-size:9px;font-family:var(--mono);color:var(--ink4);margin-left:auto}
+.ns-textarea{width:100%;background:var(--bg);border:1px solid var(--b1);border-radius:5px;padding:9px 12px;color:var(--ink);font-family:var(--sans);font-size:12px;resize:none;outline:none;line-height:1.8;transition:border-color .2s;min-height:90px}
+.ns-textarea:focus{border-color:var(--acc)}
+.ns-textarea::placeholder{color:var(--ink4);font-size:11px;line-height:1.7}
+.ns-textarea.filled{border-color:var(--grn);background:rgba(22,163,74,0.03)}
+.ns-char-count{font-size:9px;color:var(--ink4);font-family:var(--mono);text-align:right;margin-top:3px}
+.ns-char-count.ok{color:var(--grn)}
+
+/* Cornell summary (bottom) */
+.cornell-summary{border-top:2px solid var(--ink);background:var(--s2);padding:14px 16px}
+.cs-header{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--acc2);font-family:var(--mono);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cs-textarea{width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:5px;padding:10px 14px;color:var(--ink);font-family:var(--sans);font-size:12px;resize:none;outline:none;line-height:1.8;transition:border-color .2s;min-height:72px}
+.cs-textarea:focus{border-color:var(--acc)}
+.cs-textarea::placeholder{color:var(--ink4);font-style:italic;font-size:11px}
+
+/* Completion bar */
+.completion-strip{padding:12px 16px;background:var(--s3);border-top:1px solid var(--b1);display:flex;align-items:center;gap:12px}
+.cs-bar-wrap{flex:1;height:6px;background:var(--b1);border-radius:3px;overflow:hidden}
+.cs-bar-fill{height:100%;border-radius:3px;background:var(--grn);transition:width .4s ease}
+.cs-pct-txt{font-family:var(--mono);font-size:11px;font-weight:600;min-width:36px;text-align:right}
+.cs-grade{font-size:11px;color:var(--ink3);font-family:var(--mono)}
+.cs-save-btn{padding:6px 14px;background:var(--acc);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:600;transition:all .15s}
+.cs-save-btn:hover{background:var(--acc2);transform:translateY(-1px)}
+.cs-auto{font-size:10px;color:var(--grn);font-family:var(--mono);opacity:0;transition:opacity .3s}
+.cs-auto.show{opacity:1}
+
+/* ── QUIZ GENERATOR ── */
+.quiz-builder{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden}
+.qb-header{background:var(--ink);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px}
+.qb-header h3{font-size:15px;font-weight:700;color:#f5f4ef;flex:1}
+
+.qb-config{padding:20px;display:flex;flex-direction:column;gap:16px;border-bottom:1px solid var(--b1)}
+
+/* Chapter multi-select */
+.chapter-select{display:flex;flex-direction:column;gap:6px}
+.cs-row{display:flex;gap:6px;flex-wrap:wrap}
+.ch-chip{padding:6px 12px;border-radius:20px;border:1px solid var(--b1);background:var(--s2);color:var(--ink2);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.ch-chip:hover{border-color:var(--b2)}
+.ch-chip.sel{background:var(--acc-l);border-color:var(--acc);color:var(--acc2)}
+.ch-chip .chip-check{width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:7px}
+.ch-chip.sel .chip-check{background:var(--acc);border-color:var(--acc);color:#fff}
+
+/* Question type selector */
+.qtype-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qtype-card{padding:14px 10px;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r);cursor:pointer;transition:all .15s;text-align:center}
+.qtype-card:hover{border-color:var(--b2)}
+.qtype-card.sel{background:var(--acc-l);border-color:var(--acc)}
+.qtype-icon{font-size:20px;margin-bottom:6px}
+.qtype-label{font-size:11px;font-weight:600;color:var(--ink2)}
+.qtype-card.sel .qtype-label{color:var(--acc2)}
+.qtype-sub{font-size:9px;color:var(--ink4);margin-top:2px;line-height:1.4}
+
+/* Quiz options */
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qopt{display:flex;flex-direction:column;gap:5px}
+.qopt label{font-size:11px;font-weight:600;color:var(--ink2)}
+.qopt select,.qopt input{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 10px;color:var(--ink);font-family:var(--sans);font-size:12px;outline:none;width:100%;transition:border-color .2s}
+.qopt select:focus,.qopt input:focus{border-color:var(--acc)}
+
+.gen-btn{padding:12px 24px;background:var(--acc);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:700;transition:all .15s;display:flex;align-items:center;gap:8px;width:100%;justify-content:center}
+.gen-btn:hover{background:var(--acc2);transform:translateY(-1px)}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── QUIZ DISPLAY ── */
+.quiz-display{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-top:0}
+.qd-header{background:var(--ink);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qd-header h3{font-size:14px;font-weight:700;color:#f5f4ef;flex:1}
+.qd-meta{display:flex;gap:6px;flex-wrap:wrap}
+
+/* Score header */
+.quiz-score-bar{padding:10px 20px;background:var(--s3);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px}
+.qs-progress{flex:1;height:5px;background:var(--b1);border-radius:3px;overflow:hidden}
+.qs-fill{height:100%;background:var(--acc);border-radius:3px;transition:width .3s}
+.qs-label{font-size:11px;font-family:var(--mono);color:var(--ink3)}
+
+.quiz-questions{padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* MC Question */
+.q-block{background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);padding:16px;transition:border-color .2s}
+.q-block:has(.opt.correct){border-color:var(--grn)}
+.q-block:has(.opt.wrong){border-color:var(--red)}
+.q-num{font-size:9px;font-family:var(--mono);font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink4);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.q-type-badge{padding:1px 6px;border-radius:3px;font-size:8px;background:var(--acc-l);color:var(--acc2)}
+.q-text{font-size:13px;font-weight:500;color:var(--ink);line-height:1.65;margin-bottom:12px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:6px;border:1px solid var(--b1);cursor:pointer;transition:all .15s;background:var(--s1)}
+.opt:hover{border-color:var(--b2);background:var(--s2)}
+.opt.sel{border-color:var(--acc);background:var(--acc-l)}
+.opt.correct{border-color:var(--grn);background:var(--grn-l)}
+.opt.wrong{border-color:var(--red);background:var(--red-l)}
+.opt.missed{border-color:var(--amb);background:var(--amb-l);opacity:.8}
+.opt-ltr{width:22px;height:22px;border-radius:4px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono);font-weight:700;color:var(--ink3);flex-shrink:0}
+.opt.sel .opt-ltr{background:var(--acc);color:#fff}
+.opt.correct .opt-ltr{background:var(--grn);color:#fff}
+.opt.wrong .opt-ltr{background:var(--red);color:#fff}
+.opt.missed .opt-ltr{background:var(--amb);color:#fff}
+.opt-txt{font-size:12px;color:var(--ink2);line-height:1.5}
+.opt.sel .opt-txt,.opt.correct .opt-txt,.opt.wrong .opt-txt{color:var(--ink)}
+.rationale{margin-top:10px;padding:9px 12px;background:var(--grn-l);border-left:2px solid var(--grn);border-radius:5px;font-size:11px;color:#166534;line-height:1.65;display:none}
+.rationale.show{display:block}
+
+/* T/F */
+.tf-opts{display:flex;gap:8px}
+.tf-opt{flex:1;padding:12px;text-align:center;border-radius:var(--r);border:1.5px solid var(--b1);cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;background:var(--s1)}
+.tf-opt:hover{border-color:var(--b2)}
+.tf-opt.sel{border-color:var(--acc);background:var(--acc-l);color:var(--acc2)}
+.tf-opt.correct{border-color:var(--grn);background:var(--grn-l);color:var(--grn)}
+.tf-opt.wrong{border-color:var(--red);background:var(--red-l);color:var(--red)}
+
+/* Match */
+.match-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:start}
+.match-col{display:flex;flex-direction:column;gap:6px}
+.match-item{padding:8px 12px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);font-size:12px;cursor:pointer;transition:all .15s;min-height:36px;display:flex;align-items:center}
+.match-item:hover{border-color:var(--acc);background:var(--acc-l)}
+.match-item.sel{border-color:var(--acc);background:var(--acc-l);color:var(--acc2);font-weight:500}
+.match-item.matched{border-color:var(--grn);background:var(--grn-l);color:var(--grn);font-weight:500}
+.match-item.wrong-match{border-color:var(--red);background:var(--red-l);color:var(--red)}
+.match-arrows{display:flex;flex-direction:column;gap:6px;align-items:center;padding-top:0}
+.match-arrow{height:36px;display:flex;align-items:center;color:var(--ink4);font-size:14px}
+.match-line{font-size:10px;font-family:var(--mono);color:var(--grn);height:36px;display:flex;align-items:center;text-align:center;padding:0 4px}
+
+/* Open response */
+.open-scenario{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;font-size:12px;color:var(--ink);line-height:1.8;border-left:3px solid var(--pur)}
+.open-prompt{font-size:11px;font-weight:600;color:var(--pur);margin-bottom:6px;font-family:var(--mono);letter-spacing:.3px}
+.open-textarea{width:100%;background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r);padding:10px 14px;color:var(--ink);font-family:var(--sans);font-size:12px;resize:none;outline:none;line-height:1.8;transition:border-color .2s;min-height:90px}
+.open-textarea:focus{border-color:var(--pur)}
+.open-feedback{margin-top:8px;padding:10px 12px;background:var(--pur-l);border-left:2px solid var(--pur);border-radius:5px;font-size:11px;color:#5b21b6;line-height:1.65;display:none}
+.open-feedback.show{display:block}
+.check-open-btn{margin-top:8px;padding:7px 14px;background:var(--pur);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:11px;font-weight:600;transition:all .15s}
+.check-open-btn:hover{background:#6d28d9}
+
+/* Quiz footer */
+.quiz-footer{padding:16px 20px;background:var(--s2);border-top:1px solid var(--b1);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-primary{background:var(--acc);color:#fff}
+.btn-primary:hover{background:var(--acc2)}
+.btn-success{background:var(--grn);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--b1);color:var(--ink2)}
+.btn-ghost:hover{border-color:var(--b2)}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:5px}
+
+/* Score modal overlay */
+.score-modal-wrap{background:rgba(0,0,0,0.5);position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.score-modal-wrap.open{opacity:1;pointer-events:all}
+.score-modal{background:var(--s1);border-radius:var(--rxl);padding:32px;width:440px;max-width:90vw;text-align:center;transform:scale(.95);transition:transform .2s;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.score-modal-wrap.open .score-modal{transform:scale(1)}
+.sm-grade{font-size:56px;font-weight:800;line-height:1;margin-bottom:8px;font-family:var(--mono)}
+.sm-label{font-size:15px;color:var(--ink2);margin-bottom:16px}
+.sm-bar{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.sm-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.sm-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;text-align:left}
+.sm-stat{background:var(--s2);border-radius:var(--r);padding:10px 14px}
+.sm-stat-label{font-size:10px;font-family:var(--mono);color:var(--ink4);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.sm-stat-val{font-size:18px;font-weight:700;font-family:var(--mono)}
+.sm-actions{display:flex;gap:8px;justify-content:center}
+
+/* Tags */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.3px}
+.tag.blue{background:var(--acc-l);color:var(--acc2)}
+.tag.green{background:var(--grn-l);color:var(--grn)}
+.tag.amber{background:var(--amb-l);color:var(--amb)}
+.tag.red{background:var(--red-l);color:var(--red)}
+.tag.purple{background:var(--pur-l);color:var(--pur)}
+.tag.gray{background:var(--s3);color:var(--ink3)}
+
+/* Loading */
+.loading{display:flex;align-items:center;gap:10px;color:var(--ink3);font-size:12px;padding:24px 0;justify-content:center;font-family:var(--mono)}
+.loading::before{content:'';width:16px;height:16px;border:2px solid var(--b1);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#f5f4ef;border-radius:var(--r);padding:10px 16px;font-size:11px;z-index:600;opacity:0;transform:translateY(8px);transition:all .2s;font-family:var(--mono)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{background:var(--grn)}
+.toast.err{background:var(--red)}
+
+/* Print styles */
+@media print{
+  header,.sidebar,.gen-btn,.quiz-footer,.quiz-builder,button{display:none!important}
+  main{display:block}
+  .panel{display:flex!important;padding:0}
+  .cornell-wrapper{box-shadow:none;border:1px solid #000}
+}
+
+/* Empty */
+.empty-state{text-align:center;padding:48px 20px;color:var(--ink3)}
+.empty-state .ei{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-state h3{font-size:16px;font-weight:700;color:var(--ink2);margin-bottom:6px}
+.empty-state p{font-size:12px;line-height:1.7;max-width:300px;margin:0 auto}
+
+.section-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;font-family:var(--mono)}
+
+<link rel="stylesheet" href="platform.css">
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo-text">A+ 220-1202</span>
+  <div>
+    <h1>Notes & Quiz Generator</h1>
+    <p>Cornell-style notes · AI quiz generation · Chapter-sorted</p>
+  </div>
+  <div class="hright">
+    <div class="mode-pill">
+      <button class="mpb on" onclick="setView('notes')" id="vNotes">📝 Notes</button>
+      <button class="mpb" onclick="setView('quiz')" id="vQuiz">🧠 Quiz Generator</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-search"><input placeholder="Search chapters…" oninput="filterChapters(this.value)"></div>
+  <div class="sb-label">Chapters</div>
+  <div id="sbChapters"></div>
+  <div class="sb-divider"></div>
+  <div class="sb-label">Quick Actions</div>
+  <div class="sb-btn" onclick="setView('quiz')">🧠 Build a Quiz</div>
+  <div class="sb-btn" onclick="exportNotes()">📄 Export Notes</div>
+  <div class="sb-btn" onclick="window.print()">🖨️ Print Notes</div>
+</aside>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- NOTES VIEW -->
+  <div id="viewNotes" style="display:flex;flex-direction:column">
+
+    <!-- Overview panel -->
+    <div class="panel active" id="p-overview" style="max-width:100%">
+      <div class="page-title">
+        <div>
+          <h2>Cornell Notes</h2>
+          <p>Structured notes by chapter · Auto-graded on completion · Formatted for CompTIA A+ 220-1202</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="tag gray" id="overallPct">0% complete</span>
+          <button class="btn btn-primary btn-sm" onclick="selectChapter(0)">Start Chapter 1</button>
+        </div>
+      </div>
+
+      <!-- Progress overview -->
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden">
+        <div style="background:var(--ink);color:#fff;padding:12px 18px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px">
+          <span>Course Progress</span>
+          <span class="tag blue" id="chapDone">0/27 chapters</span>
+        </div>
+        <div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px" id="progressCards"></div>
+      </div>
+    </div>
+
+    <!-- Chapter note panels (generated dynamically) -->
+    <div id="chapterPanels"></div>
+
+  </div><!-- /viewNotes -->
+
+  <!-- QUIZ VIEW -->
+  <div id="viewQuiz" style="display:none">
+    <div class="panel active" style="max-width:100%;padding:24px">
+
+      <div class="page-title">
+        <div>
+          <h2>Quiz Generator</h2>
+          <p>Select chapters · Choose question types · Generate AI-powered CompTIA-style quizzes</p>
+        </div>
+      </div>
+
+      <!-- BUILDER -->
+      <div class="quiz-builder">
+        <div class="qb-header">
+          <span style="font-size:18px">🧠</span>
+          <h3>Build Your Quiz</h3>
+          <span class="tag" style="background:rgba(255,255,255,0.1);color:#9ca3af" id="selSummary">Nothing selected</span>
+        </div>
+        <div class="qb-config">
+
+          <!-- Step 1: Chapters -->
+          <div>
+            <div class="section-label">Step 1 · Select Chapters</div>
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <button class="btn btn-ghost btn-sm" onclick="selectAllChaps()">Select All</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearChaps()">Clear</button>
+            </div>
+            <div id="chapChips" class="cs-row"></div>
+          </div>
+
+          <!-- Step 2: Question types -->
+          <div>
+            <div class="section-label">Step 2 · Question Types (select multiple)</div>
+            <div class="qtype-grid">
+              <div class="qtype-card sel" onclick="toggleQType(this,'mc')" data-type="mc">
+                <div class="qtype-icon">🔤</div>
+                <div class="qtype-label">Multiple Choice</div>
+                <div class="qtype-sub">4 options, CompTIA style</div>
+              </div>
+              <div class="qtype-card" onclick="toggleQType(this,'tf')" data-type="tf">
+                <div class="qtype-icon">✅</div>
+                <div class="qtype-label">True / False</div>
+                <div class="qtype-sub">Quick concept checks</div>
+              </div>
+              <div class="qtype-card" onclick="toggleQType(this,'match')" data-type="match">
+                <div class="qtype-icon">🔗</div>
+                <div class="qtype-label">Mix & Match</div>
+                <div class="qtype-sub">Terms to definitions</div>
+              </div>
+              <div class="qtype-card" onclick="toggleQType(this,'open')" data-type="open">
+                <div class="qtype-icon">📝</div>
+                <div class="qtype-label">Open Response</div>
+                <div class="qtype-sub">CompTIA scenario format</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Options -->
+          <div>
+            <div class="section-label">Step 3 · Quiz Options</div>
+            <div class="quiz-options">
+              <div class="qopt">
+                <label>Total Questions</label>
+                <select id="qCount">
+                  <option value="5">5 questions</option>
+                  <option value="10" selected>10 questions</option>
+                  <option value="15">15 questions</option>
+                  <option value="20">20 questions</option>
+                  <option value="25">25 questions</option>
+                </select>
+              </div>
+              <div class="qopt">
+                <label>Difficulty</label>
+                <select id="qDiff">
+                  <option value="mixed" selected>Mixed</option>
+                  <option value="easy">Easy (foundational)</option>
+                  <option value="medium">Medium (application)</option>
+                  <option value="hard">Hard (analysis/exam-level)</option>
+                </select>
+              </div>
+              <div class="qopt">
+                <label>Quiz Name (optional)</label>
+                <input type="text" id="qName" placeholder="e.g. Chapter 9 Review">
+              </div>
+              <div class="qopt">
+                <label>Student Level</label>
+                <select id="qLevel">
+                  <option value="intro">Introductory</option>
+                  <option value="review" selected>Review / Mid-course</option>
+                  <option value="exam">Exam-ready</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button class="gen-btn" onclick="generateQuiz()" id="genQuizBtn">
+            ⚡ Generate Quiz
+          </button>
+        </div>
+      </div>
+
+      <!-- QUIZ DISPLAY -->
+      <div class="quiz-display" id="quizDisplay" style="display:none">
+        <div class="qd-header">
+          <h3 id="quizTitle">Quiz</h3>
+          <div class="qd-meta" id="quizMeta"></div>
+          <button class="btn btn-ghost btn-sm" onclick="window.print()" style="color:#9ca3af;border-color:#374151">🖨️ Print</button>
+        </div>
+        <div class="quiz-score-bar">
+          <div class="qs-progress"><div class="qs-fill" id="qProgress" style="width:0%"></div></div>
+          <span class="qs-label" id="qProgressLabel">0 of 0 answered</span>
+        </div>
+        <div class="quiz-questions" id="quizQs"></div>
+        <div class="quiz-footer">
+          <button class="btn btn-success" onclick="submitQuiz()" id="submitQuizBtn">Submit & Grade</button>
+          <button class="btn btn-ghost" onclick="resetQuiz()">Reset</button>
+          <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)" id="qAnsweredCount">0 / 0 answered</span>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /viewQuiz -->
+
+</div><!-- /content -->
+</main>
+
+<!-- Score Modal -->
+<div class="score-modal-wrap" id="scoreModal">
+  <div class="score-modal">
+    <div class="sm-grade" id="smGrade">—</div>
+    <div class="sm-label" id="smLabel">Quiz Complete</div>
+    <div class="sm-bar"><div class="sm-fill" id="smFill"></div></div>
+    <div class="sm-breakdown" id="smBreakdown"></div>
+    <div class="sm-actions">
+      <button class="btn btn-ghost" onclick="closeScoreModal()">Review Answers</button>
+      <button class="btn btn-primary" onclick="resetQuiz();closeScoreModal()">New Quiz</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+// ════════════════════════════════════════════
+// CHAPTERS DATA
+// ════════════════════════════════════════════
+const CHAPTERS = [
+  {id:0, ch:'Chapter 1', title:'Safety and Professionalism', videos:['Professional Communication I & II','Dealing with Difficult Customers','Physical Safety'],
+   prompts:{overview:'Describe the key principles of IT professional communication and workplace safety.',terms:'List safety equipment, ESD, PPE terms.',process:'Explain proper safety procedures when working on hardware.',realworld:'Describe a scenario where improper safety leads to equipment damage.',traps:'Common A+ mistakes around ESD and physical safety.'}},
+  {id:1, ch:'Chapter 2', title:'Introduction to Computers and Operating Systems', videos:['Common Safety Procedures','What\'s an Operating System?','Users and Super Users','Why Windows?','Touring Windows 10/11','Touring macOS','Touring Linux'],
+   prompts:{overview:'Explain what an operating system does and compare Windows, macOS, and Linux.',terms:'OS, kernel, GUI, CLI, superuser, root, administrator.',process:'Describe how user accounts and permissions differ across OS platforms.',realworld:'A user needs elevated permissions to install software. What steps do you take?',traps:'Confusing administrator vs standard user rights on different OS platforms.'}},
+  {id:2, ch:'Chapter 7', title:'Power Supplies', videos:['Power Protection','Cooling Your System'],
+   prompts:{overview:'Explain power protection concepts and system cooling methods for CompTIA A+.',terms:'UPS, surge protector, ATX, wattage, thermal paste, heat sink, fan.',process:'Describe the steps to safely replace a power supply unit.',realworld:'A workstation keeps shutting down randomly. Walk through your troubleshooting process.',traps:'Confusing surge protector with UPS; ignoring wattage requirements.'}},
+  {id:3, ch:'Chapter 8', title:'Mass Storage Technologies', videos:['Boot Order'],
+   prompts:{overview:'Describe different mass storage technologies and boot order configuration.',terms:'HDD, SSD, NVMe, SATA, BIOS, UEFI, boot sequence.',process:'Explain how to configure boot order in BIOS/UEFI.',realworld:'A technician installs a new OS drive. How do they ensure it boots correctly?',traps:'Mixing up BIOS and UEFI settings; incorrect boot priority.'}},
+  {id:4, ch:'Chapter 9', title:'Implementing Mass Storage', videos:['Understanding Partitioning','MBR Partitioning','GPT Partitioning','Understanding File Systems','Popular File Systems','Formatting in Action','Dynamic Disks','New Installation','Hardware RAID','Software RAID','Encrypting Mass Storage','Maintaining Storage Disks'],
+   prompts:{overview:'Explain partitioning schemes, file systems, RAID configurations, and storage encryption.',terms:'MBR, GPT, NTFS, FAT32, exFAT, RAID 0/1/5/10, BitLocker, partition, volume.',process:'Walk through the steps to set up a new drive with GPT partitioning and NTFS.',realworld:'A company needs redundant storage. Compare RAID 1 vs RAID 5 for their needs.',traps:'Mixing up MBR vs GPT limits; RAID is not a backup; RAID levels performance vs redundancy.'}},
+  {id:5, ch:'Chapter 10', title:'Essential Peripherals', videos:['Understanding USB','Webcams and Videoconferencing'],
+   prompts:{overview:'Describe USB standards, peripheral connections, and videoconferencing hardware.',terms:'USB 2.0, 3.0, 3.1, Type-A, Type-C, Thunderbolt, bandwidth.',process:'Explain how to install and troubleshoot USB peripherals.',realworld:'A user\'s USB webcam is not recognized. Describe your troubleshooting steps.',traps:'Confusing USB versions and speeds; not checking driver issues first.'}},
+  {id:6, ch:'Chapter 11', title:'Installing and Upgrading Operating Systems', videos:['Windows 11 Editions','Boot from Everything','Installing Windows','Post-installation Tasks','Linux Features','Installing Linux','Upgrading macOS'],
+   prompts:{overview:'Explain the process of installing, upgrading, and configuring operating systems.',terms:'Clean install, upgrade, in-place upgrade, ISO, bootable media, activation.',process:'Describe the steps for a clean Windows 11 installation from USB.',realworld:'A client needs to upgrade from Windows 10 to 11 without losing data. Plan the process.',traps:'Skipping post-installation tasks; not checking hardware compatibility before upgrading.'}},
+  {id:7, ch:'Chapter 12', title:'Working with Operating Systems', videos:['Task Manager','Windows Settings','MMC and Additional Tools','What is the Registry?','macOS Core Tools'],
+   prompts:{overview:'Explain core OS tools: Task Manager, Registry, MMC, and macOS equivalents.',terms:'Task Manager, Registry, MMC, snap-in, regedit, Activity Monitor, Finder.',process:'Describe how to use Task Manager to identify and end a misbehaving process.',realworld:'An application is using 95% CPU. What tools do you use and what steps do you take?',traps:'Editing the registry without backing it up; confusing macOS tools with Windows equivalents.'}},
+  {id:8, ch:'Chapter 13', title:'Users, Groups, and Permissions', videos:['Introduction to Users and Groups','Managing Users and Groups','NTFS Permissions','Linux and macOS Permissions','File Explorer','Sharing Resources','Security Policies'],
+   prompts:{overview:'Explain user account management, NTFS permissions, and sharing resources across platforms.',terms:'NTFS permissions, share permissions, ACL, group policy, chmod, sudo, UAC.',process:'Explain how NTFS and share permissions interact when a user accesses a network share.',realworld:'A user cannot access a shared folder even though they are in the correct group. Debug this.',traps:'NTFS vs share permissions: the most restrictive applies; not understanding inheritance.'}},
+  {id:9, ch:'Chapter 14', title:'Maintaining and Optimizing Operating Systems', videos:['Maintaining Windows','Maintaining macOS','Maintaining Linux','Working with Applications','Backing Up Data in Windows','Backing Up in Linux/macOS'],
+   prompts:{overview:'Describe OS maintenance tasks, backup strategies, and application management.',terms:'Windows Update, Time Machine, rsync, Task Scheduler, cron, disk cleanup, defrag.',process:'Describe a complete Windows maintenance routine for a business workstation.',realworld:'A client\'s computer is running slowly after 2 years. What maintenance steps do you perform?',traps:'Defragging SSDs; skipping OS updates; confusing backup types (full, incremental, differential).'}},
+  {id:10, ch:'Chapter 15', title:'Working with the Command-Line Interface', videos:['Understanding CLI','Navigating CLI','Working with Folders','Working with Files','Working with Drives','Super Copy Commands','CLI Permissions','Advanced Windows Commands','Advanced Linux Commands I & II','Introduction to Scripting','Interpreted Languages','Scripting and the Terminal'],
+   prompts:{overview:'Explain CLI navigation, file management commands, and basic scripting for Windows and Linux.',terms:'cd, dir/ls, mkdir, del/rm, copy/cp, move/mv, ipconfig, ping, chmod, grep, PowerShell.',process:'List and explain 5 essential CLI commands a technician uses daily.',realworld:'You need to copy 10,000 files from one server to another efficiently. What CLI approach do you use?',traps:'Confusing Windows vs Linux commands; rm -rf with no confirmation; not understanding paths.'}},
+  {id:11, ch:'Chapter 16', title:'Troubleshooting Systems', videos:['Windows Recovery Environment','Advanced Startup Options','Troubleshooting Boot Problems','Troubleshooting at the GUI','Troubleshooting Applications','Kernel Panic'],
+   prompts:{overview:'Explain systematic approaches to troubleshooting OS and boot problems.',terms:'WinRE, Safe Mode, Last Known Good Configuration, System Restore, kernel panic, BSOD.',process:'Describe the 6-step CompTIA troubleshooting methodology.',realworld:'A Windows PC shows a BSOD on every startup. Walk through your troubleshooting process.',traps:'Skipping steps in the troubleshooting process; not documenting findings; reinstalling OS first.'}},
+  {id:12, ch:'Chapter 17', title:'Display Technologies', videos:['Graphics Cards and Connections','Multiple Monitors'],
+   prompts:{overview:'Explain display technologies, connector types, and multiple monitor configuration.',terms:'HDMI, DisplayPort, DVI, VGA, resolution, refresh rate, GPU, integrated graphics.',process:'Explain how to set up dual monitors in Windows including display settings.',realworld:'A user reports their external monitor flickers. Describe your troubleshooting approach.',traps:'Confusing display connector types; not checking resolution/refresh rate compatibility.'}},
+  {id:13, ch:'Chapter 18', title:'Essentials of Networking', videos:['Introduction to Networking','Hexadecimal'],
+   prompts:{overview:'Explain fundamental networking concepts and hexadecimal number system for A+ exam.',terms:'LAN, WAN, MAC address, IP address, hexadecimal, binary, OSI model, TCP/IP.',process:'Convert the IP address 192.168.1.1 to binary and explain what each octet represents.',realworld:'A new employee needs network access. What networking components are involved?',traps:'Confusing MAC address with IP address; OSI layer responsibilities.'}},
+  {id:14, ch:'Chapter 19', title:'TCP/IP Basics', videos:['Introduction to TCP/IP','Network IDs and Subnet Masks','Special IP Addresses','Network Address Translation (NAT)','Dynamic IP Addressing','Working with Connections'],
+   prompts:{overview:'Explain TCP/IP addressing, subnetting, NAT, and DHCP for the A+ exam.',terms:'IP address, subnet mask, default gateway, DHCP, NAT, loopback (127.0.0.1), APIPA (169.254.x.x).',process:'Explain how a device gets an IP address using DHCP, step by step.',realworld:'A computer has an APIPA address (169.254.x.x). What does this indicate and what do you do?',traps:'Confusing public vs private IP ranges; misidentifying subnet masks; APIPA as a working configuration.'}},
+  {id:15, ch:'Chapter 20', title:'OS Networking and Network Troubleshooting', videos:['Working with DNS','Windows Naming','Working with Workgroups','Working with Active Directory','Windows Sharing','The net Command','Routers','Basic Router Configuration','Firewall Configuration','Windows Firewall','Port Forwarding','Advanced Router Configuration','Virtual LANs (VLANs)'],
+   prompts:{overview:'Explain DNS, Active Directory, network sharing, firewall configuration, and VLANs.',terms:'DNS, WINS, workgroup, domain, Active Directory, VLAN, port forwarding, firewall rule.',process:'Explain how DNS resolves a domain name when a user types a URL into a browser.',realworld:'Users on VLAN 10 cannot communicate with users on VLAN 20. What is the likely cause?',traps:'Confusing DNS vs WINS; workgroup vs domain limitations; VLANs requiring Layer 3 for inter-VLAN routing.'}},
+  {id:16, ch:'Chapter 21', title:'Wireless Networking', videos:['Wireless Network Hardware','Basic WAP Setup','Wireless Encryption','Connecting to Wi-Fi','Enterprise Wireless','Beyond Wi-Fi','Troubleshooting Wireless'],
+   prompts:{overview:'Explain wireless standards, encryption types, and wireless troubleshooting techniques.',terms:'802.11a/b/g/n/ac/ax, WPA2, WPA3, SSID, WAP, 2.4GHz, 5GHz, MIMO, enterprise wireless.',process:'Explain the difference between WPA2-Personal and WPA2-Enterprise and when each is used.',realworld:'Users in a conference room report slow Wi-Fi. What do you investigate first?',traps:'Confusing wireless standards and speeds; WPA vs WPA2 security differences; channel overlap on 2.4GHz.'}},
+  {id:17, ch:'Chapter 22', title:'Internet and SOHO Networking', videos:['Telnet and SSH','Remote Desktop Connections','The World Wide Web','File Transfer Protocol (FTP)','Proxy Servers','Virtual Private Networks (VPN)','Internet of Things (IoT)','Troubleshooting Internet Connections','Browser Security'],
+   prompts:{overview:'Explain internet protocols, remote access tools, VPNs, and browser security concepts.',terms:'SSH, RDP, FTP, SFTP, HTTP, HTTPS, VPN, proxy server, IoT, SSL/TLS, certificate.',process:'Compare Telnet and SSH. Why is SSH preferred and how does it work?',realworld:'A remote employee cannot connect via VPN. Walk through your troubleshooting steps.',traps:'Using Telnet instead of SSH; not verifying SSL certificates; assuming all IoT devices are secure.'}},
+  {id:18, ch:'Chapter 23', title:'Virtualization, Cloud Computing, and AI', videos:['Application Integration','AI Policies and Procedures','Limitations','Private vs. Public Cloud'],
+   prompts:{overview:'Explain virtualization concepts, cloud service models, and AI considerations in IT.',terms:'VM, hypervisor, Type 1/Type 2, IaaS, PaaS, SaaS, public/private/hybrid cloud, AI policy.',process:'Explain the difference between Type 1 and Type 2 hypervisors with examples.',realworld:'A company wants to move their servers to the cloud. Compare IaaS, PaaS, and SaaS options.',traps:'Confusing hypervisor types; cloud service model responsibilities (shared responsibility model).'}},
+  {id:19, ch:'Chapter 24', title:'Portable Computing', videos:['Laptop Features','Laptop Hardware Troubleshooting','Power Management'],
+   prompts:{overview:'Explain laptop-specific components, hardware troubleshooting, and power management.',terms:'LCD, OLED, inverter, Wi-Fi card, SO-DIMM, M.2, sleep, hibernate, battery calibration.',process:'Explain how to safely replace a laptop battery and keyboard.',realworld:'A laptop display is dark but the image is visible with a flashlight. What is the likely cause?',traps:'Confusing laptop vs desktop components; sleep vs hibernate behavior; battery calibration timing.'}},
+  {id:20, ch:'Chapter 25', title:'Mobile Devices', videos:['Touring Android','Touring iOS'],
+   prompts:{overview:'Compare Android and iOS mobile operating systems for the A+ exam.',terms:'Android, iOS, APK, App Store, Google Play, MDM, rooting, jailbreaking.',process:'Explain the difference between rooting an Android device and jailbreaking an iOS device.',realworld:'A user wants to install an app not in the App Store. What are the risks and alternatives?',traps:'Confusing Android vs iOS file systems; MDM enrollment requirements; security implications of rooting.'}},
+  {id:21, ch:'Chapter 26', title:'Maintaining and Securing Mobile Devices', videos:['Maintaining Mobile Devices','Mobile Devices and E-mail','Mobile Synchronization','Mobile Device Security','Mobile Security Troubleshooting'],
+   prompts:{overview:'Explain mobile device management, email configuration, sync, and security.',terms:'MDM, IMAP, POP3, Exchange ActiveSync, remote wipe, screen lock, encryption, 2FA.',process:'Describe how to configure corporate email on a mobile device using Exchange ActiveSync.',realworld:'A company-owned phone is reported stolen. What immediate steps do you take?',traps:'Confusing IMAP vs POP3 for mobile; not having remote wipe enabled before loss occurs.'}},
+  {id:22, ch:'Chapter 27', title:'Printers and Multifunction Devices', videos:['Installing a Local Printer','Sharing Printers'],
+   prompts:{overview:'Explain printer types, installation, sharing, and troubleshooting for A+.',terms:'laser printer, inkjet, thermal, 3D printer, print spooler, PCL, PostScript, driver.',process:'Explain the laser printing process in order (the 7 steps of laser printing).',realworld:'A user prints but pages come out with vertical black lines. What is the likely cause?',traps:'Confusing printer types and their maintenance; forgetting the print spooler when troubleshooting.'}},
+  {id:23, ch:'Chapter 28', title:'Essential Security Practices', videos:['Threats','Dealing with Threats','Physical Security','Passwords and Authentication','Multifactor Authentication (MFA)'],
+   prompts:{overview:'Explain security threats, authentication methods, physical security, and MFA.',terms:'MFA, biometrics, smart card, RFID, tailgating, mantrap, social engineering, zero-day.',process:'Explain the three factors of authentication and give an example of each.',realworld:'An employee holds the door open for an unknown person into a secure area. What policy was violated?',traps:'Confusing authentication factors; physical security often overlooked; MFA bypass methods.'}},
+  {id:24, ch:'Chapter 29', title:'Securing Endpoint Systems', videos:['Malware Part I & II','Anti-Malware','Social Engineering','Licensing','Incident Response','Environmental Controls'],
+   prompts:{overview:'Explain malware types, anti-malware strategies, social engineering, and incident response.',terms:'virus, worm, Trojan, ransomware, spyware, phishing, vishing, whaling, incident response, chain of custody.',process:'Describe the CompTIA A+ incident response steps when malware is detected.',realworld:'A user clicks a link and their files are suddenly encrypted. Describe your immediate response.',traps:'Confusing malware types; not isolating infected machines immediately; skipping documentation.'}},
+  {id:25, ch:'Chapter 30', title:'Operational Procedures', videos:['Documents You Need to Know','Data You Need to Know','Change Management','The Zen of Backup','Recycling and Data Destruction','Ticketing Systems'],
+   prompts:{overview:'Explain operational procedures, documentation, change management, backups, and data destruction.',terms:'SLA, AUP, NDA, change management, ticketing system, full backup, incremental, differential, shredding, degaussing.',process:'Explain the difference between full, incremental, and differential backups with use cases.',realworld:'A tech replaces a hard drive containing sensitive data. Describe proper data destruction methods.',traps:'Backup types: incremental vs differential restore time; improper data destruction methods; skipping change management.'}},
+];
+
+const NOTE_FIELDS = [
+  {id:'overview', icon:'📋', color:'#2563eb', title:'Chapter Overview', minChars:80, placeholder:'Summarize what this chapter covers and why it matters for CompTIA A+. What are the big ideas?'},
+  {id:'terms', icon:'🔑', color:'#7c3aed', title:'Key Terms & Definitions', minChars:100, placeholder:'Term: definition\nTerm: definition\n(List at least 5 key terms from this chapter)'},
+  {id:'process', icon:'⚙️', color:'#16a34a', title:'How It Works / Process Steps', minChars:80, placeholder:'Explain the main process, steps, or mechanism in your own words. Number your steps if there is a sequence.'},
+  {id:'realworld', icon:'🌐', color:'#d97706', title:'Real-World IT Scenario', minChars:60, placeholder:'Describe a real situation where a technician would use this knowledge. Be specific.'},
+  {id:'traps', icon:'⚠️', color:'#dc2626', title:'Common Exam Traps & Mistakes', minChars:50, placeholder:'What trips students up on the CompTIA A+ exam for this topic? List at least 2 traps.'},
+];
+
+// ── STATE ──
+const ST = {
+  view: 'notes',
+  chapter: null,
+  notes: loadLS('cn_notes', {}),
+  quizState: null,
+  selChaps: new Set(),
+  selTypes: new Set(['mc']),
+  quizData: null,
+  quizAnswers: {},
+  quizAnswered: 0,
+};
+
+function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function saveLS(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+// ── INIT ──
+function init(){
+  buildSidebar();
+  buildProgressCards();
+  buildChapChips();
+  buildChapterPanels();
+}
+
+// ── SIDEBAR ──
+function buildSidebar(){
+  const el=document.getElementById('sbChapters');
+  el.innerHTML=CHAPTERS.map(ch=>{
+    const score=calcChapterScore(ch.id);
+    const done=score===100;
+    return `<div class="sb-btn ${done?'done':''}" onclick="selectChapter(${ch.id})" id="sb-${ch.id}">
+      <div class="sb-check">${done?'✓':''}</div>
+      <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ch.ch}: ${ch.title}</span>
+      ${score>0?`<span class="sb-score">${score}%</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function filterChapters(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.sb-btn[id^="sb-"]').forEach(el=>{
+    el.style.display=(!q||el.textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+
+// ── PROGRESS CARDS ──
+function buildProgressCards(){
+  const el=document.getElementById('progressCards');
+  el.innerHTML=CHAPTERS.map(ch=>{
+    const score=calcChapterScore(ch.id);
+    const col=score===100?'var(--grn)':score>0?'var(--acc)':'var(--b1)';
+    return `<div onclick="selectChapter(${ch.id})" style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:12px;cursor:pointer;transition:all .15s" 
+        onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--b1)'">
+      <div style="font-size:9px;font-family:var(--mono);color:var(--ink4);margin-bottom:4px">${ch.ch}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:8px;line-height:1.3">${ch.title}</div>
+      <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:4px">
+        <div style="height:100%;background:${col};border-radius:2px;width:${score}%;transition:width .5s"></div>
+      </div>
+      <div style="font-size:10px;font-family:var(--mono);color:${score===100?'var(--grn)':'var(--ink4)'};">${score===100?'✓ Complete':score>0?score+'% done':'Not started'}</div>
+    </div>`;
+  }).join('');
+
+  const done=CHAPTERS.filter(ch=>calcChapterScore(ch.id)===100).length;
+  const overall=Math.round(CHAPTERS.reduce((s,ch)=>s+calcChapterScore(ch.id),0)/CHAPTERS.length);
+  document.getElementById('overallPct').textContent=overall+'% complete';
+  document.getElementById('chapDone').textContent=`${done}/${CHAPTERS.length} chapters`;
+}
+
+// ── SCORE CALC ──
+function calcChapterScore(id){
+  const n=ST.notes[id]||{};
+  const fields=['overview','terms','process','realworld','traps','cues','summary'];
+  let filled=0;
+  NOTE_FIELDS.forEach(f=>{const val=n[f.id]||'';if(val.length>=f.minChars)filled++;});
+  if(n.summary&&n.summary.length>=40)filled++;
+  if(n.cues&&n.cues.length>0)filled++;
+  return Math.round(filled/(NOTE_FIELDS.length+2)*100);
+}
+
+function getGrade(pct){
+  if(pct>=90)return{letter:'A',col:'var(--grn)'};
+  if(pct>=80)return{letter:'B',col:'var(--grn)'};
+  if(pct>=70)return{letter:'C',col:'var(--amb)'};
+  if(pct>=60)return{letter:'D',col:'var(--red)'};
+  return{letter:'F',col:'var(--red)'};
+}
+
+// ── BUILD CHAPTER PANELS ──
+function buildChapterPanels(){
+  const el=document.getElementById('chapterPanels');
+  el.innerHTML=CHAPTERS.map(ch=>`
+    <div class="panel" id="p-ch-${ch.id}" style="max-width:100%;display:none">
+      ${buildCornellHTML(ch)}
+    </div>`).join('');
+}
+
+function buildCornellHTML(ch){
+  const n=ST.notes[ch.id]||{};
+  const score=calcChapterScore(ch.id);
+  const grade=getGrade(score);
+  const cues=n.cues||['','',''];
+
+  return `
+  <div class="page-title">
+    <div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-bottom:4px">${ch.ch} · CompTIA A+ 220-1202</div>
+      <h2>${ch.title}</h2>
+      <p style="margin-top:4px">Videos: ${ch.videos.join(' · ')}</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="tag ${score===100?'green':score>0?'blue':'gray'}">${score}% complete</span>
+      <span class="tag ${score>=90?'green':score>=70?'amber':'red'}" id="grade-${ch.id}">${grade.letter}</span>
+    </div>
+  </div>
+
+  <div class="cornell-wrapper">
+    <!-- Header -->
+    <div class="cornell-header">
+      <div>
+        <div class="cn-chapter">${ch.ch}</div>
+        <div class="cn-title">${ch.title}</div>
+      </div>
+      <div class="cn-completion">
+        <span class="cn-pct" id="cpct-${ch.id}" style="color:${grade.col}">${score}%</span>
+        <div class="cn-ring" style="--p:${score}" id="cring-${ch.id}"><span>${grade.letter}</span></div>
+      </div>
+    </div>
+
+    <!-- Meta row -->
+    <div class="cornell-meta">
+      <div class="cm-field">
+        <div class="cm-label">Date</div>
+        <input class="cm-input" type="date" value="${n.date||''}" onchange="saveField(${ch.id},'date',this.value)">
+      </div>
+      <div class="cm-field">
+        <div class="cm-label">Day / Period</div>
+        <input class="cm-input" placeholder="Day 1 · Period 3" value="${n.period||''}" onchange="saveField(${ch.id},'period',this.value)">
+      </div>
+      <div class="cm-field">
+        <div class="cm-label">Student Code</div>
+        <input class="cm-input" placeholder="e.g. STU-007" value="${n.code||''}" onchange="saveField(${ch.id},'code',this.value)">
+      </div>
+    </div>
+
+    <!-- 2-column body -->
+    <div class="cornell-body">
+
+      <!-- LEFT: Cue column -->
+      <div class="cornell-cue">
+        <div class="cue-header">Cues / Keywords</div>
+        <div class="cue-body" id="cues-${ch.id}">
+          ${(n.cues||['','']).map((c,i)=>`
+            <div class="cue-item">
+              <div class="cue-label">Cue ${i+1}</div>
+              <textarea class="cue-input" rows="2" placeholder="Key term, question, or concept…" 
+                onchange="saveCue(${ch.id},${i},this.value)">${c}</textarea>
+            </div>`).join('')}
+          <button class="add-cue-btn" onclick="addCue(${ch.id})">+ Add Cue</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Notes column -->
+      <div class="cornell-notes">
+        <div class="notes-header">Notes · Fill all sections to complete this chapter</div>
+        ${NOTE_FIELDS.map(f=>{
+          const val=n[f.id]||'';
+          const ok=val.length>=f.minChars;
+          return `
+          <div class="note-section">
+            <div class="ns-header">
+              <div class="ns-icon" style="background:${f.color}22">${f.icon}</div>
+              <span class="ns-title">${f.title}</span>
+              <span class="ns-req">${f.minChars}+ chars ${ok?'✓':''}</span>
+            </div>
+            <textarea class="ns-textarea ${ok?'filled':''}" rows="4" 
+              placeholder="${f.placeholder}"
+              oninput="onNoteInput(${ch.id},'${f.id}',this)"
+              onchange="saveField(${ch.id},'${f.id}',this.value)">${val}</textarea>
+            <div class="ns-char-count ${ok?'ok':''}" id="cc-${ch.id}-${f.id}">${val.length}/${f.minChars} min chars</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+    </div><!-- /cornell-body -->
+
+    <!-- Summary -->
+    <div class="cornell-summary">
+      <div class="cs-header">📌 Summary — Write 2-3 sentences summarizing the most important concepts</div>
+      <textarea class="cs-textarea" rows="3" 
+        placeholder="In your own words, summarize the key takeaways from ${ch.title}. Focus on what a technician needs to know for the CompTIA A+ exam."
+        oninput="onSummaryInput(${ch.id},this)"
+        onchange="saveField(${ch.id},'summary',this.value)">${n.summary||''}</textarea>
+    </div>
+
+    <!-- Completion bar -->
+    <div class="completion-strip">
+      <span style="font-size:11px;font-weight:600;color:var(--ink2)">Completion</span>
+      <div class="cs-bar-wrap"><div class="cs-bar-fill" id="cbar-${ch.id}" style="width:${score}%"></div></div>
+      <span class="cs-pct-txt" id="cpct2-${ch.id}">${score}%</span>
+      <span class="cs-grade" id="cgrade-${ch.id}">${score===100?'★ Complete':score>=70?'Good progress':'Keep going'}</span>
+      <button class="cs-save-btn" onclick="saveNotes(${ch.id})">Save Notes</button>
+      <span class="cs-auto" id="auto-${ch.id}">✓ Saved</span>
+    </div>
+
+  </div>`;
+}
+
+// ── NOTE INTERACTIONS ──
+function onNoteInput(id,field,el){
+  const val=el.value;const f=NOTE_FIELDS.find(f=>f.id===field);
+  const ok=val.length>=(f?.minChars||50);
+  el.classList.toggle('filled',ok);
+  const cc=document.getElementById(`cc-${id}-${field}`);
+  if(cc){cc.textContent=`${val.length}/${f?.minChars||50} min chars`;cc.classList.toggle('ok',ok);}
+  // Auto-save debounce
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{saveField(id,field,val);updateChapterScore(id);},1000);
+}
+
+function onSummaryInput(id,el){
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{saveField(id,'summary',el.value);updateChapterScore(id);},1000);
+}
+
+function saveField(id,field,val){
+  if(!ST.notes[id])ST.notes[id]={};
+  ST.notes[id][field]=val;
+  saveLS('cn_notes',ST.notes);
+  updateChapterScore(id);
+  const ai=document.getElementById(`auto-${id}`);
+  if(ai){ai.classList.add('show');setTimeout(()=>ai.classList.remove('show'),2000);}
+}
+
+function saveCue(id,idx,val){
+  if(!ST.notes[id])ST.notes[id]={};
+  const cues=ST.notes[id].cues||[];
+  cues[idx]=val;
+  ST.notes[id].cues=cues;
+  saveLS('cn_notes',ST.notes);
+  updateChapterScore(id);
+}
+
+function addCue(id){
+  if(!ST.notes[id])ST.notes[id]={};
+  const cues=ST.notes[id].cues||[];
+  cues.push('');
+  ST.notes[id].cues=cues;
+  saveLS('cn_notes',ST.notes);
+  // Re-render cue column
+  const el=document.getElementById(`cues-${id}`);
+  if(el){
+    const btn=el.querySelector('.add-cue-btn');
+    const div=document.createElement('div');div.className='cue-item';
+    div.innerHTML=`<div class="cue-label">Cue ${cues.length}</div>
+      <textarea class="cue-input" rows="2" placeholder="Key term, question, or concept…" 
+        onchange="saveCue(${id},${cues.length-1},this.value)"></textarea>`;
+    el.insertBefore(div,btn);
+  }
+}
+
+function updateChapterScore(id){
+  const score=calcChapterScore(id);
+  const grade=getGrade(score);
+  const bar=document.getElementById(`cbar-${id}`);
+  const pct=document.getElementById(`cpct2-${id}`);
+  const pct1=document.getElementById(`cpct-${id}`);
+  const gradeEl=document.getElementById(`grade-${id}`);
+  const ring=document.getElementById(`cring-${id}`);
+  const gLabel=document.getElementById(`cgrade-${id}`);
+  if(bar)bar.style.width=score+'%';
+  if(pct)pct.textContent=score+'%';
+  if(pct1){pct1.textContent=score+'%';pct1.style.color=grade.col;}
+  if(gradeEl)gradeEl.textContent=grade.letter;
+  if(ring){ring.style.background=`conic-gradient(var(--grn) ${score}%,rgba(0,0,0,0.15) 0)`;ring.querySelector('span').textContent=grade.letter;}
+  if(gLabel)gLabel.textContent=score===100?'★ Complete':score>=70?'Good progress':'Keep going';
+  // Update sidebar
+  const sbEl=document.getElementById(`sb-${id}`);
+  if(sbEl){
+    sbEl.classList.toggle('done',score===100);
+    let scoreEl=sbEl.querySelector('.sb-score');
+    if(score>0){if(!scoreEl){scoreEl=document.createElement('span');scoreEl.className='sb-score';sbEl.appendChild(scoreEl);}scoreEl.textContent=score+'%';}
+    sbEl.querySelector('.sb-check').textContent=score===100?'✓':'';
+  }
+  buildProgressCards();
+}
+
+function saveNotes(id){
+  saveLS('cn_notes',ST.notes);
+  updateChapterScore(id);
+  toast('Notes saved!','ok');
+}
+
+// ── SELECT CHAPTER ──
+function selectChapter(id){
+  ST.chapter=id;
+  setView('notes');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById(`p-ch-${id}`);
+  if(panel){panel.style.display='flex';panel.classList.add('active');}
+  document.getElementById('p-overview').classList.remove('active');
+  // Update sidebar
+  document.querySelectorAll('.sb-btn[id^="sb-"]').forEach(el=>el.classList.remove('active'));
+  document.getElementById(`sb-${id}`)?.classList.add('active');
+  // Scroll
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── QUIZ BUILDER ──
+function buildChapChips(){
+  document.getElementById('chapChips').innerHTML=CHAPTERS.map(ch=>`
+    <div class="ch-chip" onclick="toggleChap(${ch.id},this)" id="chip-${ch.id}">
+      <div class="chip-check"></div>
+      ${ch.ch}
+    </div>`).join('');
+}
+
+function toggleChap(id,el){
+  if(ST.selChaps.has(id)){ST.selChaps.delete(id);el.classList.remove('sel');}
+  else{ST.selChaps.add(id);el.classList.add('sel');}
+  updateSelSummary();
+}
+function selectAllChaps(){CHAPTERS.forEach(ch=>{ST.selChaps.add(ch.id);document.getElementById(`chip-${ch.id}`)?.classList.add('sel');});updateSelSummary();}
+function clearChaps(){ST.selChaps.clear();document.querySelectorAll('.ch-chip').forEach(el=>el.classList.remove('sel'));updateSelSummary();}
+
+function updateSelSummary(){
+  const el=document.getElementById('selSummary');
+  el.textContent=ST.selChaps.size===0?'Nothing selected':`${ST.selChaps.size} chapter${ST.selChaps.size>1?'s':''} selected`;
+}
+
+function toggleQType(el,type){
+  if(ST.selTypes.has(type)){if(ST.selTypes.size===1)return;ST.selTypes.delete(type);el.classList.remove('sel');}
+  else{ST.selTypes.add(type);el.classList.add('sel');}
+}
+
+// ── GENERATE QUIZ ──
+async function generateQuiz(){
+  if(ST.selChaps.size===0){toast('Select at least one chapter','err');return;}
+  if(ST.selTypes.size===0){toast('Select at least one question type','err');return;}
+
+  const btn=document.getElementById('genQuizBtn');
+  btn.disabled=true;btn.textContent='⚡ Generating Quiz…';
+  document.getElementById('quizDisplay').style.display='none';
+
+  const chapters=CHAPTERS.filter(ch=>ST.selChaps.has(ch.id));
+  const types=[...ST.selTypes];
+  const count=parseInt(document.getElementById('qCount').value);
+  const diff=document.getElementById('qDiff').value;
+  const level=document.getElementById('qLevel').value;
+  const name=document.getElementById('qName').value||`${chapters.map(c=>c.ch).join(', ')} Quiz`;
+
+  const chapSummary=chapters.map(ch=>`${ch.ch}: ${ch.title} (topics: ${ch.videos.slice(0,3).join(', ')})`).join('\n');
+  const typeInstructions={
+    mc:`Multiple choice: 4 options A-D, CompTIA qualifier word (BEST/FIRST/MOST/NEXT), plausible distractors`,
+    tf:`True/False: clear factual statements, mix of true and false`,
+    match:`Mix & Match: 4 term-definition pairs that could realistically be confused`,
+    open:`Open Response: 2-4 sentence realistic IT scenario with a constraint and qualifier word, written like CompTIA scenario questions. Include a model answer with bullet points.`
+  };
+  const typeDescs=types.map(t=>typeInstructions[t]).join('\n');
+
+  const prompt=`Generate a ${count}-question CompTIA A+ 220-1202 quiz for high school students.
+Chapters covered:\n${chapSummary}
+Difficulty: ${diff} · Level: ${level}
+Question types to include (distribute evenly): ${types.join(', ')}
+
+${typeDescs}
+
+Return JSON array of exactly ${count} questions:
+[
+  {"type":"mc","q":"question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"...","chapter":"Ch X"},
+  {"type":"tf","q":"statement","answer":true,"rationale":"...","chapter":"Ch X"},
+  {"type":"match","pairs":[{"term":"...","def":"..."},{"term":"...","def":"..."},{"term":"...","def":"..."},{"term":"...","def":"..."}],"chapter":"Ch X"},
+  {"type":"open","scenario":"2-4 sentence IT scenario with constraint and qualifier word","prompt":"What should the technician do FIRST?","modelAnswer":"bullet point model answer with CompTIA reasoning","chapter":"Ch X"}
+]
+
+Rules: vary chapters, no repeated questions, realistic IT scenarios, CompTIA exam style wording.`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown.',messages:[{role:'user',content:prompt}]})});
+    const d=await resp.json();
+    const text=d.content?.map(c=>c.text||'').join('')||'';
+    const clean=text.replace(/```json\n?|\n?```/g,'').trim();
+    const questions=JSON.parse(clean);
+    ST.quizData=questions;
+    ST.quizAnswers={};
+    ST.quizAnswered=0;
+    renderQuiz(name,chapters,types,diff);
+    toast(`${questions.length} questions generated!`,'ok');
+  }catch(e){toast('Generation failed — try again','err');console.error(e);}
+
+  btn.disabled=false;btn.textContent='⚡ Generate Quiz';
+}
+
+// ── RENDER QUIZ ──
+function renderQuiz(name,chapters,types,diff){
+  const el=document.getElementById('quizDisplay');
+  el.style.display='block';
+  document.getElementById('quizTitle').textContent=name;
+  document.getElementById('quizMeta').innerHTML=`
+    <span class="tag blue">${ST.quizData.length} questions</span>
+    <span class="tag gray">${types.join(' · ')}</span>
+    <span class="tag ${diff==='hard'?'red':diff==='easy'?'green':'amber'}">${diff}</span>`;
+  updateProgress();
+
+  const qs=document.getElementById('quizQs');
+  qs.innerHTML=ST.quizData.map((q,i)=>renderQuestion(q,i)).join('');
+  el.scrollIntoView({behavior:'smooth'});
+}
+
+function renderQuestion(q,i){
+  const typeLabel={mc:'Multiple Choice',tf:'True / False',match:'Mix & Match',open:'Open Response'};
+  let body='';
+
+  if(q.type==='mc'){
+    body=`<div class="opts">
+      ${['A','B','C','D'].map(l=>`
+        <div class="opt" onclick="selectOpt(${i},'${l}',this)" data-opt="${l}">
+          <div class="opt-ltr">${l}</div>
+          <div class="opt-txt">${q.opts[l]}</div>
+        </div>`).join('')}
+    </div>`;
+  } else if(q.type==='tf'){
+    body=`<div class="tf-opts">
+      <div class="tf-opt" onclick="selectTF(${i},true,this)" data-tf="true">True</div>
+      <div class="tf-opt" onclick="selectTF(${i},false,this)" data-tf="false">False</div>
+    </div>`;
+  } else if(q.type==='match'){
+    const shuffled=[...q.pairs].sort(()=>Math.random()-.5);
+    body=`<div class="match-grid">
+      <div class="match-col" id="terms-${i}">
+        ${q.pairs.map((p,j)=>`<div class="match-item" onclick="selectMatchTerm(${i},${j},this)" data-idx="${j}">${p.term}</div>`).join('')}
+      </div>
+      <div class="match-arrows">
+        ${q.pairs.map(()=>`<div class="match-arrow">→</div>`).join('')}
+      </div>
+      <div class="match-col" id="defs-${i}">
+        ${shuffled.map((p,j)=>`<div class="match-item" onclick="selectMatchDef(${i},j,this,'${p.def.replace(/'/g,"\\'")}',${q.pairs.findIndex(pp=>pp.def===p.def)})" data-def="${p.def.substring(0,20)}">${p.def}</div>`).join('')}
+      </div>
+    </div>`;
+  } else if(q.type==='open'){
+    body=`<div class="open-scenario">${q.scenario}</div>
+      <div class="open-prompt">📝 ${q.prompt||'What should the technician do FIRST?'}</div>
+      <textarea class="open-textarea" rows="4" placeholder="Write your response in CompTIA A+ style. Identify the qualifier word, key evidence from the scenario, and explain your reasoning step by step." id="open-${i}"></textarea>
+      <button class="check-open-btn" onclick="checkOpen(${i})">Check My Answer</button>
+      <div class="open-feedback" id="of-${i}"></div>`;
+  }
+
+  return `<div class="q-block" id="qb-${i}">
+    <div class="q-num">
+      <span>Q${i+1}</span>
+      <span class="q-type-badge">${typeLabel[q.type]||q.type}</span>
+      <span style="font-size:9px;color:var(--ink4)">${q.chapter||''}</span>
+    </div>
+    <div class="q-text">${q.q||q.scenario||'Match the terms to their definitions'}</div>
+    ${body}
+    <div class="rationale" id="rat-${i}">${q.rationale||q.modelAnswer||''}</div>
+  </div>`;
+}
+
+// ── QUIZ INTERACTIONS ──
+let matchSelTerm={};
+
+function selectOpt(i,letter,el){
+  if(ST.quizAnswers[i]!==undefined)return;
+  el.closest('.opts').querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  ST.quizAnswers[i]=letter;
+  updateProgress();
+}
+
+function selectTF(i,val,el){
+  if(ST.quizAnswers[i]!==undefined)return;
+  el.closest('.tf-opts').querySelectorAll('.tf-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  ST.quizAnswers[i]=val;
+  updateProgress();
+}
+
+function selectMatchTerm(i,j,el){
+  document.querySelectorAll(`#terms-${i} .match-item`).forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  matchSelTerm[i]=j;
+}
+
+function selectMatchDef(i,j,el,def,correctIdx){
+  const termIdx=matchSelTerm[i];
+  if(termIdx===undefined)return;
+  if(!ST.quizAnswers[i])ST.quizAnswers[i]={};
+  ST.quizAnswers[i][termIdx]=correctIdx;
+  el.classList.add('matched');
+  document.getElementById(`terms-${i}`)?.querySelectorAll('.match-item')[termIdx]?.classList.add('matched');
+  delete matchSelTerm[i];
+  if(Object.keys(ST.quizAnswers[i]).length===4)updateProgress();
+}
+
+async function checkOpen(i){
+  const ta=document.getElementById(`open-${i}`);
+  const resp=ta?.value.trim();
+  if(!resp||resp.length<20){toast('Write a more complete response first','err');return;}
+  const q=ST.quizData[i];
+  const btn=ta.nextElementSibling;
+  btn.disabled=true;btn.textContent='Checking…';
+  try{
+    const j=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:'You are a CompTIA A+ instructor. Give brief, encouraging feedback on a student\'s open response. Keep it under 80 words. Note what they got right, what was missing, and the key points from the model answer.',messages:[{role:'user',content:`Question/Scenario: ${q.scenario}\nPrompt: ${q.prompt}\nModel answer: ${q.modelAnswer}\nStudent response: ${resp}\n\nGive feedback in this format: "✓ What you got right: ... | ✗ What was missing: ... | Key point: ..."`}]})});
+    const data=await j.json();
+    const feedback=data.content?.map(c=>c.text||'').join('')||'';
+    const fb=document.getElementById(`of-${i}`);
+    fb.innerHTML=`<strong>Feedback:</strong> ${feedback}<br><br><strong>Model Answer:</strong> ${q.modelAnswer}`;
+    fb.classList.add('show');
+    ST.quizAnswers[i]='checked';
+    updateProgress();
+  }catch(e){toast('Check failed','err');}
+  btn.disabled=false;btn.textContent='Check My Answer';
+}
+
+function updateProgress(){
+  const total=ST.quizData?.length||0;
+  const answered=Object.keys(ST.quizAnswers).length;
+  const pct=total?Math.round(answered/total*100):0;
+  document.getElementById('qProgress').style.width=pct+'%';
+  document.getElementById('qProgressLabel').textContent=`${answered} of ${total} answered`;
+  document.getElementById('qAnsweredCount').textContent=`${answered} / ${total} answered`;
+}
+
+// ── SUBMIT QUIZ ──
+function submitQuiz(){
+  const qs=ST.quizData;if(!qs)return;
+  let correct=0,total=0,breakdown={mc:0,mcTotal:0,tf:0,tfTotal:0,match:0,matchTotal:0,open:0,openTotal:0};
+
+  qs.forEach((q,i)=>{
+    const ans=ST.quizAnswers[i];
+    if(q.type==='mc'){
+      breakdown.mcTotal++;
+      const correct_q=ans===q.answer;
+      if(correct_q){correct++;breakdown.mc++;}
+      // Highlight
+      document.querySelectorAll(`#qb-${i} .opt`).forEach(el=>{
+        const l=el.dataset.opt;
+        if(l===q.answer)el.classList.add('correct');
+        else if(l===ans&&l!==q.answer)el.classList.add('wrong');
+      });
+      document.getElementById(`rat-${i}`)?.classList.add('show');
+      total++;
+    } else if(q.type==='tf'){
+      breakdown.tfTotal++;
+      const correct_q=String(ans)===String(q.answer);
+      if(correct_q){correct++;breakdown.tf++;}
+      document.querySelectorAll(`#qb-${i} .tf-opt`).forEach(el=>{
+        const v=el.dataset.tf==='true';
+        if(v===q.answer)el.classList.add('correct');
+        else if(String(v)===String(ans)&&v!==q.answer)el.classList.add('wrong');
+      });
+      document.getElementById(`rat-${i}`)?.classList.add('show');
+      total++;
+    } else if(q.type==='match'){
+      breakdown.matchTotal+=4;
+      const matched=ans||{};
+      let matchScore=0;
+      Object.entries(matched).forEach(([termIdx,defIdx])=>{if(parseInt(termIdx)===parseInt(defIdx)){matchScore++;correct++;}});
+      breakdown.match+=matchScore;
+      total+=4;
+    } else if(q.type==='open'){
+      breakdown.openTotal++;
+      if(ans==='checked'){correct++;breakdown.open++;total++;}
+      else total++;
+    }
+  });
+
+  const pct=total?Math.round(correct/total*100):0;
+  const grade=getGrade(pct);
+
+  // Show modal
+  document.getElementById('smGrade').textContent=pct+'%';
+  document.getElementById('smGrade').style.color=grade.col;
+  document.getElementById('smLabel').textContent=`${grade.letter} · ${correct} of ${total} correct · ${pct>=70?'PASS':'NEEDS REVIEW'}`;
+  document.getElementById('smFill').style.width=pct+'%';
+  document.getElementById('smFill').style.background=grade.col;
+
+  let bd='';
+  if(breakdown.mcTotal)bd+=`<div class="sm-stat"><div class="sm-stat-label">Multiple Choice</div><div class="sm-stat-val" style="color:${getGrade(Math.round(breakdown.mc/breakdown.mcTotal*100)).col}">${breakdown.mc}/${breakdown.mcTotal}</div></div>`;
+  if(breakdown.tfTotal)bd+=`<div class="sm-stat"><div class="sm-stat-label">True / False</div><div class="sm-stat-val" style="color:${getGrade(Math.round(breakdown.tf/breakdown.tfTotal*100)).col}">${breakdown.tf}/${breakdown.tfTotal}</div></div>`;
+  if(breakdown.matchTotal)bd+=`<div class="sm-stat"><div class="sm-stat-label">Mix & Match</div><div class="sm-stat-val" style="color:${getGrade(Math.round(breakdown.match/breakdown.matchTotal*100)).col}">${breakdown.match}/${breakdown.matchTotal}</div></div>`;
+  if(breakdown.openTotal)bd+=`<div class="sm-stat"><div class="sm-stat-label">Open Response</div><div class="sm-stat-val">${breakdown.open}/${breakdown.openTotal}</div></div>`;
+  document.getElementById('smBreakdown').innerHTML=bd;
+  document.getElementById('scoreModal').classList.add('open');
+}
+
+function closeScoreModal(){document.getElementById('scoreModal').classList.remove('open');}
+
+function resetQuiz(){
+  ST.quizAnswers={};ST.quizAnswered=0;ST.quizData=null;
+  document.getElementById('quizDisplay').style.display='none';
+}
+
+// ── VIEWS ──
+function setView(v){
+  ST.view=v;
+  document.getElementById('viewNotes').style.display=v==='notes'?'flex':'none';
+  document.getElementById('viewQuiz').style.display=v==='quiz'?'':'none';
+  document.getElementById('vNotes').classList.toggle('on',v==='notes');
+  document.getElementById('vQuiz').classList.toggle('on',v==='quiz');
+}
+
+// ── EXPORT ──
+function exportNotes(){
+  const lines=['CompTIA A+ 220-1202 — Cornell Notes Export\n','='.repeat(50),'\n'];
+  CHAPTERS.forEach(ch=>{
+    const n=ST.notes[ch.id]||{};
+    const score=calcChapterScore(ch.id);
+    lines.push(`\n${ch.ch}: ${ch.title} (${score}% complete)\n${'-'.repeat(40)}`);
+    lines.push(`Date: ${n.date||'—'} | Period: ${n.period||'—'}`);
+    if(n.cues?.length)lines.push(`\nCues/Keywords:\n${n.cues.filter(Boolean).map(c=>`  • ${c}`).join('\n')}`);
+    NOTE_FIELDS.forEach(f=>{if(n[f.id])lines.push(`\n${f.title}:\n${n[f.id]}`);});
+    if(n.summary)lines.push(`\nSummary:\n${n.summary}`);
+    lines.push('\n');
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='CompTIA_A+_Cornell_Notes.txt';a.click();
+  toast('Notes exported!','ok');
+}
+
+// ── TOAST ──
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+init();
+</script>
+<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('notes');}
+}
+</script>
+</body>
+</html>

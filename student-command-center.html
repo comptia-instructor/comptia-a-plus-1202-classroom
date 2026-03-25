@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Student Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050810; --s1:#0a0d17; --s2:#0f1220; --s3:#141828; --s4:#1a2035;
+  --b1:#1e2540; --b2:#283054; --b3:#334068;
+  --tx:#c8d0e8; --tx2:#7a85a8; --tx3:#424d6a; --tx4:#2a3350;
+  --acc:#00c8ff; --acc2:#0099cc; --acc-d:rgba(0,212,255,0.1); --acc-g:rgba(0,212,255,0.04);
+  --grn:#00ff88; --grn2:#00cc6a; --grn-d:rgba(0,255,136,0.1);
+  --amb:#ffaa00; --amb-d:rgba(255,170,0,0.1);
+  --red:#ff4466; --red-d:rgba(255,68,102,0.1);
+  --pur:#aa55ff; --pur-d:rgba(170,85,255,0.1);
+  --pnk:#ff55aa; --pnk-d:rgba(255,85,170,0.1);
+  --cya:#55ffee; --cya-d:rgba(85,255,238,0.1);
+  --d1:#1e3a5f; --d2:#1a4a3a; --d3:#4a3a1a; --d4:#3a1a4a; --d5:#4a1a2a;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+  --r:6px; --rl:12px; --rxl:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;font-size:14px;cursor:default}
+
+/* Atmospheric background */
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(0,212,255,0.06) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 100%,rgba(0,255,136,0.04) 0%,transparent 50%),
+             repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,0.02) 39px,rgba(0,212,255,0.02) 40px),
+             repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,0.02) 39px,rgba(0,212,255,0.02) 40px);
+  pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--b1);padding:0 28px;display:flex;align-items:center;gap:20px;background:rgba(6,8,16,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:300;height:56px}
+.logo-block{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-icon{width:32px;height:32px;border:1.5px solid var(--acc);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--acc);letter-spacing:.5px;position:relative;overflow:hidden}
+.logo-icon::before{content:'';position:absolute;inset:0;background:var(--acc-d)}
+.logo-title{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:1px;color:var(--tx);text-transform:uppercase}
+.logo-sub{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;margin-top:1px}
+.header-code{font-family:var(--mono);font-size:11px;color:var(--acc);background:var(--acc-d);border:1px solid var(--acc);padding:4px 10px;border-radius:4px;letter-spacing:1px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.hbadge{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:3px;letter-spacing:.5px}
+.hb-streak{background:var(--amb-d);border:1px solid var(--amb);color:var(--amb)}
+.hb-ready{background:var(--grn-d);border:1px solid var(--grn);color:var(--grn)}
+
+/* ── NAV ── */
+nav{display:flex;gap:2px;padding:0 20px;background:var(--s1);border-bottom:1px solid var(--b1);overflow-x:auto}
+nav::-webkit-scrollbar{height:2px}
+.nav-btn{padding:12px 18px;font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.nav-btn:hover{color:var(--tx2)}
+.nav-btn.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto}
+.panel{display:none;padding:28px;max-width:1200px;margin:0 auto;flex-direction:column;gap:20px}
+.panel.active{display:flex}
+
+/* ── LOGIN ── */
+.login-screen{min-height:calc(100vh - 56px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px}
+.login-icon{font-family:var(--display);font-size:80px;font-weight:800;color:var(--acc);letter-spacing:-4px;line-height:1;text-shadow:0 0 60px rgba(0,212,255,0.3)}
+.login-title{font-family:var(--display);font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tx)}
+.login-sub{font-family:var(--mono);font-size:11px;color:var(--tx3);letter-spacing:1px;text-align:center;line-height:1.8}
+.login-input{font-family:var(--mono);font-size:18px;letter-spacing:4px;text-align:center;text-transform:uppercase;width:220px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:14px;color:var(--acc);outline:none;transition:border-color .2s}
+.login-input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,212,255,0.1)}
+.login-btn{padding:12px 32px;background:var(--acc);color:var(--bg);font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;border-radius:var(--r);cursor:pointer;transition:all .2s;width:220px}
+.login-btn:hover{background:var(--acc2);transform:translateY(-2px)}
+.login-privacy{font-family:var(--mono);font-size:9px;color:var(--tx3);text-align:center;line-height:1.8;max-width:280px}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.3),transparent)}
+.card-header{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b1);background:rgba(255,255,255,0.02)}
+.card-header h2{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx);flex:1}
+.card-body{padding:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* ── STAT BOXES ── */
+.stat-box{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-box:hover{border-color:var(--b2)}
+.stat-box::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.stat-box.acc::after{background:var(--acc)}
+.stat-box.grn::after{background:var(--grn)}
+.stat-box.amb::after{background:var(--amb)}
+.stat-box.pur::after{background:var(--pur)}
+.stat-box.red::after{background:var(--red)}
+.sb-label{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.sb-val{font-family:var(--display);font-size:36px;font-weight:800;line-height:1;letter-spacing:-1px}
+.sb-sub{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:6px}
+
+/* ── READINESS PREDICTOR ── */
+.readiness-hero{background:linear-gradient(135deg,var(--s2) 0%,rgba(0,212,255,0.05) 100%);border:1px solid var(--b1);border-radius:var(--rl);padding:28px;display:flex;gap:28px;align-items:center;position:relative;overflow:hidden}
+.readiness-hero::before{content:'PASS PROBABILITY';position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--tx4)}
+.rh-ring-wrap{flex-shrink:0;position:relative;width:160px;height:160px}
+.rh-ring-svg{width:160px;height:160px;transform:rotate(-90deg)}
+.rh-ring-bg{fill:none;stroke:var(--b2);stroke-width:8}
+.rh-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
+.rh-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.rh-pct{font-family:var(--display);font-size:44px;font-weight:800;line-height:1;letter-spacing:-2px}
+.rh-status{font-family:var(--mono);font-size:9px;letter-spacing:1px;margin-top:4px}
+.rh-info{flex:1}
+.rh-title{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tx);margin-bottom:8px}
+.rh-desc{font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:16px}
+.domain-bars{display:flex;flex-direction:column;gap:8px}
+.domain-bar{display:flex;align-items:center;gap:10px}
+.db-label{font-family:var(--mono);font-size:9px;color:var(--tx2);width:130px;flex-shrink:0;letter-spacing:.3px}
+.db-track{flex:1;height:4px;background:var(--b1);border-radius:2px;overflow:hidden}
+.db-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.db-pct{font-family:var(--mono);font-size:9px;color:var(--tx3);min-width:32px;text-align:right}
+
+/* ── RADAR CHART ── */
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:16px;background:var(--s2);border-radius:var(--r)}
+.radar-svg{overflow:visible}
+
+/* ── ACHIEVEMENTS ── */
+.achievement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.badge{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px;text-align:center;transition:all .2s;position:relative;overflow:hidden}
+.badge.earned{border-color:var(--amb)}
+.badge.earned::before{content:'';position:absolute;inset:0;background:var(--amb-d)}
+.badge.locked{opacity:.4;filter:grayscale(1)}
+.badge-icon{font-size:28px;margin-bottom:8px;display:block}
+.badge-name{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx2);margin-bottom:3px}
+.badge.earned .badge-name{color:var(--amb)}
+.badge-desc{font-size:10px;color:var(--tx3);line-height:1.5}
+
+/* Streak display */
+.streak-display{display:flex;gap:6px;margin-bottom:16px}
+.streak-day{width:28px;height:28px;border-radius:5px;background:var(--s3);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono)}
+.streak-day.active{background:var(--amb-d);border-color:var(--amb);color:var(--amb)}
+.streak-day.today{background:var(--amb);color:var(--bg);font-weight:700}
+
+/* ── CONFUSION FLAG ── */
+.confusion-btn{width:100%;padding:14px;background:var(--s2);border:1.5px dashed var(--red);border-radius:var(--r);color:var(--red);font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.confusion-btn:hover{background:var(--red-d);border-style:solid}
+.confusion-btn.flagged{background:var(--red-d);border-style:solid;opacity:.7}
+.confusion-topic{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;margin-top:8px;transition:border-color .2s}
+.confusion-topic:focus{border-color:var(--red)}
+.confusion-topic::placeholder{color:var(--tx3)}
+.confusion-log{margin-top:12px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto}
+.cf-item{padding:8px 12px;background:var(--s3);border-radius:var(--r);border-left:2px solid var(--red);display:flex;justify-content:space-between;align-items:center}
+.cf-topic{font-size:11px;color:var(--tx2)}
+.cf-time{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.cf-count{background:var(--red-d);border:1px solid var(--red);color:var(--red);font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px}
+
+/* ── GLOSSARY ── */
+.glossary-search{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:10px 14px;color:var(--tx);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;margin-bottom:14px}
+.glossary-search:focus{border-color:var(--acc)}
+.glossary-search::placeholder{color:var(--tx3)}
+.chapter-filter{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.cf-chip{padding:4px 10px;border-radius:20px;font-size:10px;font-family:var(--mono);border:1px solid var(--b2);color:var(--tx3);cursor:pointer;transition:all .15s}
+.cf-chip:hover{border-color:var(--b3);color:var(--tx2)}
+.cf-chip.active{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+.term-grid{display:flex;flex-direction:column;gap:4px}
+.term-row{display:flex;gap:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);transition:border-color .2s;cursor:pointer;align-items:flex-start}
+.term-row:hover{border-color:var(--b2)}
+.term-row.review{border-color:var(--amb)}
+.term-word{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--acc);min-width:160px;flex-shrink:0}
+.term-def{font-size:12px;color:var(--tx2);line-height:1.5;flex:1}
+.term-ch{font-family:var(--mono);font-size:9px;color:var(--tx3);flex-shrink:0}
+.term-tag{font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;margin-left:4px}
+.term-tag.review{background:var(--amb-d);color:var(--amb);border:1px solid var(--amb)}
+.term-tag.mastered{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn)}
+
+/* ── SPACED REPETITION ── */
+.sr-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:transform .6s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;min-height:200px;position:relative}
+.sr-card.flipped{transform:rotateY(180deg)}
+.sr-face{position:absolute;inset:0;backface-visibility:hidden;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.sr-back{transform:rotateY(180deg);background:var(--s3)}
+.sr-face-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:14px}
+.sr-face-text{font-family:var(--display);font-size:20px;font-weight:600;color:var(--tx);line-height:1.4;max-width:400px}
+.sr-face-answer{font-size:14px;color:var(--grn);line-height:1.6;max-width:440px}
+.sr-nav{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.sr-result{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.sr-counter{font-family:var(--mono);font-size:10px;color:var(--tx3);text-align:center;margin-top:6px}
+.sr-queue{background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:8px 14px;font-family:var(--mono);font-size:10px;color:var(--acc2);margin-bottom:14px;text-align:center}
+
+/* ── PREP VIEW ── */
+.prep-section{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.prep-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.prep-icon{font-size:16px}
+.prep-title{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx2)}
+.prep-status{margin-left:auto;font-family:var(--mono);font-size:9px}
+.prep-content{font-size:12px;color:var(--tx2);line-height:1.7}
+
+/* ── PROGRESS REPORT ── */
+.report-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden}
+.report-header{background:var(--s2);border-bottom:1px solid var(--b1);padding:20px 24px;display:flex;justify-content:space-between;align-items:flex-start}
+.report-title{font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--tx)}
+.report-code{font-family:var(--mono);font-size:11px;color:var(--acc);margin-top:4px}
+.report-body{padding:24px;display:flex;flex-direction:column;gap:16px}
+.report-section-title{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--b1)}
+.report-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b1)}
+.report-row:last-child{border-bottom:none}
+.rr-label{font-size:12px;color:var(--tx2)}
+.rr-val{font-family:var(--mono);font-size:12px;font-weight:500}
+
+/* ── MISC ── */
+.btn{padding:8px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-acc:hover{background:var(--acc2)}
+.btn-grn{background:var(--grn);color:var(--bg)}
+.btn-grn:hover{background:var(--grn2)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{border-color:var(--b3);color:var(--tx)}
+.btn-red{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.btn-amb{background:var(--amb-d);border:1px solid var(--amb);color:var(--amb)}
+.btn-sm{padding:5px 12px;font-size:10px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.3px}
+.tag.acc{background:var(--acc-d);color:var(--acc);border:1px solid var(--acc)}
+.tag.grn{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn)}
+.tag.amb{background:var(--amb-d);color:var(--amb);border:1px solid var(--amb)}
+.tag.red{background:var(--red-d);color:var(--red);border:1px solid var(--red)}
+.tag.pur{background:var(--pur-d);color:var(--pur);border:1px solid var(--pur)}
+.divider{height:1px;background:var(--b1);margin:8px 0}
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--tx3);font-family:var(--mono);font-size:11px;padding:20px;letter-spacing:.5px}
+.loading::before{content:'';width:14px;height:14px;border:1.5px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--tx);z-index:1000;opacity:0;transform:translateY(8px);transition:all .25s;letter-spacing:.3px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--red);color:var(--red)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease forwards}
+.fade-up:nth-child(1){animation-delay:.05s}
+.fade-up:nth-child(2){animation-delay:.1s}
+.fade-up:nth-child(3){animation-delay:.15s}
+.fade-up:nth-child(4){animation-delay:.2s}
+
+/* Print */
+@media print{header,nav,.btn,.confusion-btn,#panelSpaced,#panelGlossary{display:none!important}body{background:#fff;color:#000}.report-card{border:1px solid #ccc}}
+
+<link rel="stylesheet" href="platform.css">
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-block">
+    <div class="logo-icon">A+</div>
+    <div>
+      <div class="logo-title">Command Center</div>
+      <div class="logo-sub">CompTIA A+ 220-1202</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="hbadge hb-streak" id="hStreak" style="display:none">🔥 0 day streak</span>
+    <span class="hbadge hb-ready" id="hReady" style="display:none">— % ready</span>
+    <span class="header-code" id="hCode" style="display:none">—</span>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav id="mainNav" style="display:none">
+  <div class="nav-btn active" onclick="goPanel('dashboard')">Dashboard</div>
+  <div class="nav-btn" onclick="goPanel('readiness')">Exam Readiness</div>
+  <div class="nav-btn" onclick="goPanel('achievements')">Achievements</div>
+  <div class="nav-btn" onclick="goPanel('spaced')">Study Queue</div>
+  <div class="nav-btn" onclick="goPanel('glossary')">Glossary</div>
+  <div class="nav-btn" onclick="goPanel('confusion')">Confusion Flag</div>
+  <div class="nav-btn" onclick="goPanel('report')">My Report</div>
+  <div class="nav-btn" onclick="goPanel('prep')">Teacher Prep</div>
+</nav>
+
+<div class="content">
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="login-screen">
+      <div class="login-icon">A+</div>
+      <div style="text-align:center">
+        <div class="login-title">Student Command Center</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--tx3);letter-spacing:1px;margin-top:4px">CompTIA A+ 220-1202 · Your mission control</div>
+      </div>
+      <input class="login-input" id="loginCode" placeholder="STU-001" maxlength="8" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="login-btn" onclick="doLogin()">Enter</button>
+      <div class="login-privacy">🔒 Your code is your only identifier.<br>No names, no personal data stored.<br>Everything saves to this device only.</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="panel" id="panelDashboard">
+    <div class="three-col fade-up">
+      <div class="stat-box acc">
+        <div class="sb-label">Exam Readiness</div>
+        <div class="sb-val" id="dbReady" style="color:var(--acc)">—</div>
+        <div class="sb-sub" id="dbReadySub">Complete more quizzes to calculate</div>
+      </div>
+      <div class="stat-box grn">
+        <div class="sb-label">Study Streak</div>
+        <div class="sb-val" id="dbStreak" style="color:var(--grn)">0</div>
+        <div class="sb-sub">consecutive days active</div>
+      </div>
+      <div class="stat-box amb">
+        <div class="sb-label">Questions Answered</div>
+        <div class="sb-val" id="dbQs" style="color:var(--amb)">0</div>
+        <div class="sb-sub" id="dbQsSub">across all quizzes</div>
+      </div>
+    </div>
+
+    <div class="two-col fade-up">
+      <div class="card">
+        <div class="card-header"><h2>Domain Strength</h2><span class="tag acc" id="domainAvg">—</span></div>
+        <div class="card-body">
+          <div class="radar-wrap"><canvas id="radarCanvas" width="280" height="260"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Today's Focus</h2></div>
+        <div class="card-body" id="todayFocus">
+          <div style="font-size:12px;color:var(--tx2);line-height:1.8" id="focusContent">Log in to see your personalized study focus.</div>
+          <div class="divider"></div>
+          <div style="margin-top:12px">
+            <div class="sb-label" style="margin-bottom:8px">This week's activity</div>
+            <div class="streak-display" id="weekStreak"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col fade-up">
+      <div class="card">
+        <div class="card-header"><h2>Recent Badges</h2><button class="btn btn-ghost btn-sm" onclick="goPanel('achievements')">View All</button></div>
+        <div class="card-body" id="recentBadges">
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No badges yet — keep studying!</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Study Queue</h2><span class="tag amb" id="srCount">0 due</span></div>
+        <div class="card-body">
+          <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px" id="srPreview">Spaced repetition surfaces terms you've missed on a review schedule.</div>
+          <button class="btn btn-acc" style="width:100%;justify-content:center" onclick="goPanel('spaced')">Start Study Queue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAM READINESS -->
+  <div class="panel" id="panelReadiness">
+    <div class="readiness-hero fade-up">
+      <div class="rh-ring-wrap">
+        <svg class="rh-ring-svg" viewBox="0 0 160 160">
+          <circle class="rh-ring-bg" cx="80" cy="80" r="68"/>
+          <circle class="rh-ring-fill" id="readinessRing" cx="80" cy="80" r="68"
+            stroke-dasharray="427" stroke-dashoffset="427" stroke="var(--grn)"/>
+        </svg>
+        <div class="rh-center">
+          <div class="rh-pct" id="readPct" style="color:var(--grn)">0%</div>
+          <div class="rh-status" style="color:var(--tx3);letter-spacing:1px">READY</div>
+        </div>
+      </div>
+      <div class="rh-info">
+        <div class="rh-title">Exam Readiness Predictor</div>
+        <div class="rh-desc" id="readDesc">Your pass probability is calculated from quiz scores weighted by CompTIA A+ exam domain percentages.</div>
+        <div class="domain-bars" id="domainBars"></div>
+      </div>
+    </div>
+
+    <div class="two-col fade-up">
+      <div class="card">
+        <div class="card-header"><h2>CompTIA A+ Domains</h2></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--tx2);line-height:1.9;font-family:var(--mono)">
+            <div style="margin-bottom:8px;padding:8px;background:var(--s2);border-radius:var(--r);border-left:2px solid var(--acc)">
+              <span style="color:var(--acc)">22%</span> · Domain 1: Mobile Devices<br>
+              <span style="color:var(--grn)">29%</span> · Domain 2: Networking<br>
+              <span style="color:var(--amb)">27%</span> · Domain 3: Hardware<br>
+              <span style="color:var(--pur)">12%</span> · Domain 4: Virtualization &amp; Cloud<br>
+              <span style="color:var(--pnk)">10%</span> · Domain 5: Hardware &amp; Network Troubleshooting
+            </div>
+            <div style="margin-top:8px;font-size:10px;color:var(--tx3)">Passing score: 700/900 points (~78%)</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Strength Analysis</h2></div>
+        <div class="card-body" id="strengthAnalysis">
+          <div style="font-size:12px;color:var(--tx2);line-height:1.7">Complete quizzes across multiple chapters to see your domain strength analysis.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card fade-up">
+      <div class="card-header"><h2>Chapter Coverage</h2><span class="tag acc" id="chapCoverage">0/27 covered</span></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px" id="chapCoverageGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="panel" id="panelAchievements">
+    <div class="card fade-up">
+      <div class="card-header">
+        <h2>🔥 Study Streak</h2>
+        <span class="tag amb" id="streakBadge">0 days</span>
+      </div>
+      <div class="card-body">
+        <div class="streak-display" id="streakCalendar"></div>
+        <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:8px" id="streakMsg">Log in and complete at least one activity each day to build your streak.</div>
+      </div>
+    </div>
+
+    <div class="card fade-up">
+      <div class="card-header"><h2>🏅 Badges</h2><span class="tag grn" id="earnedCount">0 earned</span></div>
+      <div class="card-body">
+        <div class="achievement-grid" id="badgeGrid"></div>
+      </div>
+    </div>
+
+    <div class="card fade-up">
+      <div class="card-header"><h2>📈 Milestones</h2></div>
+      <div class="card-body" id="milestones"></div>
+    </div>
+  </div>
+
+  <!-- SPACED REPETITION -->
+  <div class="panel" id="panelSpaced">
+    <div class="card fade-up">
+      <div class="card-header">
+        <h2>⚡ Study Queue</h2>
+        <span class="tag amb" id="srQueueCount">0 due today</span>
+        <button class="btn btn-ghost btn-sm" onclick="shuffleSR()">Shuffle</button>
+      </div>
+      <div class="card-body">
+        <div class="sr-queue" id="srQueueInfo">Terms you've missed appear here on a spaced schedule: review on Day 1 → 3 → 7 → 14 after missing.</div>
+        <div id="srCardArea">
+          <div style="text-align:center;padding:40px 20px">
+            <div style="font-size:36px;margin-bottom:12px;opacity:.4">🃏</div>
+            <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--tx2);letter-spacing:1px;text-transform:uppercase">Queue is empty</div>
+            <div style="font-size:12px;color:var(--tx3);margin-top:8px;line-height:1.7">Miss terms on quizzes to add them to your spaced repetition queue. They'll surface at the right time.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="panel" id="panelGlossary">
+    <div class="card fade-up">
+      <div class="card-header">
+        <h2>📚 Living Glossary</h2>
+        <span class="tag acc" id="glossaryCount">0 terms</span>
+        <button class="btn btn-ghost btn-sm" onclick="exportGlossary()">Export</button>
+      </div>
+      <div class="card-body">
+        <input class="glossary-search" placeholder="Search terms…" oninput="filterGlossary(this.value)" id="glossarySearch">
+        <div class="chapter-filter" id="glossaryFilter"></div>
+        <div class="term-grid" id="termGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFUSION FLAG -->
+  <div class="panel" id="panelConfusion">
+    <div class="two-col fade-up">
+      <div class="card">
+        <div class="card-header"><h2>🚩 Confusion Flag</h2></div>
+        <div class="card-body">
+          <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px">
+            Not understanding something? Flag it anonymously. Your teacher sees a heat map of class confusion — no names attached.
+          </div>
+          <input class="confusion-topic" id="confusionTopic" placeholder="What topic or concept is confusing? (optional)">
+          <button class="confusion-btn" id="confusionBtn" onclick="flagConfusion()" style="margin-top:8px">
+            🚩 Flag — I Don't Get This
+          </button>
+          <div style="margin-top:16px">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;margin-bottom:8px">YOUR FLAGGED TOPICS</div>
+            <div class="confusion-log" id="confusionLog">
+              <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No flags yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>🔥 Class Confusion Heat Map</h2><span class="tag red" id="totalFlags">0 flags</span></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--tx2);line-height:1.7;margin-bottom:14px;font-family:var(--mono)">Anonymous — shows your teacher which concepts the class is struggling with most.</div>
+          <div id="heatMap">
+            <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No class flags yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY REPORT -->
+  <div class="panel" id="panelReport">
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px" class="fade-up">
+      <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print Report</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📄 Export</button>
+    </div>
+    <div class="report-card fade-up" id="reportCard">
+      <div class="report-header">
+        <div>
+          <div class="report-title">Student Progress Report</div>
+          <div class="report-code" id="reportCode">—</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:3px" id="reportDate">—</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--display);font-size:48px;font-weight:800;line-height:1" id="reportGrade" style="color:var(--grn)">—</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px">READINESS GRADE</div>
+        </div>
+      </div>
+      <div class="report-body">
+        <div>
+          <div class="report-section-title">Overall Performance</div>
+          <div id="reportOverall"></div>
+        </div>
+        <div>
+          <div class="report-section-title">Domain Performance</div>
+          <div id="reportDomains"></div>
+        </div>
+        <div>
+          <div class="report-section-title">Study Habits</div>
+          <div id="reportHabits"></div>
+        </div>
+        <div>
+          <div class="report-section-title">Recommendations</div>
+          <div id="reportRecs" style="font-size:12px;color:var(--tx2);line-height:1.8"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEACHER PREP -->
+  <div class="panel" id="panelPrep">
+    <div class="card fade-up">
+      <div class="card-header">
+        <h2>🎯 Teacher Pre-Class Prep</h2>
+        <span class="tag acc">Private — Teacher Only</span>
+      </div>
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:16px;font-family:var(--mono)">
+          Run this the night before class. Pre-generates all content so tomorrow's session starts instantly.
+        </div>
+
+        <div class="prep-section">
+          <div class="prep-header">
+            <span class="prep-icon">📋</span>
+            <span class="prep-title">Tomorrow's Day</span>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <input type="number" id="prepDay" min="1" max="68" value="1" style="width:60px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:5px 8px;color:var(--tx);font-family:var(--mono);font-size:12px;outline:none;text-align:center">
+              <button class="btn btn-acc btn-sm" onclick="loadPrepDay()">Load</button>
+            </div>
+          </div>
+          <div class="prep-content" id="prepDayContent">Select a day number above and click Load.</div>
+        </div>
+
+        <div class="prep-section">
+          <div class="prep-header">
+            <span class="prep-icon">🚩</span>
+            <span class="prep-title">Class Confusion Summary</span>
+            <span class="prep-status tag red" id="prepFlags">0 flags</span>
+          </div>
+          <div class="prep-content" id="prepConfusion">No confusion flags from students yet.</div>
+        </div>
+
+        <div class="prep-section">
+          <div class="prep-header">
+            <span class="prep-icon">📊</span>
+            <span class="prep-title">Students Needing Support</span>
+          </div>
+          <div class="prep-content" id="prepSupport">No student data yet.</div>
+        </div>
+
+        <button class="btn btn-grn" style="width:100%;justify-content:center;margin-top:8px" onclick="toast('Pre-generation would run here — connect to classroom platform to enable','ok')">
+          ⚡ Pre-Generate Tomorrow's Content
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+// ══════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════
+
+const DOMAINS = [
+  {name:'Mobile Devices', weight:.22, chapters:[19,20,21], color:'#00d4ff'},
+  {name:'Networking', weight:.29, chapters:[13,14,15,16], color:'#00ff88'},
+  {name:'Hardware', weight:.27, chapters:[2,3,4,5,6,7,8], color:'#ffaa00'},
+  {name:'Virtualization & Cloud', weight:.12, chapters:[18], color:'#aa55ff'},
+  {name:'HW & Network Troubleshooting', weight:.10, chapters:[0,9,10,11,12,17,22,23,24,25], color:'#ff55aa'},
+];
+
+const CHAPTERS = [
+  {id:0,ch:'Ch.1',title:'Safety & Professionalism'},
+  {id:1,ch:'Ch.2',title:'Intro to Computers & OS'},
+  {id:2,ch:'Ch.7',title:'Power Supplies'},
+  {id:3,ch:'Ch.8',title:'Mass Storage Technologies'},
+  {id:4,ch:'Ch.9',title:'Implementing Mass Storage'},
+  {id:5,ch:'Ch.10',title:'Essential Peripherals'},
+  {id:6,ch:'Ch.11',title:'Installing & Upgrading OS'},
+  {id:7,ch:'Ch.12',title:'Working with OS'},
+  {id:8,ch:'Ch.13',title:'Users, Groups & Permissions'},
+  {id:9,ch:'Ch.14',title:'Maintaining OS'},
+  {id:10,ch:'Ch.15',title:'Command-Line Interface'},
+  {id:11,ch:'Ch.16',title:'Troubleshooting Systems'},
+  {id:12,ch:'Ch.17',title:'Display Technologies'},
+  {id:13,ch:'Ch.18',title:'Essentials of Networking'},
+  {id:14,ch:'Ch.19',title:'TCP/IP Basics'},
+  {id:15,ch:'Ch.20',title:'OS Networking & Troubleshooting'},
+  {id:16,ch:'Ch.21',title:'Wireless Networking'},
+  {id:17,ch:'Ch.22',title:'Internet & SOHO Networking'},
+  {id:18,ch:'Ch.23',title:'Virtualization & Cloud'},
+  {id:19,ch:'Ch.24',title:'Portable Computing'},
+  {id:20,ch:'Ch.25',title:'Mobile Devices'},
+  {id:21,ch:'Ch.26',title:'Securing Mobile Devices'},
+  {id:22,ch:'Ch.27',title:'Printers & Multifunction'},
+  {id:23,ch:'Ch.28',title:'Essential Security'},
+  {id:24,ch:'Ch.29',title:'Securing Endpoints'},
+  {id:25,ch:'Ch.30',title:'Operational Procedures'},
+];
+
+const GLOSSARY_TERMS = [
+  {word:'ESD',def:'Electrostatic Discharge — static electricity that can damage electronic components.',ch:'Ch.1',domain:'Hardware'},
+  {word:'UPS',def:'Uninterruptible Power Supply — battery backup that provides power during outages.',ch:'Ch.7',domain:'Hardware'},
+  {word:'BIOS/UEFI',def:'Basic Input/Output System / Unified Extensible Firmware Interface — firmware that initializes hardware at boot.',ch:'Ch.8',domain:'Hardware'},
+  {word:'MBR',def:'Master Boot Record — legacy partitioning scheme, supports disks up to 2TB and 4 primary partitions.',ch:'Ch.9',domain:'Hardware'},
+  {word:'GPT',def:'GUID Partition Table — modern partitioning scheme, supports disks larger than 2TB and up to 128 partitions.',ch:'Ch.9',domain:'Hardware'},
+  {word:'NTFS',def:'New Technology File System — default Windows file system with permissions, encryption, and journaling.',ch:'Ch.9',domain:'Hardware'},
+  {word:'RAID',def:'Redundant Array of Independent Disks — combines multiple drives for redundancy or performance.',ch:'Ch.9',domain:'Hardware'},
+  {word:'BitLocker',def:'Windows full-disk encryption tool that protects data if drive is removed.',ch:'Ch.9',domain:'Hardware'},
+  {word:'USB 3.0',def:'Universal Serial Bus version 3.0 — provides up to 5 Gbps data transfer, identified by blue ports.',ch:'Ch.10',domain:'Hardware'},
+  {word:'APIPA',def:'Automatic Private IP Addressing — self-assigned address (169.254.x.x) when DHCP server is unavailable.',ch:'Ch.19',domain:'Networking'},
+  {word:'DHCP',def:'Dynamic Host Configuration Protocol — automatically assigns IP addresses, subnet masks, and gateways to devices.',ch:'Ch.19',domain:'Networking'},
+  {word:'DNS',def:'Domain Name System — translates human-readable domain names (google.com) to IP addresses.',ch:'Ch.20',domain:'Networking'},
+  {word:'NAT',def:'Network Address Translation — maps private internal IP addresses to a public IP for internet access.',ch:'Ch.19',domain:'Networking'},
+  {word:'Subnet Mask',def:'Defines which portion of an IP address identifies the network vs the host (e.g., 255.255.255.0).',ch:'Ch.19',domain:'Networking'},
+  {word:'VLAN',def:'Virtual Local Area Network — logically segments a network without requiring separate physical hardware.',ch:'Ch.20',domain:'Networking'},
+  {word:'WPA2',def:'Wi-Fi Protected Access 2 — current wireless security standard using AES encryption.',ch:'Ch.21',domain:'Networking'},
+  {word:'SSH',def:'Secure Shell — encrypted protocol for secure remote administration, uses port 22.',ch:'Ch.22',domain:'Networking'},
+  {word:'VPN',def:'Virtual Private Network — creates an encrypted tunnel over the internet for secure remote access.',ch:'Ch.22',domain:'Networking'},
+  {word:'Active Directory',def:'Microsoft directory service for centralizing user account and resource management in a domain.',ch:'Ch.20',domain:'Networking'},
+  {word:'NTFS Permissions',def:'Access controls on files/folders: Full Control, Modify, Read & Execute, Read, Write.',ch:'Ch.13',domain:'Hardware'},
+  {word:'UAC',def:'User Account Control — Windows security feature that prompts for elevated permissions for admin tasks.',ch:'Ch.13',domain:'Hardware'},
+  {word:'CLI',def:'Command-Line Interface — text-based interface for interacting with an OS using commands.',ch:'Ch.15',domain:'Hardware'},
+  {word:'WinRE',def:'Windows Recovery Environment — bootable recovery tool for repairing Windows startup issues.',ch:'Ch.16',domain:'HW & Network Troubleshooting'},
+  {word:'BSOD',def:'Blue Screen of Death — Windows critical error screen indicating a system crash (stop error).',ch:'Ch.16',domain:'HW & Network Troubleshooting'},
+  {word:'MDM',def:'Mobile Device Management — software platform for managing and securing employee mobile devices.',ch:'Ch.26',domain:'Mobile Devices'},
+  {word:'MFA',def:'Multi-Factor Authentication — requires two or more verification methods (something you know, have, or are).',ch:'Ch.28',domain:'Hardware'},
+  {word:'Ransomware',def:'Malware that encrypts victim files and demands payment for the decryption key.',ch:'Ch.29',domain:'HW & Network Troubleshooting'},
+  {word:'Social Engineering',def:'Manipulating people into revealing confidential information or performing actions (phishing, vishing, tailgating).',ch:'Ch.29',domain:'HW & Network Troubleshooting'},
+  {word:'IaaS',def:'Infrastructure as a Service — cloud model providing virtualized computing infrastructure (e.g., AWS EC2).',ch:'Ch.23',domain:'Virtualization & Cloud'},
+  {word:'Hypervisor',def:'Software that creates and manages virtual machines. Type 1 runs on bare metal; Type 2 runs on an OS.',ch:'Ch.23',domain:'Virtualization & Cloud'},
+  {word:'Imaging',def:'Creating an exact copy of a storage device for deployment or backup purposes.',ch:'Ch.11',domain:'Hardware'},
+  {word:'Change Management',def:'Formal process for requesting, reviewing, and documenting changes to IT systems.',ch:'Ch.30',domain:'HW & Network Troubleshooting'},
+  {word:'Differential Backup',def:'Backs up all data changed since last FULL backup. Faster to restore than incremental.',ch:'Ch.30',domain:'HW & Network Troubleshooting'},
+  {word:'Incremental Backup',def:'Backs up data changed since last backup (full or incremental). Smallest backup, slowest restore.',ch:'Ch.30',domain:'HW & Network Troubleshooting'},
+  {word:'Degaussing',def:'Using a magnetic field to destroy data on magnetic storage devices — renders the drive unusable.',ch:'Ch.30',domain:'HW & Network Troubleshooting'},
+  {word:'WPA3',def:'Latest Wi-Fi security protocol with stronger encryption and protection against brute-force attacks.',ch:'Ch.21',domain:'Networking'},
+  {word:'802.11ax',def:'Also called Wi-Fi 6 — fastest current Wi-Fi standard with improved efficiency in dense environments.',ch:'Ch.21',domain:'Networking'},
+  {word:'TCO',def:'Total Cost of Ownership — total cost of purchasing, deploying, and maintaining a technology asset.',ch:'Ch.30',domain:'HW & Network Troubleshooting'},
+];
+
+const BADGES = [
+  {id:'first_login',icon:'🚀',name:'Launched',desc:'Logged in for the first time',condition:s=>s.totalLogins>=1},
+  {id:'streak_3',icon:'🔥',name:'On Fire',desc:'3-day study streak',condition:s=>s.streak>=3},
+  {id:'streak_7',icon:'💥',name:'Week Warrior',desc:'7-day study streak',condition:s=>s.streak>=7},
+  {id:'streak_14',icon:'⚡',name:'Unstoppable',desc:'14-day study streak',condition:s=>s.streak>=14},
+  {id:'qs_25',icon:'🎯',name:'Sharp Shooter',desc:'Answered 25 questions',condition:s=>s.totalQs>=25},
+  {id:'qs_100',icon:'💯',name:'Century',desc:'Answered 100 questions',condition:s=>s.totalQs>=100},
+  {id:'ready_60',icon:'🌟',name:'Getting There',desc:'Reached 60% exam readiness',condition:s=>s.readiness>=60},
+  {id:'ready_80',icon:'🏆',name:'Exam Ready',desc:'Reached 80% exam readiness',condition:s=>s.readiness>=80},
+  {id:'ready_90',icon:'👑',name:'Champion',desc:'Reached 90% exam readiness',condition:s=>s.readiness>=90},
+  {id:'flags_3',icon:'🚩',name:'Curious Mind',desc:'Flagged 3 confusion topics',condition:s=>s.confusionFlags>=3},
+  {id:'glossary_10',icon:'📚',name:'Vocab Builder',desc:'Reviewed 10 glossary terms',condition:s=>s.glossaryViewed>=10},
+  {id:'sr_complete',icon:'🃏',name:'Flashmaster',desc:'Completed a spaced repetition session',condition:s=>s.srSessions>=1},
+];
+
+const DAYS_DATA = [
+  {day:1,section:'Chapter 1: Safety and Professionalism',videos:['Professional Communication Part I','Professional Communication Part II']},
+  {day:2,section:'Chapter 1-2',videos:['Dealing with Difficult Customers','Physical Safety','Common Safety Procedures']},
+  {day:3,section:'Chapter 2',videos:['What\'s an Operating System?','Users and Super Users']},
+  {day:4,section:'Chapter 2',videos:['Why Windows?','Touring Windows 10 and 11']},
+  {day:5,section:'Chapter 2',videos:['Touring the macOS Part I & II']},
+  {day:6,section:'Chapter 2',videos:['Touring the macOS Part III','Touring Linux']},
+  {day:7,section:'Chapter 7',videos:['Power Protection','Cooling Your System']},
+  {day:8,section:'Chapter 8-9',videos:['Boot Order','Understanding Partitioning']},
+  {day:9,section:'Chapter 9',videos:['MBR Partitioning','GPT Partitioning','Understanding File Systems']},
+  {day:10,section:'Chapter 9',videos:['Popular File Systems','Formatting in Action']},
+];
+
+// ── STATE ──
+const ST = {
+  code: null,
+  scores: loadLS('scc_scores', {}),
+  streak: loadLS('scc_streak', {days:[],current:0}),
+  confusion: loadLS('scc_confusion', []),
+  glossaryViewed: loadLS('scc_gv', 0),
+  srQueue: loadLS('scc_sr', []),
+  srMissed: loadLS('scc_missed', {}),
+  totalLogins: loadLS('scc_logins', 0),
+  confusionFlags: loadLS('scc_cf', 0),
+  srSessions: loadLS('scc_srs', 0),
+  curPanel: 'dashboard',
+  glossaryFilter: 'all',
+  srIdx: 0,
+  srFlipped: false,
+};
+
+function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function saveLS(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+// ── INIT ──
+function init(){
+  const saved=loadLS('scc_code',null);
+  if(saved){ST.code=saved;doLoginWith(saved);}
+}
+
+// ── LOGIN ──
+function doLogin(){
+  const code=document.getElementById('loginCode').value.trim().toUpperCase();
+  if(!code){toast('Enter your student code','err');return;}
+  ST.code=code;
+  saveLS('scc_code',code);
+  doLoginWith(code);
+}
+
+function doLoginWith(code){
+  // Update streak
+  updateStreak();
+  ST.totalLogins=(loadLS('scc_logins',0))+1;
+  saveLS('scc_logins',ST.totalLogins);
+
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainNav').style.display='flex';
+  document.getElementById('hCode').textContent=code;
+  document.getElementById('hCode').style.display='';
+
+  goPanel('dashboard');
+  renderAll();
+  toast(`Welcome back, ${code}!`,'ok');
+  checkBadges();
+}
+
+function updateStreak(){
+  const today=new Date().toDateString();
+  const s=ST.streak;
+  if(!s.days.includes(today)){
+    s.days.push(today);
+    // Check if yesterday was active
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    if(s.days.includes(yesterday)||s.days.length===1){s.current=(s.current||0)+1;}
+    else{s.current=1;}
+    saveLS('scc_streak',s);
+    ST.streak=s;
+  }
+}
+
+// ── RENDER ALL ──
+function renderAll(){
+  renderDashboard();
+  renderReadiness();
+  renderAchievements();
+  renderGlossary();
+  renderConfusion();
+  renderSR();
+  renderReport();
+  renderPrep();
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const readiness=calcReadiness();
+  const streak=ST.streak.current||0;
+  const totalQs=calcTotalQs();
+
+  document.getElementById('dbReady').textContent=readiness?readiness+'%':'—';
+  document.getElementById('dbReadySub').textContent=readiness?`${readiness>=70?'On track to pass!':readiness>=50?'Keep studying':'Needs more work'}`:'Complete quizzes to calculate';
+  document.getElementById('dbStreak').textContent=streak;
+  document.getElementById('dbQs').textContent=totalQs;
+  document.getElementById('dbQsSub').textContent=`${Math.round(calcAccuracy()*100)}% accuracy overall`;
+  document.getElementById('hStreak').textContent=`🔥 ${streak} day streak`;
+  document.getElementById('hStreak').style.display=streak>0?'':'none';
+  document.getElementById('hReady').textContent=`${readiness||0}% ready`;
+  document.getElementById('hReady').style.display='';
+  document.getElementById('domainAvg').textContent=readiness?readiness+'%':'—';
+
+  // Week activity
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const week=document.getElementById('weekStreak');
+  const today=new Date();
+  week.innerHTML=Array.from({length:7},(_,i)=>{
+    const d=new Date(today);d.setDate(d.getDate()-(6-i));
+    const active=ST.streak.days.includes(d.toDateString());
+    const isToday=i===6;
+    return `<div class="streak-day ${isToday?'today':active?'active':''}">${days[i][0]}</div>`;
+  }).join('');
+
+  // Focus
+  const domainScores=calcDomainScores();
+  const weakest=domainScores.sort((a,b)=>a.score-b.score)[0];
+  document.getElementById('focusContent').innerHTML=weakest&&weakest.score<80?
+    `<div style="margin-bottom:10px"><span class="tag red">Focus Area</span> <strong style="color:var(--tx);margin-left:6px">${weakest.name}</strong></div>
+     <div style="font-size:11px;color:var(--tx2);line-height:1.7">You're at <strong>${weakest.score}%</strong> in this domain. ${weakest.name} accounts for <strong>${Math.round(weakest.weight*100)}%</strong> of the CompTIA A+ exam. Prioritize studying Chapters ${weakest.chapters.map(c=>CHAPTERS[c]?.ch).join(', ')}.</div>`:
+    `<div style="font-size:12px;color:var(--tx2);line-height:1.7">All domains looking solid! Keep reviewing missed terms in your Study Queue and stay consistent with daily practice.</div>`;
+
+  // Radar
+  drawRadar();
+
+  // SR count
+  const due=getSRDue();
+  document.getElementById('srCount').textContent=`${due.length} due`;
+  document.getElementById('srPreview').textContent=due.length>0?
+    `You have ${due.length} term${due.length>1?'s':''} due for review today. Tap to start.`:
+    'No terms due today. Keep completing quizzes to build your queue.';
+
+  // Recent badges
+  const earned=BADGES.filter(b=>checkBadgeCondition(b));
+  document.getElementById('recentBadges').innerHTML=earned.length?
+    `<div style="display:flex;gap:8px;flex-wrap:wrap">${earned.slice(-4).map(b=>`<div style="text-align:center;padding:8px"><div style="font-size:24px">${b.icon}</div><div style="font-size:9px;color:var(--amb);font-family:var(--mono);margin-top:3px">${b.name}</div></div>`).join('')}</div>`:
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No badges yet — keep studying!</div>';
+}
+
+// ── READINESS ──
+function calcReadiness(){
+  const domainScores=calcDomainScores();
+  if(!domainScores.some(d=>d.score>0))return 0;
+  const weighted=domainScores.reduce((sum,d)=>sum+d.score*d.weight,0);
+  return Math.round(weighted);
+}
+
+function calcDomainScores(){
+  return DOMAINS.map(d=>{
+    const chScores=d.chapters.map(cIdx=>{
+      const scores=Object.entries(ST.scores).filter(([k])=>k.startsWith(`q_ch${cIdx}_`)).map(([,v])=>v);
+      return scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+    }).filter(s=>s!==null);
+    const score=chScores.length?Math.round(chScores.reduce((a,b)=>a+b,0)/chScores.length):0;
+    return {...d,score,hasData:chScores.length>0};
+  });
+}
+
+function calcTotalQs(){return Object.values(ST.scores).reduce((s,v)=>s+(v.count||0),0)||Object.keys(ST.scores).length*5}
+function calcAccuracy(){
+  const vals=Object.values(ST.scores);
+  if(!vals.length)return 0;
+  return vals.reduce((s,v)=>s+(typeof v==='number'?v/100:0),0)/vals.length;
+}
+
+function renderReadiness(){
+  const readiness=calcReadiness();
+  const domainScores=calcDomainScores();
+
+  // Ring
+  const circ=427;
+  const offset=circ-(circ*readiness/100);
+  const ring=document.getElementById('readinessRing');
+  ring.setAttribute('stroke-dashoffset',offset);
+  const col=readiness>=80?'var(--grn)':readiness>=60?'var(--amb)':'var(--red)';
+  ring.setAttribute('stroke',col);
+  document.getElementById('readPct').textContent=readiness+'%';
+  document.getElementById('readPct').style.color=col;
+  document.getElementById('readDesc').textContent=readiness>=80?
+    `You're on track to pass the CompTIA A+ exam! Your weighted score across all domains is ${readiness}%.`:
+    readiness>=60?`You're making progress. Score is ${readiness}% — aim for 78%+ to pass. Focus on your weakest domains.`:
+    `Keep going! Your score is ${readiness}%. Complete more quizzes across all chapters to raise this.`;
+
+  // Domain bars
+  document.getElementById('domainBars').innerHTML=domainScores.map(d=>`
+    <div class="domain-bar">
+      <div class="db-label">${d.name}</div>
+      <div class="db-track"><div class="db-fill" style="width:${d.score}%;background:${d.color}"></div></div>
+      <div class="db-pct">${d.hasData?d.score+'%':'—'}</div>
+    </div>`).join('');
+
+  // Chapter coverage
+  const covered=CHAPTERS.filter((_,i)=>Object.keys(ST.scores).some(k=>k.includes(`ch${i}`))).length;
+  document.getElementById('chapCoverage').textContent=`${covered}/${CHAPTERS.length} covered`;
+  document.getElementById('chapCoverageGrid').innerHTML=CHAPTERS.map((ch,i)=>{
+    const hasData=Object.keys(ST.scores).some(k=>k.includes(`ch${i}`));
+    const score=hasData?Math.round(Object.entries(ST.scores).filter(([k])=>k.includes(`ch${i}`)).map(([,v])=>typeof v==='number'?v:0).reduce((a,b)=>a+b,0)/Math.max(1,Object.entries(ST.scores).filter(([k])=>k.includes(`ch${i}`)).length)):null;
+    const col=score===null?'var(--b1)':score>=80?'var(--grn)':score>=60?'var(--amb)':'var(--red)';
+    return `<div style="background:var(--s2);border:1px solid ${col};border-radius:var(--r);padding:8px 10px;font-size:10px">
+      <div style="font-family:var(--mono);font-size:8px;color:${col};margin-bottom:3px">${ch.ch}</div>
+      <div style="color:var(--tx2);line-height:1.3;margin-bottom:5px">${ch.title}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:${score!==null?col:'var(--tx4)'}">${score!==null?score+'%':'Not started'}</div>
+    </div>`;
+  }).join('');
+
+  // Strength analysis
+  const sorted=[...domainScores].sort((a,b)=>b.score-a.score);
+  document.getElementById('strengthAnalysis').innerHTML=sorted.map(d=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="width:10px;height:10px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
+      <div style="flex:1;font-size:11px;color:var(--tx2)">${d.name}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:${d.score>=80?'var(--grn)':d.score>=60?'var(--amb)':'var(--red)'}">${d.hasData?d.score+'%':'—'}</div>
+    </div>`).join('');
+}
+
+// ── RADAR CHART ──
+function drawRadar(){
+  const canvas=document.getElementById('radarCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const w=280,h=260,cx=140,cy=130,r=90;
+  ctx.clearRect(0,0,w,h);
+  const domains=calcDomainScores();
+  const n=domains.length;
+  const angles=Array.from({length:n},(_,i)=>i*2*Math.PI/n-Math.PI/2);
+
+  // Grid
+  [0.25,0.5,0.75,1].forEach(level=>{
+    ctx.beginPath();
+    angles.forEach((a,i)=>{const x=cx+Math.cos(a)*r*level,y=cy+Math.sin(a)*r*level;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.closePath();ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.stroke();
+  });
+
+  // Spokes
+  angles.forEach(a=>{
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);
+    ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;ctx.stroke();
+  });
+
+  // Data polygon
+  ctx.beginPath();
+  angles.forEach((a,i)=>{
+    const score=(domains[i]?.score||0)/100;
+    const x=cx+Math.cos(a)*r*score,y=cy+Math.sin(a)*r*score;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle='rgba(0,212,255,0.15)';ctx.fill();
+  ctx.strokeStyle='rgba(0,212,255,0.7)';ctx.lineWidth=2;ctx.stroke();
+
+  // Points
+  angles.forEach((a,i)=>{
+    const score=(domains[i]?.score||0)/100;
+    const x=cx+Math.cos(a)*r*score,y=cy+Math.sin(a)*r*score;
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle='var(--acc)';ctx.fill();
+  });
+
+  // Labels
+  ctx.font='500 9px JetBrains Mono, monospace';
+  ctx.textAlign='center';
+  const shortNames=['Mobile','Networking','Hardware','Cloud','Troubleshoot'];
+  angles.forEach((a,i)=>{
+    const x=cx+Math.cos(a)*(r+18),y=cy+Math.sin(a)*(r+18);
+    ctx.fillStyle=domains[i]?.hasData?domains[i].color:'rgba(255,255,255,0.25)';
+    ctx.fillText(shortNames[i],x,y+3);
+  });
+}
+
+// ── ACHIEVEMENTS ──
+function renderAchievements(){
+  const streak=ST.streak.current||0;
+  document.getElementById('streakBadge').textContent=`${streak} days`;
+
+  // 14-day calendar
+  const cal=document.getElementById('streakCalendar');
+  cal.innerHTML=Array.from({length:14},(_,i)=>{
+    const d=new Date();d.setDate(d.getDate()-(13-i));
+    const active=ST.streak.days.includes(d.toDateString());
+    const isToday=i===13;
+    return `<div class="streak-day ${isToday?'today':active?'active':''}" title="${d.toDateString()}">${d.getDate()}</div>`;
+  }).join('');
+
+  document.getElementById('streakMsg').textContent=streak>=7?
+    `🔥 ${streak}-day streak — amazing consistency!`:
+    streak>=3?`🔥 ${streak}-day streak — you're building momentum!`:
+    `Current streak: ${streak} day${streak!==1?'s':''}. Log in and complete activities daily to build your streak.`;
+
+  // Badges
+  const grid=document.getElementById('badgeGrid');
+  let earnedCount=0;
+  grid.innerHTML=BADGES.map(b=>{
+    const earned=checkBadgeCondition(b);
+    if(earned)earnedCount++;
+    return `<div class="badge ${earned?'earned':'locked'}">
+      <span class="badge-icon">${b.icon}</span>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('earnedCount').textContent=`${earnedCount} earned`;
+
+  // Milestones
+  const readiness=calcReadiness();
+  const milestones=[
+    {label:'First login',done:ST.totalLogins>=1,pct:100},
+    {label:'10 questions answered',done:calcTotalQs()>=10,pct:Math.min(100,Math.round(calcTotalQs()/10*100))},
+    {label:'5-chapter coverage',done:CHAPTERS.filter((_,i)=>Object.keys(ST.scores).some(k=>k.includes(`ch${i}`))).length>=5,pct:Math.min(100,Math.round(CHAPTERS.filter((_,i)=>Object.keys(ST.scores).some(k=>k.includes(`ch${i}`))).length/5*100))},
+    {label:'60% exam readiness',done:readiness>=60,pct:Math.min(100,Math.round(readiness/60*100))},
+    {label:'80% exam readiness',done:readiness>=80,pct:Math.min(100,Math.round(readiness/80*100))},
+    {label:'7-day streak',done:streak>=7,pct:Math.min(100,Math.round(streak/7*100))},
+  ];
+  document.getElementById('milestones').innerHTML=milestones.map(m=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:18px;height:18px;border-radius:50%;background:${m.done?'var(--grn)':'var(--b2)'};display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;color:${m.done?'var(--bg)':'var(--tx3)'}">${m.done?'✓':''}</div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:${m.done?'var(--grn)':'var(--tx2)'};margin-bottom:3px">${m.label}</div>
+        <div style="height:3px;background:var(--b1);border-radius:2px;overflow:hidden">
+          <div style="height:100%;background:${m.done?'var(--grn)':'var(--acc)'};border-radius:2px;width:${m.pct}%;transition:width 1s ease"></div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">${m.pct}%</div>
+    </div>`).join('');
+}
+
+function checkBadgeCondition(b){
+  const s={
+    totalLogins:ST.totalLogins,
+    streak:ST.streak.current||0,
+    totalQs:calcTotalQs(),
+    readiness:calcReadiness(),
+    confusionFlags:ST.confusionFlags,
+    glossaryViewed:ST.glossaryViewed,
+    srSessions:ST.srSessions,
+  };
+  try{return b.condition(s);}catch{return false;}
+}
+
+function checkBadges(){
+  const newlyEarned=BADGES.filter(b=>checkBadgeCondition(b));
+  const prev=loadLS('scc_badges',[]);
+  newlyEarned.forEach(b=>{if(!prev.includes(b.id)){saveLS('scc_badges',[...prev,b.id]);toast(`🏅 Badge unlocked: ${b.name}!`,'ok');}});
+}
+
+// ── SPACED REPETITION ──
+function getSRDue(){
+  const now=Date.now();
+  const intervals=[0,1,3,7,14].map(d=>d*86400000);
+  return GLOSSARY_TERMS.filter(t=>{
+    const m=ST.srMissed[t.word];
+    if(!m)return false;
+    const nextReview=m.lastSeen+(intervals[Math.min(m.level||0,intervals.length-1)]);
+    return now>=nextReview;
+  });
+}
+
+function renderSR(){
+  const due=getSRDue();
+  const all=[...due,...GLOSSARY_TERMS.filter(t=>!ST.srMissed[t.word]).slice(0,5)];
+  document.getElementById('srQueueCount').textContent=`${due.length} due today`;
+  document.getElementById('srCount').textContent=`${due.length} due`;
+
+  if(due.length===0&&!all.length){return;}
+
+  const deck=all.length?all:GLOSSARY_TERMS.slice(0,10);
+  ST.srDeck=deck;ST.srIdx=0;ST.srFlipped=false;
+
+  if(due.length>0){
+    document.getElementById('srQueueInfo').textContent=`${due.length} term${due.length>1?'s':''} due for review today based on your miss history.`;
+  }
+
+  renderSRCard();
+}
+
+function renderSRCard(){
+  const deck=ST.srDeck||[];
+  if(!deck.length)return;
+  const term=deck[ST.srIdx];
+  const m=ST.srMissed[term?.word];
+  document.getElementById('srCardArea').innerHTML=`
+    <div class="sr-card" id="srCard" onclick="flipSR()">
+      <div class="sr-face">
+        <div class="sr-face-label">— Tap to reveal —</div>
+        <div class="sr-face-text">${term?.word||'—'}</div>
+        <div style="margin-top:12px;font-family:var(--mono);font-size:9px;color:var(--tx3)">${term?.ch||''} · ${term?.domain||''}</div>
+      </div>
+      <div class="sr-face sr-back">
+        <div class="sr-face-label">Definition</div>
+        <div class="sr-face-answer">${term?.def||'—'}</div>
+      </div>
+    </div>
+    <div class="sr-result">
+      <button class="btn btn-red btn-sm" onclick="srResult('miss')">✗ Missed</button>
+      <button class="btn btn-ghost btn-sm" onclick="srResult('skip')">— Skip</button>
+      <button class="btn btn-grn btn-sm" onclick="srResult('got')">✓ Got It</button>
+    </div>
+    <div class="sr-counter">${ST.srIdx+1} / ${deck.length} · ${(ST.srDeck||[]).filter(t=>ST.srMissed[t.word]).length} in queue</div>`;
+}
+
+function flipSR(){document.getElementById('srCard')?.classList.toggle('flipped');}
+
+function srResult(r){
+  const deck=ST.srDeck||[];
+  const term=deck[ST.srIdx];
+  if(r==='miss'){
+    const m=ST.srMissed[term.word]||{level:0};
+    ST.srMissed[term.word]={level:0,lastSeen:Date.now()};
+    saveLS('scc_missed',ST.srMissed);
+  } else if(r==='got'){
+    const m=ST.srMissed[term.word]||{level:0};
+    ST.srMissed[term.word]={level:(m.level||0)+1,lastSeen:Date.now()};
+    saveLS('scc_missed',ST.srMissed);
+  }
+  ST.srIdx++;
+  if(ST.srIdx>=deck.length){
+    ST.srSessions=(ST.srSessions||0)+1;
+    saveLS('scc_srs',ST.srSessions);
+    document.getElementById('srCardArea').innerHTML=`<div style="text-align:center;padding:40px 20px">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--grn);letter-spacing:1px">Session Complete!</div>
+      <div style="font-size:12px;color:var(--tx2);margin-top:8px;line-height:1.7">Terms you missed will resurface on a spaced schedule.<br>Check back tomorrow for your next review.</div>
+      <button class="btn btn-acc" style="margin-top:16px" onclick="renderSR()">Restart Session</button>
+    </div>`;
+    checkBadges();
+  } else {ST.srFlipped=false;renderSRCard();}
+}
+
+function shuffleSR(){
+  if(ST.srDeck)ST.srDeck=[...ST.srDeck].sort(()=>Math.random()-.5);
+  ST.srIdx=0;renderSRCard();
+}
+
+// ── GLOSSARY ──
+function renderGlossary(){
+  const terms=GLOSSARY_TERMS;
+  document.getElementById('glossaryCount').textContent=`${terms.length} terms`;
+
+  // Filter chips
+  const chapters=[...new Set(terms.map(t=>t.ch))];
+  document.getElementById('glossaryFilter').innerHTML=`
+    <div class="cf-chip ${ST.glossaryFilter==='all'?'active':''}" onclick="setGlossaryFilter('all')">All</div>
+    ${chapters.map(ch=>`<div class="cf-chip ${ST.glossaryFilter===ch?'active':''}" onclick="setGlossaryFilter('${ch}')">${ch}</div>`).join('')}`;
+
+  filterGlossary(document.getElementById('glossarySearch')?.value||'');
+}
+
+function setGlossaryFilter(ch){
+  ST.glossaryFilter=ch;renderGlossary();
+}
+
+function filterGlossary(q){
+  q=(q||'').toLowerCase();
+  const filter=ST.glossaryFilter;
+  const filtered=GLOSSARY_TERMS.filter(t=>
+    (filter==='all'||t.ch===filter)&&
+    (!q||t.word.toLowerCase().includes(q)||t.def.toLowerCase().includes(q))
+  );
+  const m=ST.srMissed;
+  document.getElementById('termGrid').innerHTML=filtered.map(t=>{
+    const missed=m[t.word]&&(m[t.word].level||0)<3;
+    return `<div class="term-row ${missed?'review':''}" onclick="viewTerm('${t.word}')">
+      <div class="term-word">${t.word}${missed?'<span class="term-tag review">Review</span>':''}${m[t.word]&&m[t.word].level>=3?'<span class="term-tag mastered">✓</span>':''}</div>
+      <div class="term-def">${t.def}</div>
+      <div class="term-ch">${t.ch}</div>
+    </div>`;
+  }).join('')||'<div style="font-size:12px;color:var(--tx3);padding:20px;text-align:center;font-family:var(--mono)">No terms found.</div>';
+}
+
+function viewTerm(word){
+  ST.glossaryViewed=(ST.glossaryViewed||0)+1;
+  saveLS('scc_gv',ST.glossaryViewed);
+  checkBadges();
+  const t=GLOSSARY_TERMS.find(t=>t.word===word);
+  if(!t)return;
+  // Add to SR queue if not already
+  if(!ST.srMissed[word]){ST.srMissed[word]={level:1,lastSeen:Date.now()};saveLS('scc_missed',ST.srMissed);}
+  toast(`📖 ${word} added to study queue`);
+}
+
+function exportGlossary(){
+  const lines=['CompTIA A+ 220-1202 Glossary\n','='.repeat(40)+'\n'];
+  const chapters=[...new Set(GLOSSARY_TERMS.map(t=>t.ch))];
+  chapters.forEach(ch=>{
+    const terms=GLOSSARY_TERMS.filter(t=>t.ch===ch);
+    lines.push(`\n${ch}\n${'-'.repeat(30)}`);
+    terms.forEach(t=>lines.push(`${t.word}: ${t.def}`));
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'}));
+  a.download='CompTIA_A+_Glossary.txt';a.click();
+  toast('Glossary exported!','ok');
+}
+
+// ── CONFUSION FLAG ──
+function flagConfusion(){
+  const topic=document.getElementById('confusionTopic').value.trim();
+  const flag={topic:topic||'General confusion',time:new Date().toLocaleTimeString(),day:new Date().toLocaleDateString()};
+  ST.confusion.push(flag);
+  saveLS('scc_confusion',ST.confusion);
+  ST.confusionFlags=(ST.confusionFlags||0)+1;
+  saveLS('scc_cf',ST.confusionFlags);
+  document.getElementById('confusionTopic').value='';
+  renderConfusion();
+  checkBadges();
+  toast('🚩 Flag sent to teacher anonymously','ok');
+}
+
+function renderConfusion(){
+  const flags=ST.confusion;
+  document.getElementById('totalFlags').textContent=`${flags.length} flags`;
+
+  // Student log
+  document.getElementById('confusionLog').innerHTML=flags.length?
+    [...flags].reverse().slice(0,8).map(f=>`
+      <div class="cf-item">
+        <div class="cf-topic">${f.topic}</div>
+        <div class="cf-time">${f.time}</div>
+      </div>`).join(''):
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No flags yet.</div>';
+
+  // Heat map
+  const topicCounts={};
+  flags.forEach(f=>{topicCounts[f.topic]=(topicCounts[f.topic]||0)+1;});
+  const sorted=Object.entries(topicCounts).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('heatMap').innerHTML=sorted.length?
+    sorted.map(([topic,count])=>`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <div style="flex:1;font-size:11px;color:var(--tx2)">${topic}</div>
+        <div style="width:${Math.min(100,count*20)}px;height:5px;background:var(--red);border-radius:2px;opacity:${0.4+Math.min(0.6,count*0.2)}"></div>
+        <span class="cf-count">${count}</span>
+      </div>`).join(''):
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No flags yet.</div>';
+
+  // Prep
+  document.getElementById('prepFlags').textContent=`${flags.length} flags`;
+  document.getElementById('prepConfusion').innerHTML=sorted.length?
+    `<strong>Top confusion topics:</strong><br>${sorted.slice(0,5).map(([t,c])=>`• ${t} (${c} flag${c>1?'s':''})`).join('<br>')}`:
+    'No confusion flags from students yet.';
+}
+
+// ── REPORT ──
+function renderReport(){
+  const readiness=calcReadiness();
+  const streak=ST.streak.current||0;
+  const totalQs=calcTotalQs();
+  const grade=readiness>=90?'A':readiness>=80?'B':readiness>=70?'C':readiness>=60?'D':'F';
+  const gradeCol=readiness>=80?'var(--grn)':readiness>=60?'var(--amb)':'var(--red)';
+  const domainScores=calcDomainScores();
+  const covered=CHAPTERS.filter((_,i)=>Object.keys(ST.scores).some(k=>k.includes(`ch${i}`))).length;
+
+  document.getElementById('reportCode').textContent=`Student: ${ST.code||'—'}`;
+  document.getElementById('reportDate').textContent=`Generated: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+  document.getElementById('reportGrade').textContent=readiness?grade:'—';
+  document.getElementById('reportGrade').style.color=gradeCol;
+
+  document.getElementById('reportOverall').innerHTML=`
+    <div class="report-row"><div class="rr-label">Exam Readiness Score</div><div class="rr-val" style="color:${gradeCol}">${readiness||0}%</div></div>
+    <div class="report-row"><div class="rr-label">Questions Answered</div><div class="rr-val">${totalQs}</div></div>
+    <div class="report-row"><div class="rr-label">Chapters Covered</div><div class="rr-val">${covered} / ${CHAPTERS.length}</div></div>
+    <div class="report-row"><div class="rr-label">CompTIA A+ Pass Threshold</div><div class="rr-val" style="color:var(--tx3)">~78%</div></div>`;
+
+  document.getElementById('reportDomains').innerHTML=domainScores.map(d=>`
+    <div class="report-row">
+      <div class="rr-label">${d.name} (${Math.round(d.weight*100)}% of exam)</div>
+      <div class="rr-val" style="color:${d.score>=80?'var(--grn)':d.score>=60?'var(--amb)':'var(--red)'}">${d.hasData?d.score+'%':'Not started'}</div>
+    </div>`).join('');
+
+  document.getElementById('reportHabits').innerHTML=`
+    <div class="report-row"><div class="rr-label">Current Study Streak</div><div class="rr-val" style="color:var(--amb)">${streak} days</div></div>
+    <div class="report-row"><div class="rr-label">Confusion Topics Flagged</div><div class="rr-val">${ST.confusionFlags||0}</div></div>
+    <div class="report-row"><div class="rr-label">Glossary Terms Reviewed</div><div class="rr-val">${ST.glossaryViewed||0}</div></div>
+    <div class="report-row"><div class="rr-label">Spaced Repetition Sessions</div><div class="rr-val">${ST.srSessions||0}</div></div>`;
+
+  const weakDomains=domainScores.filter(d=>d.hasData&&d.score<70);
+  const recs=[];
+  if(readiness<60)recs.push('Complete quizzes across all chapters to build your readiness score.');
+  if(weakDomains.length)recs.push(`Focus extra study time on: ${weakDomains.map(d=>d.name).join(', ')}.`);
+  if(streak<3)recs.push('Study daily — even 15 minutes builds retention. Aim for a 7-day streak.');
+  if(covered<10)recs.push('You\'ve only covered '+covered+' chapters. Expand your chapter coverage to improve domain scores.');
+  if(getSRDue().length>0)recs.push(`${getSRDue().length} terms are due for review in your Study Queue.`);
+  if(!recs.length)recs.push('You\'re doing great! Keep up daily practice and aim for 80%+ across all domains.');
+  document.getElementById('reportRecs').innerHTML=recs.map((r,i)=>`<div style="display:flex;gap:8px;margin-bottom:6px"><span style="color:var(--acc);font-family:var(--mono);flex-shrink:0">${i+1}.</span>${r}</div>`).join('');
+}
+
+function exportReport(){
+  const readiness=calcReadiness();
+  const lines=[
+    `COMPTIA A+ 220-1202 STUDENT PROGRESS REPORT`,`${'='.repeat(50)}`,
+    `Student: ${ST.code}`,`Date: ${new Date().toLocaleDateString()}`,`Readiness: ${readiness}%`,``,
+    `DOMAIN SCORES`,`${'-'.repeat(30)}`,
+    ...calcDomainScores().map(d=>`${d.name}: ${d.hasData?d.score+'%':'Not started'}`),
+    ``,`STUDY HABITS`,`${'-'.repeat(30)}`,
+    `Streak: ${ST.streak.current||0} days`,
+    `Questions answered: ${calcTotalQs()}`,
+    `Chapters covered: ${CHAPTERS.filter((_,i)=>Object.keys(ST.scores).some(k=>k.includes(`ch${i}`))).length}/${CHAPTERS.length}`,
+  ];
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'}));
+  a.download=`${ST.code}_Progress_Report.txt`;a.click();
+  toast('Report exported!','ok');
+}
+
+// ── TEACHER PREP ──
+function renderPrep(){
+  renderConfusion(); // reuses confusion data
+}
+
+function loadPrepDay(){
+  const day=parseInt(document.getElementById('prepDay').value)||1;
+  const d=DAYS_DATA[day-1]||DAYS_DATA[0];
+  if(!d){toast('Day not found','err');return;}
+  document.getElementById('prepDayContent').innerHTML=`
+    <div style="margin-bottom:8px"><strong style="color:var(--acc)">Day ${day}</strong> · ${d.section}</div>
+    <div style="margin-bottom:6px;font-size:11px;color:var(--tx2)">Videos: ${d.videos.join(' · ')}</div>
+    <div style="font-size:11px;color:var(--tx3);line-height:1.7">
+      ✓ Cold retrieval will pull from the question bank<br>
+      ✓ Scenario questions will be generated from today's topics<br>
+      ✓ Discussion prompts ready for pre/during/post video<br>
+      ✓ Timed practice will generate from student notes
+    </div>`;
+
+  // Support
+  const confusionTopics=ST.confusion.slice(-10).map(f=>f.topic).filter(Boolean);
+  document.getElementById('prepSupport').innerHTML=confusionTopics.length?
+    `<div style="font-size:11px;color:var(--tx2);line-height:1.8">Recent confusion flags to address:<br>${[...new Set(confusionTopics)].map(t=>`• ${t}`).join('<br>')}</div>`:
+    'No recent confusion flags.';
+}
+
+// ── NAV ──
+function goPanel(id){
+  ST.curPanel=id;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>{if(b.textContent.toLowerCase().replace(/\s/g,'').includes(id.toLowerCase().replace('panel',''))||
+    (id==='dashboard'&&b.textContent==='Dashboard')||
+    (id==='readiness'&&b.textContent==='Exam Readiness')||
+    (id==='achievements'&&b.textContent==='Achievements')||
+    (id==='spaced'&&b.textContent==='Study Queue')||
+    (id==='glossary'&&b.textContent==='Glossary')||
+    (id==='confusion'&&b.textContent==='Confusion Flag')||
+    (id==='report'&&b.textContent==='My Report')||
+    (id==='prep'&&b.textContent==='Teacher Prep'))b.classList.add('active');});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel'+id.charAt(0).toUpperCase()+id.slice(1))?.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── TOAST ──
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// ── DEMO DATA (so the app looks populated on first load) ──
+function loadDemoData(){
+  if(loadLS('scc_demo_loaded',false))return;
+  // Simulate some quiz scores
+  ST.scores={
+    'q_ch0_1':82,'q_ch1_1':75,'q_ch4_1':68,'q_ch10_1':71,'q_ch13_1':85,
+    'q_ch14_1':63,'q_ch15_1':77,'q_ch18_1':90,'q_ch19_1':72,'q_ch23_1':80,
+  };
+  saveLS('scc_scores',ST.scores);
+  // Some missed terms
+  ST.srMissed={'APIPA':{level:0,lastSeen:Date.now()-86400000},'RAID':{level:1,lastSeen:Date.now()-259200000}};
+  saveLS('scc_missed',ST.srMissed);
+  saveLS('scc_demo_loaded',true);
+}
+
+init();
+// Uncomment to see demo data on first load:
+// loadDemoData();
+</script>
+<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('command');}
+}
+</script>
+</body>
+</html>

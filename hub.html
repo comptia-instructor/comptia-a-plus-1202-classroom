@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Mission Control</title>
+<link rel="stylesheet" href="platform.css">
+<style>
+/* Hub-specific styles only — everything else from platform.css */
+.hero { padding: 72px 0 56px; text-align: center; }
+.hero-eye {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.hero-eye::before,.hero-eye::after {
+  content: '';
+  width: 48px; height: 1px;
+  background: linear-gradient(90deg,transparent,var(--acc));
+}
+.hero-eye::after { background: linear-gradient(90deg,var(--acc),transparent); }
+
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(52px, 9vw, 96px);
+  font-weight: 900;
+  line-height: .92;
+  letter-spacing: -3px;
+  text-transform: uppercase;
+  color: var(--tx);
+  margin-bottom: 14px;
+}
+.hero-title .hl { color: var(--acc); display: block; }
+
+.hero-stats {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+.hs { text-align: center; }
+.hs-n {
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.hs-l {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* Announcement */
+.ann-bar {
+  max-width: 760px;
+  margin: 0 auto 48px;
+  background: linear-gradient(135deg, rgba(0,200,255,.07), rgba(187,68,255,.04));
+  border: 1px solid var(--acc);
+  border-radius: var(--rl);
+  padding: 14px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+}
+.ann-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,transparent,var(--acc),transparent);
+}
+.ann-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.ann-label { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--acc); text-transform: uppercase; margin-bottom: 3px; }
+.ann-text { font-size: 13px; color: var(--tx); line-height: 1.6; flex: 1; }
+.ann-edit {
+  background: var(--acc-d);
+  border: 1px solid var(--acc);
+  color: var(--acc);
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+  flex-shrink: 0;
+  align-self: center;
+}
+.ann-edit:hover { background: rgba(0,200,255,.18); }
+
+/* Section label */
+.section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--tx3);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--b1); }
+
+/* Tool cards */
+.tool-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 14px; }
+.tool-grid-2 { grid-template-columns: repeat(2,1fr); }
+@media (max-width: 800px) { .tool-grid,.tool-grid-2 { grid-template-columns: 1fr; } }
+
+.tool-card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--rl);
+  padding: 22px;
+  cursor: pointer;
+  transition: all .25s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-decoration: none;
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .25s;
+}
+.tool-card:hover { transform: translateY(-3px); border-color: var(--tc, var(--acc)); }
+.tool-card:hover::before { opacity: 1; }
+/* Color variants */
+.tc-acc { --tc: var(--acc); }
+.tc-acc::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,200,255,.06),transparent); }
+.tc-grn { --tc: var(--grn); }
+.tc-grn::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,240,128,.06),transparent); }
+.tc-pur { --tc: var(--pur); }
+.tc-pur::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(187,68,255,.06),transparent); }
+.tc-gold { --tc: var(--gold); }
+.tc-gold::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,215,0,.05),transparent); }
+.tc-red { --tc: var(--red); }
+.tc-red::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,34,85,.05),transparent); }
+.tc-amb { --tc: var(--amb); }
+.tc-amb::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,184,0,.05),transparent); }
+.tc-pnk { --tc: var(--pnk); }
+.tc-pnk::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,68,153,.05),transparent); }
+.tc-cya { --tc: var(--cya); }
+.tc-cya::before { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,238,221,.05),transparent); }
+
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.card-icon {
+  width: 42px; height: 42px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+  border: 1px solid var(--tc, var(--acc));
+  background: color-mix(in srgb, var(--tc, var(--acc)) 10%, transparent);
+}
+.card-badge {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--tc, var(--acc));
+  color: var(--tc, var(--acc));
+}
+.card-title {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--tx);
+  line-height: 1.1;
+}
+.card-sub { font-size: 11px; color: var(--tx2); line-height: 1.65; }
+.card-features { display: flex; flex-direction: column; gap: 4px; }
+.cf {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: .2px;
+}
+.cf::before { content: '—'; color: var(--tc, var(--acc)); font-weight: 700; }
+.card-action {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ca-label { font-family: var(--mono); font-size: 9px; color: var(--tc, var(--acc)); letter-spacing: .5px; }
+.ca-arrow { font-size: 15px; color: var(--tc, var(--acc)); transition: transform .2s; }
+.tool-card:hover .ca-arrow { transform: translateX(4px); }
+
+/* Quick actions */
+.quick-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 44px; }
+@media (max-width: 600px) { .quick-grid { grid-template-columns: repeat(2,1fr); } }
+.quick-card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--r);
+  padding: 14px 12px;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+}
+.quick-card:hover { border-color: var(--b2); transform: translateY(-2px); background: var(--s2); }
+.qc-icon { font-size: 22px; }
+.qc-label { font-family: var(--display); font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--tx2); }
+.qc-sub { font-size: 9px; color: var(--tx3); font-family: var(--mono); }
+
+/* Calendar strip */
+.cal-strip {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--rl);
+  padding: 18px;
+  margin-bottom: 44px;
+  overflow: hidden;
+}
+.cal-strip-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.cal-strip-title { font-family: var(--display); font-size: 15px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--tx); }
+.cal-controls { display: flex; gap: 5px; align-items: center; }
+.cal-week-label { font-family: var(--mono); font-size: 10px; color: var(--tx3); padding: 0 8px; }
+.cal-nav-btn {
+  width: 24px; height: 24px;
+  background: var(--s2); border: 1px solid var(--b1); border-radius: 5px;
+  color: var(--tx2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all .15s;
+}
+.cal-nav-btn:hover { border-color: var(--b2); color: var(--tx); }
+.day-strip { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+.ds-day {
+  background: var(--s2); border: 1px solid var(--b1); border-radius: 7px;
+  padding: 7px 5px; text-align: center; min-height: 68px;
+  cursor: pointer; transition: all .15s; position: relative;
+}
+.ds-day:hover { border-color: var(--b2); }
+.ds-day.today { border-color: var(--acc); background: var(--acc-d); }
+.ds-day.done  { border-color: var(--grn); background: var(--grn-d); opacity: .7; }
+.ds-day.no-class { opacity: .2; pointer-events: none; }
+.ds-date { font-family: var(--mono); font-size: 8px; color: var(--tx3); margin-bottom: 3px; }
+.ds-num  { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--acc); line-height: 1; }
+.ds-ch   { font-size: 8px; color: var(--tx3); line-height: 1.3; margin-top: 3px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ds-tick { position: absolute; top: 3px; right: 4px; font-size: 8px; color: var(--grn); }
+.cal-legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+.cl-item { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 9px; color: var(--tx3); }
+.cl-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--b1);
+  padding: 28px 0;
+  margin-top: 48px;
+}
+.footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.footer-brand { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--tx2); letter-spacing: 1px; }
+.footer-mono  { font-family: var(--mono); font-size: 9px; color: var(--tx3); letter-spacing: .5px; line-height: 1.8; }
+
+/* Modal */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(6px);
+  z-index: 600;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+}
+.modal-bg.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--s1); border: 1px solid var(--b2);
+  border-radius: var(--rxl); padding: 28px;
+  width: 480px; max-width: 90vw;
+  transform: scale(.96); transition: transform .2s;
+}
+.modal-bg.open .modal { transform: scale(1); }
+.modal h3 {
+  font-family: var(--display); font-size: 20px; font-weight: 700;
+  letter-spacing: .8px; text-transform: uppercase; color: var(--tx);
+  margin-bottom: 6px;
+}
+.modal p { font-size: 12px; color: var(--tx2); line-height: 1.7; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+</style>
+</head>
+<body class="platform-atmosphere">
+<div class="platform-shell">
+
+<!-- HEADER -->
+<header class="platform-header">
+  <a href="hub.html" class="ph-logo">A+</a>
+  <div>
+    <div class="ph-title">Mission <span>Control</span></div>
+    <div class="ph-sub">CompTIA A+ 220-1202 · Classroom Hub</div>
+  </div>
+  <div class="ph-right" id="headerRight">
+    <span class="ph-back" onclick="openAnnModal()">📢 Announce</span>
+  </div>
+</header>
+
+<div class="platform-content">
+<div class="wrap">
+
+  <!-- First-run banner (only shows if setup not complete) -->
+  <div id="setupBanner" style="background:linear-gradient(135deg,rgba(0,200,255,0.08),rgba(187,68,255,0.05));border:1px solid var(--acc);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin:20px 0 0;position:relative">
+    <span style="font-size:24px">🚀</span>
+    <div style="flex:1">
+      <div style="font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:3px">First time? Run the Setup Wizard</div>
+      <div style="font-size:12px;color:var(--tx2);line-height:1.6">Generate student codes, set your course start date, test AI connectivity, and configure Google Sheets sync — all in one place.</div>
+    </div>
+    <a href="setup-wizard.html" style="background:var(--acc);color:var(--bg);padding:10px 20px;border-radius:6px;font-family:var(--display);font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:all .15s">Run Setup →</a>
+    <button onclick="document.getElementById('setupBanner').style.display='none';localStorage.setItem('hub_banner_dismissed','1')" style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 6px">✕</button>
+  </div>
+  <script>if(localStorage.getItem('setup_complete')||localStorage.getItem('hub_banner_dismissed'))document.getElementById('setupBanner').style.display='none';</script>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eye">CompTIA A+ 220-1202 · Classroom Platform</div>
+    <h1 class="hero-title">Mission<span class="hl">Control</span></h1>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--tx3);letter-spacing:.8px;margin-bottom:28px">68 days · 147 videos · 27 chapters · 9 tools</p>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-n" style="color:var(--acc)">68</div><div class="hs-l">Class Days</div></div>
+      <div class="hs"><div class="hs-n" style="color:var(--grn)">147</div><div class="hs-l">Videos</div></div>
+      <div class="hs"><div class="hs-n" style="color:var(--pur)">27</div><div class="hs-l">Chapters</div></div>
+      <div class="hs"><div class="hs-n" style="color:var(--amb)">9</div><div class="hs-l">Tools</div></div>
+    </div>
+
+    <!-- Announcement -->
+    <div class="ann-bar">
+      <div class="ann-icon">📢</div>
+      <div style="flex:1">
+        <div class="ann-label">Teacher Announcement</div>
+        <div class="ann-text" id="annText">Welcome! Click Edit to post today's announcement for your class.</div>
+      </div>
+      <button class="ann-edit" onclick="openAnnModal()">✏️ Edit</button>
+    </div>
+  </div>
+
+  <!-- CORE TOOLS -->
+  <div class="section-label">Core Tools</div>
+  <div class="tool-grid" style="margin-bottom:14px">
+    <a class="tool-card tc-acc" href="comptia-classroom-v2.html">
+      <div class="card-top">
+        <div class="card-icon">🏫</div>
+        <span class="card-badge">DAILY USE</span>
+      </div>
+      <div class="card-title">Classroom</div>
+      <div class="card-sub">Runs every phase of the daily lesson — cold retrieval through timed practice.</div>
+      <div class="card-features">
+        <div class="cf">Cold retrieval · Scenario questions</div>
+        <div class="cf">Discussion prompts · Video links</div>
+        <div class="cf">Auto-grading · Progress dashboard</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open tool</span><span class="ca-arrow">→</span></div>
+    </a>
+    <a class="tool-card tc-grn" href="comptia-notes-quiz.html">
+      <div class="card-top">
+        <div class="card-icon">📝</div>
+        <span class="card-badge">STUDENT</span>
+      </div>
+      <div class="card-title">Notes & Quizzes</div>
+      <div class="card-sub">Cornell-style notes for all 27 chapters plus AI quiz generation.</div>
+      <div class="card-features">
+        <div class="cf">Cornell notes · Auto-graded completion</div>
+        <div class="cf">MC · True/False · Match · Open response</div>
+        <div class="cf">PDF export · Print-ready</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open tool</span><span class="ca-arrow">→</span></div>
+    </a>
+    <a class="tool-card tc-pur" href="student-command-center.html">
+      <div class="card-top">
+        <div class="card-icon">🎮</div>
+        <span class="card-badge">STUDENT</span>
+      </div>
+      <div class="card-title">Command Center</div>
+      <div class="card-sub">Student's personal hub — readiness, achievements, spaced repetition.</div>
+      <div class="card-features">
+        <div class="cf">Exam readiness % by domain</div>
+        <div class="cf">Spaced repetition · Glossary</div>
+        <div class="cf">12 badges · Progress report</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open tool</span><span class="ca-arrow">→</span></div>
+    </a>
+  </div>
+
+  <div class="tool-grid tool-grid-2" style="margin-bottom:14px">
+    <a class="tool-card tc-gold" href="pbis-quiz-tools.html">
+      <div class="card-top">
+        <div class="card-icon">🏆</div>
+        <span class="card-badge">PBIS</span>
+      </div>
+      <div class="card-title">PBIS & Quiz Tools</div>
+      <div class="card-sub">Auto-award PBIS points, run lockdown quizzes, generate print-ready PDF quizzes.</div>
+      <div class="card-features">
+        <div class="cf">Auto-award · PBIS Rewards export</div>
+        <div class="cf">Lockdown browser · Integrity log</div>
+        <div class="cf">PDF quiz generator · Answer key</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open tool</span><span class="ca-arrow">→</span></div>
+    </a>
+    <a class="tool-card tc-red" href="exam-suite.html">
+      <div class="card-top">
+        <div class="card-icon">🎓</div>
+        <span class="card-badge">EXAM PREP</span>
+      </div>
+      <div class="card-title">Exam Suite</div>
+      <div class="card-sub">Full 90-question simulator, micro-lessons, parent comms, sub mode, retake manager.</div>
+      <div class="card-features">
+        <div class="cf">90Q exam · 900-point scale</div>
+        <div class="cf">Micro-lessons · Parent communication</div>
+        <div class="cf">Substitute mode · Retake manager</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open tool</span><span class="ca-arrow">→</span></div>
+    </a>
+  </div>
+
+  <div class="tool-grid" style="margin-bottom:44px">
+    <a class="tool-card tc-red" href="competition-arena.html">
+      <div class="card-top">
+        <div class="card-icon">⚔️</div>
+        <span class="card-badge">COMPETITION</span>
+      </div>
+      <div class="card-title">Arena</div>
+      <div class="card-sub">Live leaderboards, boss battles, weekly challenges, question voting.</div>
+      <div class="card-features">
+        <div class="cf">5-category leaderboard · Projector mode</div>
+        <div class="cf">Boss battles · Weekly challenges</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open arena</span><span class="ca-arrow">→</span></div>
+    </a>
+    <a class="tool-card tc-acc" href="engagement-layer.html">
+      <div class="card-top">
+        <div class="card-icon">⚡</div>
+        <span class="card-badge">ENGAGEMENT</span>
+      </div>
+      <div class="card-title">Engage</div>
+      <div class="card-sub">QOTD, class XP, hot streak alerts, readiness arc, teacher spotlight, weekly report.</div>
+      <div class="card-features">
+        <div class="cf">Question of the Day · Class XP</div>
+        <div class="cf">Hot streak · Spotlight · Most Improved</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open tool</span><span class="ca-arrow">→</span></div>
+    </a>
+    <a class="tool-card tc-pnk" href="setup-extras.html">
+      <div class="card-top">
+        <div class="card-icon">⚙️</div>
+        <span class="card-badge">SETUP</span>
+      </div>
+      <div class="card-title">Setup & Extras</div>
+      <div class="card-sub">Google Sheets sync, daily digest template, printable student cheat sheet.</div>
+      <div class="card-features">
+        <div class="cf">Cross-device sync · Google Sheets</div>
+        <div class="cf">Daily digest · Cheat sheet</div>
+      </div>
+      <div class="card-action"><span class="ca-label">Open tool</span><span class="ca-arrow">→</span></div>
+    </a>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="section-label">Quick Actions</div>
+  <div class="quick-grid">
+    <a class="quick-card" href="comptia-classroom-v2.html">
+      <div class="qc-icon">▶️</div>
+      <div class="qc-label">Start Class</div>
+      <div class="qc-sub">Launch today's lesson</div>
+    </a>
+    <a class="quick-card" href="exam-suite.html#sub">
+      <div class="qc-icon">🔄</div>
+      <div class="qc-label">Sub Mode</div>
+      <div class="qc-sub">Simplified sub view</div>
+    </a>
+    <a class="quick-card" href="pbis-quiz-tools.html">
+      <div class="qc-icon">🏆</div>
+      <div class="qc-label">Award Points</div>
+      <div class="qc-sub">PBIS Rewards</div>
+    </a>
+    <a class="quick-card" href="engagement-layer.html">
+      <div class="qc-icon">⚡</div>
+      <div class="qc-label">QOTD</div>
+      <div class="qc-sub">Question of the day</div>
+    </a>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="section-label">Class Calendar</div>
+  <div class="cal-strip">
+    <div class="cal-strip-hdr">
+      <div class="cal-strip-title">68-Day Course Schedule</div>
+      <div class="cal-controls">
+        <button class="cal-nav-btn" onclick="prevWeek()">‹</button>
+        <div class="cal-week-label" id="weekLabel">—</div>
+        <button class="cal-nav-btn" onclick="nextWeek()">›</button>
+        <a href="exam-suite.html" class="p-btn p-btn-ghost p-btn-sm" style="margin-left:6px;text-decoration:none">Full Calendar →</a>
+      </div>
+    </div>
+    <div class="day-strip" id="dayStrip"></div>
+    <div class="cal-legend">
+      <div class="cl-item"><div class="cl-dot" style="background:var(--acc-d);border:1px solid var(--acc)"></div>Today</div>
+      <div class="cl-item"><div class="cl-dot" style="background:var(--grn-d);border:1px solid var(--grn)"></div>Completed</div>
+      <div class="cl-item"><div class="cl-dot" style="background:var(--s2);border:1px solid var(--b1)"></div>Upcoming</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">CompTIA A+ 220-1202 · Mission Control</div>
+        <div class="footer-mono">9 tools · Student data stored locally · FERPA-safe · No names collected</div>
+      </div>
+      <div class="footer-mono" style="text-align:right">
+        Powered by Claude AI<br>
+        All tools open in same tab
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /wrap -->
+</div><!-- /content -->
+</div><!-- /shell -->
+
+<!-- Announcement Modal -->
+<div class="modal-bg" id="annModal">
+  <div class="modal">
+    <h3>Daily Announcement</h3>
+    <p>This message appears at the top of the hub. Update it each morning with the day's focus, reminders, or encouragement.</p>
+    <textarea class="p-input p-textarea" id="annInput" rows="4" placeholder="e.g. Today we start TCP/IP networking — Day 37. Quiz at end of class. Check your readiness arc before we begin!"></textarea>
+    <div class="modal-actions">
+      <button class="p-btn p-btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="p-btn p-btn-acc" onclick="saveAnn()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+if(typeof Platform!=='undefined'){Platform.init('hub');}
+
+const DAYS_DATA=[
+  {day:1,section:'Ch.1 Safety'},{day:2,section:'Ch.1-2'},{day:3,section:'Ch.2 OS Intro'},
+  {day:4,section:'Ch.2 Windows'},{day:5,section:'Ch.2 macOS'},{day:6,section:'Ch.2 Linux'},
+  {day:7,section:'Ch.7 Power'},{day:8,section:'Ch.8-9 Storage'},{day:9,section:'Ch.9 Partitioning'},
+  {day:10,section:'Ch.9 File Systems'},{day:11,section:'Ch.9 Mass Storage'},{day:12,section:'Ch.9 RAID'},
+  {day:13,section:'Ch.9 Encryption'},{day:14,section:'Ch.10 Peripherals'},{day:15,section:'Ch.11 OS Install'},
+  {day:16,section:'Ch.11 Windows'},{day:17,section:'Ch.11 Linux'},{day:18,section:'Ch.12 Task Mgr'},
+  {day:19,section:'Ch.12 Registry'},{day:20,section:'Ch.12-13 OS Tools'},{day:21,section:'Ch.13 Users'},
+  {day:22,section:'Ch.13 NTFS'},{day:23,section:'Ch.13 Sharing'},{day:24,section:'Ch.14 Maintenance'},
+  {day:25,section:'Ch.14 Backup'},{day:26,section:'Ch.14-15 CLI'},{day:27,section:'Ch.15 CLI Nav'},
+  {day:28,section:'Ch.15 Files'},{day:29,section:'Ch.15 Commands'},{day:30,section:'Ch.15 Advanced'},
+  {day:31,section:'Ch.15 Scripting'},{day:32,section:'Ch.16 Recovery'},{day:33,section:'Ch.16 Boot'},
+  {day:34,section:'Ch.16 GUI'},{day:35,section:'Ch.16-17 Display'},{day:36,section:'Ch.17-18 Network'},
+  {day:37,section:'Ch.18-19 TCP/IP'},{day:38,section:'Ch.19 Subnetting'},{day:39,section:'Ch.19 NAT/DHCP'},
+  {day:40,section:'Ch.19-20 DNS'},{day:41,section:'Ch.20 AD/Groups'},{day:42,section:'Ch.20 Routers'},
+  {day:43,section:'Ch.20 Firewall'},{day:44,section:'Ch.20 Advanced'},{day:45,section:'Ch.20-21 Wireless'},
+  {day:46,section:'Ch.21 Wireless'},{day:47,section:'Ch.21 Enterprise'},{day:48,section:'Ch.21-22 Internet'},
+  {day:49,section:'Ch.22 Remote'},{day:50,section:'Ch.22 FTP/Proxy'},{day:51,section:'Ch.22 VPN/IoT'},
+  {day:52,section:'Ch.22 Troubleshoot'},{day:53,section:'Ch.23 Cloud'},{day:54,section:'Ch.23-24 Laptop'},
+  {day:55,section:'Ch.24 Portable'},{day:56,section:'Ch.25 Mobile'},{day:57,section:'Ch.26 Mobile Sec'},
+  {day:58,section:'Ch.26 MDM'},{day:59,section:'Ch.27 Printers'},{day:60,section:'Ch.28 Security'},
+  {day:61,section:'Ch.28 Auth'},{day:62,section:'Ch.28-29 Malware'},{day:63,section:'Ch.29 Anti-Malware'},
+  {day:64,section:'Ch.29 Social Eng'},{day:65,section:'Ch.29-30 Incident'},{day:66,section:'Ch.30 Docs'},
+  {day:67,section:'Ch.30 Backup'},{day:68,section:'Ch.30 Ticketing'},
+];
+
+let currentWeek = pls('hub_week', 0);
+
+function init() {
+  const ann = pls('hub_announcement', '');
+  if (ann) document.getElementById('annText').textContent = ann;
+  renderCalendar();
+}
+
+// Announcement
+function openAnnModal() {
+  document.getElementById('annInput').value = pls('hub_announcement','');
+  document.getElementById('annModal').classList.add('open');
+}
+function closeModal() { document.getElementById('annModal').classList.remove('open'); }
+function saveAnn() {
+  const v = document.getElementById('annInput').value.trim();
+  if (!v) return;
+  psl('hub_announcement', v);
+  document.getElementById('annText').textContent = v;
+  closeModal();
+  Platform.toast('Announcement saved', 'ok');
+}
+
+// Calendar
+function renderCalendar() {
+  const today = new Date();
+  const dow = (today.getDay()+6)%7;
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - dow + (currentWeek*7));
+
+  const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6);
+  document.getElementById('weekLabel').textContent = `${fmt(weekStart)} – ${fmt(weekEnd)}`;
+
+  const calStart = pls('cal_start', null);
+  let classStart = calStart ? new Date(calStart) : (() => {
+    const d = new Date(today); d.setDate(d.getDate() - dow - 28); return d;
+  })();
+
+  const done = pls('hub_done', []);
+  const days = ['M','T','W','T','F','S','S'];
+
+  document.getElementById('dayStrip').innerHTML = Array.from({length:7},(_,i) => {
+    const date = new Date(weekStart); date.setDate(weekStart.getDate()+i);
+    const isToday  = date.toDateString() === today.toDateString();
+    const isWeekend = i >= 5;
+    let classDay = null;
+    if (!isWeekend && calStart) {
+      const diff = Math.floor((date - classStart)/86400000);
+      if (diff >= 0) {
+        const wk = Math.floor(diff/7), dw = diff%7;
+        if (dw < 5) { classDay = wk*5+dw+1; if (classDay > 68) classDay = null; }
+      }
+    }
+    const d = classDay ? DAYS_DATA[classDay-1] : null;
+    const isDone = classDay && done.includes(classDay);
+    return `<div class="ds-day ${isToday?'today':''} ${isDone?'done':''} ${isWeekend?'no-class':''}"
+      title="${d?`Day ${classDay}: ${d.section}`:''}">
+      ${isDone?'<div class="ds-tick">✓</div>':''}
+      <div class="ds-date">${days[i]} ${date.getDate()}</div>
+      ${classDay ? `<div class="ds-num">D${classDay}</div><div class="ds-ch">${d?.section||''}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function prevWeek() { currentWeek--; psl('hub_week',currentWeek); renderCalendar(); }
+function nextWeek() { currentWeek++; psl('hub_week',currentWeek); renderCalendar(); }
+
+init();
+</script>
+</body>
+</html>

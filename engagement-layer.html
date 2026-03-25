@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Engagement Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050810;--s1:#07090f;--s2:#0b0e18;--s3:#0f1320;--s4:#141828;
+  --b1:#1a2038;--b2:#222a48;--b3:#2c3660;
+  --tx:#ccd4f0;--tx2:#6878a8;--tx3:#364060;--tx4:#1e2840;
+  --acc:#00c8ff;--acc2:#0088cc;--acc-d:rgba(0,204,255,0.1);
+  --grn:#00ff77;--grn2:#00cc5a;--grn-d:rgba(0,255,119,0.1);
+  --amb:#ffbb00;--amb2:#cc8800;--amb-d:rgba(255,187,0,0.1);
+  --red:#ff2255;--red-d:rgba(255,34,85,0.1);
+  --pur:#cc44ff;--pur-d:rgba(204,68,255,0.1);
+  --gold:#ffd700;--gold-d:rgba(255,215,0,0.12);
+  --hot:#ff6600;--hot-d:rgba(255,102,0,0.12);
+  --mono:'JetBrains Mono',monospace;
+  --display:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+  --r:6px;--rl:12px;--rxl:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 100% 50% at 50% -5%,rgba(0,204,255,0.07),transparent 60%),
+  radial-gradient(ellipse 50% 40% at 0% 100%,rgba(255,215,0,0.04),transparent 50%),
+  radial-gradient(ellipse 40% 30% at 100% 60%,rgba(0,255,119,0.03),transparent 50%),
+  repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(0,204,255,0.015) 59px,rgba(0,204,255,0.015) 60px),
+  repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(0,204,255,0.015) 59px,rgba(0,204,255,0.015) 60px);
+  pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--b1);padding:0 24px;display:flex;align-items:center;gap:14px;background:rgba(3,5,8,0.97);backdrop-filter:blur(24px);position:sticky;top:0;z-index:400;height:52px;flex-shrink:0}
+.logo{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--acc);border:1px solid var(--acc);padding:4px 8px;border-radius:4px;background:var(--acc-d);letter-spacing:.5px}
+.htitle{font-family:var(--display);font-size:17px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--tx)}
+.htitle span{color:var(--acc)}
+.hsub{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sound-toggle{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--tx3);cursor:pointer;padding:4px 10px;border:1px solid var(--b1);border-radius:20px;transition:all .15s}
+.sound-toggle:hover{border-color:var(--b2);color:var(--tx2)}
+.sound-toggle.on{border-color:var(--grn);color:var(--grn);background:var(--grn-d)}
+.back{font-family:var(--mono);font-size:9px;color:var(--tx2);background:var(--s2);border:1px solid var(--b1);padding:5px 12px;border-radius:5px;cursor:pointer;text-decoration:none;transition:all .15s}
+.back:hover{border-color:var(--b2);color:var(--tx)}
+
+/* ── NAV ── */
+nav{display:flex;background:var(--s1);border-bottom:1px solid var(--b1);padding:0 20px;overflow-x:auto;flex-shrink:0}
+nav::-webkit-scrollbar{height:2px}
+.tab{padding:12px 16px;font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--tx2)}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+.content{flex:1;overflow-y:auto}
+.panel{display:none;padding:24px;max-width:1000px;margin:0 auto;flex-direction:column;gap:18px}
+.panel.active{display:flex}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,204,255,0.2),transparent)}
+.card-hdr{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b1);background:rgba(255,255,255,0.015);flex-wrap:wrap}
+.card-hdr h2{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx);flex:1}
+.card-body{padding:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-grn{background:var(--grn);color:var(--bg)}
+.btn-gold{background:var(--gold);color:var(--bg)}
+.btn-hot{background:var(--hot);color:#fff}
+.btn-pur{background:var(--pur-d);border:1px solid var(--pur);color:var(--pur)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{border-color:var(--b3);color:var(--tx)}
+.btn-sm{padding:5px 12px;font-size:10px;border-radius:5px}
+.btn-lg{padding:14px 32px;font-size:16px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.3px;border:1px solid}
+.tag.acc{background:var(--acc-d);color:var(--acc);border-color:var(--acc)}
+.tag.grn{background:var(--grn-d);color:var(--grn);border-color:var(--grn)}
+.tag.amb{background:var(--amb-d);color:var(--amb);border-color:var(--amb)}
+.tag.gold{background:var(--gold-d);color:var(--gold);border-color:var(--gold)}
+.tag.hot{background:var(--hot-d);color:var(--hot);border-color:var(--hot)}
+.tag.pur{background:var(--pur-d);color:var(--pur);border-color:var(--pur)}
+
+/* ── QOTD ── */
+.qotd-hero{background:linear-gradient(135deg,rgba(0,204,255,0.08),rgba(204,68,255,0.05));border:1px solid var(--acc);border-radius:var(--rxl);padding:28px;position:relative;overflow:hidden}
+.qotd-hero::before{content:'QUESTION OF THE DAY';position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--tx4)}
+.qotd-label{font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.qotd-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--acc),transparent)}
+.qotd-q{font-size:16px;font-weight:500;color:var(--tx);line-height:1.65;margin-bottom:18px}
+.qotd-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.qotd-opt{padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2)}
+.qotd-opt:hover{border-color:var(--b2);color:var(--tx)}
+.qotd-opt.sel{border-color:var(--acc);background:var(--acc-d);color:var(--tx)}
+.qotd-opt.correct{border-color:var(--grn);background:var(--grn-d);color:var(--grn)}
+.qotd-opt.wrong{border-color:var(--red);background:var(--red-d);color:var(--red)}
+.qotd-ltr{font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;width:16px}
+.qotd-winners{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.qotd-winner{font-family:var(--mono);font-size:9px;background:var(--gold-d);border:1px solid var(--gold);color:var(--gold);padding:2px 8px;border-radius:3px}
+.qotd-timer{font-family:var(--display);font-size:40px;font-weight:900;color:var(--acc);letter-spacing:2px;text-align:center;margin-bottom:8px}
+.qotd-timer.warn{color:var(--amb);animation:pulse .6s ease infinite}
+.qotd-timer.done{color:var(--grn)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── CLASS XP ── */
+.xp-display{background:linear-gradient(135deg,var(--s2),rgba(204,68,255,0.05));border:1px solid var(--b1);border-radius:var(--rxl);padding:28px;text-align:center;position:relative;overflow:hidden}
+.xp-level{font-family:var(--display);font-size:clamp(16px,4vw,28px);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pur);margin-bottom:4px}
+.xp-title{font-family:var(--display);font-size:clamp(28px,6vw,56px);font-weight:900;letter-spacing:-1px;text-transform:uppercase;color:var(--tx);margin-bottom:16px;line-height:1}
+.xp-bar-wrap{max-width:500px;margin:0 auto 12px;position:relative}
+.xp-bar{height:16px;background:var(--b1);border-radius:8px;overflow:hidden;border:1px solid var(--b2)}
+.xp-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--pur),var(--acc));transition:width 1.5s cubic-bezier(.4,0,.2,1);position:relative}
+.xp-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:20px;background:rgba(255,255,255,0.3);filter:blur(4px)}
+.xp-nums{font-family:var(--mono);font-size:11px;color:var(--tx3);display:flex;justify-content:space-between;margin-top:4px}
+.xp-milestone{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.xp-ms{text-align:center;padding:10px 16px;background:var(--s3);border-radius:var(--r);border:1px solid var(--b1);min-width:100px}
+.xp-ms.achieved{border-color:var(--pur);background:var(--pur-d)}
+.xp-ms-num{font-family:var(--display);font-size:18px;font-weight:800;color:var(--pur)}
+.xp-ms.achieved .xp-ms-num{color:var(--gold)}
+.xp-ms-label{font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:2px}
+
+.xp-award-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:4px}
+.xp-award{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s}
+.xp-award:hover{border-color:var(--pur)}
+.xa-icon{font-size:20px;flex-shrink:0}
+.xa-info{flex:1}
+.xa-name{font-size:11px;font-weight:600;color:var(--tx)}
+.xa-xp{font-family:var(--mono);font-size:10px;color:var(--pur)}
+
+/* ── HOT STREAK ── */
+.streak-monitor{background:linear-gradient(135deg,var(--hot-d),var(--s2));border:1px solid var(--hot);border-radius:var(--rl);padding:20px;margin-bottom:14px}
+.sm-label{font-family:var(--mono);font-size:9px;color:var(--hot);letter-spacing:1.5px;margin-bottom:10px}
+.sm-dots{display:flex;gap:6px;margin-bottom:12px}
+.sm-dot{width:36px;height:36px;border-radius:8px;background:var(--s3);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .3s}
+.sm-dot.correct{background:var(--hot-d);border-color:var(--hot);animation:hotPop .3s ease}
+.sm-dot.wrong{background:var(--red-d);border-color:var(--red)}
+@keyframes hotPop{0%{transform:scale(.8)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.streak-count{font-family:var(--display);font-size:48px;font-weight:900;color:var(--hot);line-height:1}
+.streak-best{font-family:var(--mono);font-size:10px;color:var(--tx3)}
+
+.student-streaks{display:flex;flex-direction:column;gap:6px}
+.ss-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r)}
+.ss-name{font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx);flex:1}
+.ss-dots{display:flex;gap:3px}
+.ss-d{width:10px;height:10px;border-radius:2px;background:var(--s3)}
+.ss-d.c{background:var(--hot)}
+.ss-d.w{background:var(--red)}
+.ss-streak{font-family:var(--mono);font-size:11px;color:var(--hot);min-width:30px;text-align:right}
+
+/* ── READINESS ARC ── */
+.arc-display{text-align:center;padding:32px 20px}
+.arc-wrap{position:relative;width:260px;height:140px;margin:0 auto 20px}
+.arc-svg{width:260px;height:140px}
+.arc-code-inp{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;color:var(--acc);font-family:var(--mono);font-size:14px;letter-spacing:2px;text-align:center;text-transform:uppercase;outline:none;width:160px;transition:border-color .2s;margin-bottom:14px}
+.arc-code-inp:focus{border-color:var(--acc)}
+.arc-pct{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:var(--display);font-size:48px;font-weight:900;line-height:1;letter-spacing:-2px}
+.arc-label{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;white-space:nowrap}
+.arc-status{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.arc-desc{font-size:12px;color:var(--tx2);line-height:1.7;max-width:400px;margin:0 auto 16px}
+.arc-milestones{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.arc-ms{padding:6px 14px;border-radius:20px;font-family:var(--mono);font-size:10px;border:1px solid var(--b1);color:var(--tx3)}
+.arc-ms.reached{border-color:var(--grn);color:var(--grn);background:var(--grn-d)}
+.arc-ms.next{border-color:var(--acc);color:var(--acc);background:var(--acc-d);animation:glowPulse 2s ease infinite}
+@keyframes glowPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(0,204,255,0.3)}}
+
+/* ── SPOTLIGHT ── */
+.spotlight-btn{width:100%;padding:20px;background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,187,0,0.06));border:2px solid var(--gold);border-radius:var(--rxl);cursor:pointer;transition:all .2s;text-align:center;font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;justify-content:center;gap:12px}
+.spotlight-btn:hover{background:rgba(255,215,0,0.18);transform:translateY(-2px)}
+.spotlight-config{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.sc-inp{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 14px;color:var(--tx);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;width:100%}
+.sc-inp:focus{border-color:var(--gold)}
+.sc-inp::placeholder{color:var(--tx3)}
+
+/* Spotlight overlay */
+.spotlight-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.spotlight-overlay.active{opacity:1;pointer-events:all}
+.spotlight-content{text-align:center;animation:spotlightIn .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes spotlightIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.sl-icon{font-size:80px;margin-bottom:16px;animation:spin3d 1s ease}
+@keyframes spin3d{from{transform:rotateY(-180deg)}to{transform:rotateY(0)}}
+.sl-label{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.sl-name{font-family:var(--display);font-size:clamp(48px,8vw,96px);font-weight:900;letter-spacing:-2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;text-shadow:0 0 60px rgba(255,215,0,0.5)}
+.sl-msg{font-family:var(--display);font-size:clamp(18px,3vw,28px);font-weight:600;letter-spacing:1px;color:var(--tx);margin-bottom:24px;max-width:600px;line-height:1.3}
+.sl-pts{font-family:var(--display);font-size:clamp(24px,4vw,40px);font-weight:800;color:var(--grn);letter-spacing:1px}
+.sl-close{margin-top:24px;font-family:var(--mono);font-size:10px;color:var(--tx3);cursor:pointer;letter-spacing:1px}
+
+/* ── WEEKLY REPORT ── */
+.report-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden}
+.rc-header{background:var(--s2);border-bottom:1px solid var(--b1);padding:20px 24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px}
+.rc-title{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--tx)}
+.rc-week{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:3px}
+.rc-grade{font-family:var(--display);font-size:56px;font-weight:900;line-height:1;letter-spacing:-2px}
+.rc-body{padding:24px;display:flex;flex-direction:column;gap:16px}
+.rc-section{margin-bottom:4px}
+.rc-section-title{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--b1)}
+.rc-stat{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b1)}
+.rc-stat:last-child{border-bottom:none}
+.rc-stat-label{font-size:12px;color:var(--tx2)}
+.rc-stat-val{font-family:var(--mono);font-size:12px;font-weight:500}
+.spotlight-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s2);border-radius:var(--r);border-left:3px solid var(--gold)}
+.sr-icon{font-size:20px}
+.sr-info{flex:1}
+.sr-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px}
+.sr-name{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+
+/* ── MOST IMPROVED ── */
+.improved-grid{display:flex;flex-direction:column;gap:8px}
+.improved-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);transition:all .2s}
+.improved-row.top{border-color:var(--grn);background:linear-gradient(90deg,var(--grn-d),var(--s2))}
+.ir-rank{font-family:var(--display);font-size:22px;font-weight:800;min-width:36px;text-align:center}
+.ir-name{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;color:var(--tx);flex:1}
+.ir-scores{text-align:right}
+.ir-change{font-family:var(--display);font-size:20px;font-weight:800;color:var(--grn)}
+.ir-from{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+
+/* MISC */
+.divider{height:1px;background:var(--b1);margin:8px 0}
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--tx3);font-family:var(--mono);font-size:11px;padding:24px}
+.loading::before{content:'';width:14px;height:14px;border:1.5px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--tx);z-index:2000;opacity:0;transform:translateY(8px);transition:all .25s;max-width:300px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.toast.gold{border-color:var(--gold);color:var(--gold)}
+.toast.hot{border-color:var(--hot);color:var(--hot)}
+
+/* Celebration overlay */
+.celebrate{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall 3s ease-in both}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+@media print{header,nav,.btn,.sound-toggle,#panelQotd,#panelXp,#panelStreak,#panelArc,#panelSpotlight{display:none!important}body{background:#fff;color:#000}.panel{display:flex!important}.report-card{border:1px solid #ccc}.rc-header{background:#f5f5f5!important}.rc-title,.rc-grade{color:#000!important}}
+
+<link rel="stylesheet" href="platform.css">
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">A+ 220</div>
+  <div>
+    <div class="htitle">Engagement <span>Layer</span></div>
+    <div class="hsub">QOTD · Class XP · Hot Streak · Readiness Arc · Spotlight · Report Card · Most Improved</div>
+  </div>
+  <div class="hright">
+    <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔇 Sound Off</div>
+    <a href="hub.html" class="back">← Hub</a>
+  </div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="goTab('qotd')">⚡ Question of the Day</div>
+  <div class="tab" onclick="goTab('xp')">🎮 Class XP</div>
+  <div class="tab" onclick="goTab('streak')">🔥 Hot Streak</div>
+  <div class="tab" onclick="goTab('arc')">🎯 Readiness Arc</div>
+  <div class="tab" onclick="goTab('spotlight')">🌟 Teacher Spotlight</div>
+  <div class="tab" onclick="goTab('report')">📊 Weekly Report</div>
+  <div class="tab" onclick="goTab('improved')">📈 Most Improved</div>
+</nav>
+
+<div class="content">
+
+<!-- ══════════════════════════════════
+     1. QUESTION OF THE DAY
+══════════════════════════════════ -->
+<div class="panel active" id="panelQotd">
+
+  <!-- QOTD Hero -->
+  <div class="qotd-hero">
+    <div class="qotd-label">⚡ Today's Challenge</div>
+    <div id="qotdTimer" class="qotd-timer">—</div>
+    <div class="qotd-q" id="qotdQ">Loading today's question…</div>
+    <div class="qotd-opts" id="qotdOpts"></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-bottom:4px">First 3 correct = +1 PBIS point each</div>
+        <div class="qotd-winners" id="qotdWinners"></div>
+      </div>
+      <div style="margin-left:auto;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <input type="text" id="qotdCode" placeholder="Your code" style="background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:6px 10px;color:var(--acc);font-family:var(--mono);font-size:11px;letter-spacing:1px;outline:none;width:120px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Teacher controls -->
+  <div class="card">
+    <div class="card-hdr"><h2>🎛️ Teacher Controls</h2></div>
+    <div class="card-body">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="btn btn-acc" onclick="generateQOTD()" id="genQotdBtn">⚡ Generate New Question</button>
+        <button class="btn btn-ghost btn-sm" onclick="startQotdTimer(60)">60s Timer</button>
+        <button class="btn btn-ghost btn-sm" onclick="startQotdTimer(90)">90s Timer</button>
+        <button class="btn btn-ghost btn-sm" onclick="startQotdTimer(120)">2min Timer</button>
+        <button class="btn btn-ghost btn-sm" onclick="revealQotd()">Reveal Answer</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetQotd()">Reset</button>
+      </div>
+      <div style="font-size:11px;color:var(--tx2);line-height:1.7;font-family:var(--mono)">
+        Start class with QOTD every day. Generate the question, start the timer, first 3 correct answers get +1 PBIS point automatically. Resets daily.
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:var(--s2);border-radius:var(--r);border-left:2px solid var(--acc)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--acc);margin-bottom:4px">TODAY'S STATS</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          <div style="font-size:12px;color:var(--tx2)">Correct: <span style="color:var(--grn);font-family:var(--mono)" id="qotdCorrectCount">0</span></div>
+          <div style="font-size:12px;color:var(--tx2)">Attempted: <span style="color:var(--tx);font-family:var(--mono)" id="qotdAttemptCount">0</span></div>
+          <div style="font-size:12px;color:var(--tx2)">Winners: <span style="color:var(--gold);font-family:var(--mono)" id="qotdWinnerCount">0/3</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     2. CLASS XP
+══════════════════════════════════ -->
+<div class="panel" id="panelXp">
+
+  <div class="xp-display">
+    <div class="xp-level" id="xpLevelLabel">LEVEL 1</div>
+    <div class="xp-title" id="xpTitle">Beginners</div>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+      <div class="xp-nums"><span id="xpCurrent">0 XP</span><span id="xpNext">200 XP to next level</span></div>
+    </div>
+    <div class="xp-milestone" id="xpMilestones"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><h2>⚡ Award Class XP</h2><span class="tag pur" id="totalXpTag">0 XP total</span></div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px">The whole class earns XP together. When the class levels up, everyone celebrates. Award XP for collective achievements.</div>
+      <div class="xp-award-grid" id="xpAwardGrid"></div>
+      <div class="divider" style="margin:14px 0"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="number" id="customXp" placeholder="Custom XP" min="1" max="500" style="width:120px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-family:var(--mono);font-size:13px;outline:none;text-align:center">
+        <input type="text" id="customXpReason" placeholder="Reason…" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;min-width:140px">
+        <button class="btn btn-pur btn-sm" onclick="awardCustomXp()">+ Award XP</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     3. HOT STREAK
+══════════════════════════════════ -->
+<div class="panel" id="panelStreak">
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hdr"><h2>🔥 Hot Streak Tracker</h2><span class="tag hot" id="myStreakTag">0 in a row</span></div>
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:16px">5 correct answers in a row = HOT STREAK 🔥 announcement + PBIS point. Tracks accuracy across any quiz.</div>
+        <div class="streak-monitor">
+          <div class="sm-label">CURRENT STREAK MONITOR</div>
+          <div class="sm-dots" id="streakDots">
+            <div class="sm-dot">?</div>
+            <div class="sm-dot">?</div>
+            <div class="sm-dot">?</div>
+            <div class="sm-dot">?</div>
+            <div class="sm-dot">?</div>
+          </div>
+          <div class="streak-count" id="streakCount">0</div>
+          <div class="streak-best" id="streakBest">Best: 0 in a row</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:8px">SIMULATE (for testing)</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-grn btn-sm" onclick="addStreakAnswer(true,'TEST')">✓ Correct</button>
+          <button class="btn btn-ghost btn-sm" onclick="addStreakAnswer(false,'TEST')">✗ Wrong</button>
+          <input type="text" id="streakCode" placeholder="STU-001" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:5px 8px;color:var(--acc);font-family:var(--mono);font-size:11px;outline:none;width:90px;letter-spacing:.5px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-ghost btn-sm" onclick="resetStreak()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><h2>🏆 Class Streak Leaderboard</h2></div>
+      <div class="card-body">
+        <div style="font-size:11px;color:var(--tx2);margin-bottom:12px;line-height:1.7;font-family:var(--mono)">Best consecutive correct answers this session.</div>
+        <div class="student-streaks" id="studentStreaks">
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No streak data yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     4. READINESS ARC
+══════════════════════════════════ -->
+<div class="panel" id="panelArc">
+
+  <div class="card">
+    <div class="card-hdr"><h2>🎯 Exam Readiness Journey</h2></div>
+    <div class="card-body">
+      <div class="arc-display">
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:14px">Enter your student code to see your personalized readiness arc</div>
+        <input class="arc-code-inp" id="arcCode" placeholder="STU-001" oninput="this.value=this.value.toUpperCase();loadArc(this.value)">
+        <div class="arc-wrap">
+          <svg class="arc-svg" viewBox="0 0 260 140">
+            <!-- Background arc -->
+            <path d="M 20 130 A 110 110 0 0 1 240 130" fill="none" stroke="#1a2038" stroke-width="16" stroke-linecap="round"/>
+            <!-- Progress arc -->
+            <path id="arcPath" d="M 20 130 A 110 110 0 0 1 240 130" fill="none" stroke="url(#arcGrad)" stroke-width="16" stroke-linecap="round" stroke-dasharray="345" stroke-dashoffset="345" style="transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)"/>
+            <!-- Milestone marks -->
+            <circle cx="20" cy="130" r="5" fill="#1a2038"/>
+            <circle cx="89" cy="22" r="5" fill="#1a2038" id="arc50mark"/>
+            <circle cx="130" cy="10" r="5" fill="#1a2038" id="arc70mark"/>
+            <circle cx="171" cy="22" r="5" fill="#1a2038" id="arc80mark"/>
+            <circle cx="240" cy="130" r="5" fill="#1a2038"/>
+            <!-- Labels -->
+            <text x="10" y="148" font-size="8" fill="#364060" font-family="JetBrains Mono, monospace">0%</text>
+            <text x="80" y="16" font-size="8" fill="#364060" font-family="JetBrains Mono, monospace">50%</text>
+            <text x="120" y="8" font-size="8" fill="#364060" font-family="JetBrains Mono, monospace">70%</text>
+            <text x="162" y="16" font-size="8" fill="#364060" font-family="JetBrains Mono, monospace">80%</text>
+            <text x="230" y="148" font-size="8" fill="#364060" font-family="JetBrains Mono, monospace">100%</text>
+            <defs>
+              <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff2255"/>
+                <stop offset="50%" stop-color="#ffbb00"/>
+                <stop offset="78%" stop-color="#00ccff"/>
+                <stop offset="100%" stop-color="#00ff77"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="arc-pct" id="arcPct" style="color:var(--acc)">—</div>
+          <div class="arc-label">EXAM READINESS</div>
+        </div>
+        <div class="arc-status" id="arcStatus" style="color:var(--tx3)">Enter your code to begin</div>
+        <div class="arc-desc" id="arcDesc">Your readiness score is calculated from quiz scores weighted by CompTIA A+ exam domain percentages.</div>
+        <div class="arc-milestones" id="arcMilestones">
+          <div class="arc-ms">🎯 50% — Halfway</div>
+          <div class="arc-ms">📚 70% — Getting close</div>
+          <div class="arc-ms">⭐ 80% — Exam ready</div>
+          <div class="arc-ms">👑 90% — Champion</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Class overview arcs -->
+  <div class="card">
+    <div class="card-hdr"><h2>Class Readiness Overview</h2></div>
+    <div class="card-body" id="classArcOverview">
+      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">Class readiness data appears here as students check their scores.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     5. TEACHER SPOTLIGHT
+══════════════════════════════════ -->
+<div class="panel" id="panelSpotlight">
+
+  <div class="spotlight-config">
+    <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:6px">One click puts a student on the projector with a full-screen flash, announcement, and auto PBIS point. Use it for great questions, clutch moments, breakthroughs, or just to recognize effort.</div>
+    <input class="sc-inp" type="text" id="slCode" placeholder="Student code (STU-001 or their nickname)" oninput="this.value=this.value.toUpperCase()">
+    <input class="sc-inp" id="slMsg" placeholder="Recognition message (e.g. Asked the best question of the week!)">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <select id="slEmoji" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:16px;outline:none">
+        <option value="🌟">🌟 Shining Star</option>
+        <option value="🏆">🏆 Champion</option>
+        <option value="🔥">🔥 On Fire</option>
+        <option value="💡">💡 Big Brain</option>
+        <option value="⚡">⚡ Electric</option>
+        <option value="👑">👑 Royalty</option>
+        <option value="🎯">🎯 Bullseye</option>
+        <option value="💪">💪 Grinder</option>
+        <option value="🚀">🚀 Launching</option>
+      </select>
+      <select id="slPts" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:12px;outline:none">
+        <option value="1">+1 PBIS point</option>
+        <option value="2" selected>+2 PBIS points</option>
+        <option value="3">+3 PBIS points</option>
+        <option value="5">+5 PBIS points</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="spotlight-btn" onclick="launchSpotlight()">
+    <span id="slEmojiPreview">🌟</span>
+    SPOTLIGHT THIS STUDENT
+  </button>
+
+  <!-- Recent spotlights -->
+  <div class="card">
+    <div class="card-hdr"><h2>Recent Spotlights</h2></div>
+    <div class="card-body" id="spotlightLog">
+      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No spotlights yet today.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Spotlight Overlay -->
+<div class="spotlight-overlay" id="spotlightOverlay" onclick="closeSpotlight()">
+  <div class="spotlight-content">
+    <div class="sl-icon" id="slIconDisp">🌟</div>
+    <div class="sl-label">Teacher Spotlight</div>
+    <div class="sl-name" id="slNameDisp">—</div>
+    <div class="sl-msg" id="slMsgDisp">—</div>
+    <div class="sl-pts" id="slPtsDisp">+2 PBIS Points</div>
+    <div class="sl-close">Tap anywhere to close</div>
+  </div>
+</div>
+
+<!-- Celebrate canvas -->
+<div class="celebrate" id="celebrate"></div>
+
+<!-- ══════════════════════════════════
+     6. WEEKLY REPORT
+══════════════════════════════════ -->
+<div class="panel" id="panelReport">
+
+  <div style="display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+    <button class="btn btn-acc" onclick="generateReport()">⚡ Generate This Week's Report</button>
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print</button>
+    <button class="btn btn-ghost btn-sm" onclick="copyReport()">📋 Copy Text</button>
+  </div>
+
+  <div id="reportOutput">
+    <div style="text-align:center;padding:48px;color:var(--tx3);font-family:var(--mono)">Click "Generate This Week's Report" to build the class summary.</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     7. MOST IMPROVED
+══════════════════════════════════ -->
+<div class="panel" id="panelImproved">
+
+  <div class="card">
+    <div class="card-hdr">
+      <h2>📈 Most Improved This Week</h2>
+      <span class="tag grn" id="improvedWeek">Week 1</span>
+      <button class="btn btn-ghost btn-sm" onclick="calculateImproved()">Calculate</button>
+    </div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:16px;font-family:var(--mono)">
+        Ranks students by score improvement — not absolute score. A student who jumped from 45% to 72% ranks higher than one who went from 80% to 85%. Most Improved winner gets +5 PBIS points and a Spotlight automatically.
+      </div>
+      <div class="improved-grid" id="improvedGrid">
+        <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:16px;text-align:center">Click Calculate to rank this week's most improved students.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log improvement manually -->
+  <div class="card">
+    <div class="card-hdr"><h2>Log Score Improvement</h2></div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.7">Log a student's score from last week and this week to track improvement.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <input type="text" id="impCode" placeholder="Student code" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 10px;color:var(--acc);font-family:var(--mono);font-size:11px;letter-spacing:.5px;outline:none;width:120px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+        <input type="number" id="impLast" placeholder="Last week %" min="0" max="100" style="width:110px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 10px;color:var(--tx);font-family:var(--mono);font-size:12px;outline:none;text-align:center">
+        <input type="number" id="impThis" placeholder="This week %" min="0" max="100" style="width:110px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 10px;color:var(--grn);font-family:var(--mono);font-size:12px;outline:none;text-align:center">
+        <button class="btn btn-grn btn-sm" onclick="logImprovement()">Log</button>
+      </div>
+      <div id="impLog" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /content -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function sl(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+const ST = {
+  soundOn: ls('eng_sound',false),
+  qotd: ls('eng_qotd',null),
+  qotdWinners: ls('eng_qotd_w',[]),
+  qotdAnswers: ls('eng_qotd_a',{}),
+  qotdTimer: null,
+  qotdSecs: 0,
+  qotdRevealed: false,
+  classXP: ls('eng_xp',0),
+  xpLog: ls('eng_xp_log',[]),
+  hotStreak: {current:0,best:0,history:[]},
+  studentStreaks: ls('eng_streaks',{}),
+  spotlights: ls('eng_spotlights',[]),
+  improvements: ls('eng_improvements',{}),
+  arcCache: ls('eng_arc_cache',{}),
+};
+
+const XP_LEVELS = [
+  {level:1,title:'Beginners',xp:0},
+  {level:2,title:'Technicians',xp:200},
+  {level:3,title:'IT Juniors',xp:500},
+  {level:4,title:'A+ Candidates',xp:900},
+  {level:5,title:'CompTIA Ready',xp:1400},
+  {level:6,title:'Network Pros',xp:2000},
+  {level:7,title:'Security Aware',xp:2700},
+  {level:8,title:'Certified Elite',xp:3500},
+  {level:9,title:'Tech Champions',xp:4400},
+  {level:10,title:'A+ CERTIFIED',xp:5400},
+];
+
+const XP_AWARDS = [
+  {icon:'⚡',name:'Class answered QOTD',xp:10},
+  {icon:'👹',name:'Boss Battle completed',xp:25},
+  {icon:'🏆',name:'Weekly challenge done',xp:30},
+  {icon:'📝',name:'All notes submitted',xp:20},
+  {icon:'🔥',name:'Class streak hit 5',xp:15},
+  {icon:'💯',name:'Quiz avg above 80%',xp:20},
+  {icon:'🎓',name:'Practice exam taken',xp:15},
+  {icon:'💬',name:'10 questions banked',xp:10},
+];
+
+// ── INIT ──
+function init(){
+  updateSoundUI();
+  renderXP();
+  renderXpAwards();
+  loadQOTD();
+  renderSpotlightLog();
+  renderImprovementLog();
+  document.getElementById('slEmoji').addEventListener('change',e=>{document.getElementById('slEmojiPreview').textContent=e.target.value;});
+}
+
+function goTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabs=['qotd','xp','streak','arc','spotlight','report','improved'];
+  const idx=tabs.indexOf(id);
+  document.querySelectorAll('.tab')[idx]?.classList.add('active');
+  document.getElementById('panel'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('active');
+}
+
+// ── SOUND ──
+function toggleSound(){
+  ST.soundOn=!ST.soundOn;
+  sl('eng_sound',ST.soundOn);
+  updateSoundUI();
+  if(ST.soundOn) playSound('unlock');
+}
+function updateSoundUI(){
+  const el=document.getElementById('soundToggle');
+  el.textContent=ST.soundOn?'🔊 Sound On':'🔇 Sound Off';
+  el.classList.toggle('on',ST.soundOn);
+}
+function playSound(type){
+  if(!ST.soundOn) return;
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const sounds={
+      correct:[[523,0.1,0.15],[659,0.1,0.15],[784,0.1,0.3]],
+      wrong:[[300,0.1,0.2],[250,0.1,0.3]],
+      streak:[[523,0,0.1],[659,0.1,0.1],[784,0.2,0.1],[1046,0.3,0.4]],
+      unlock:[[440,0,0.1],[554,0.1,0.1],[659,0.2,0.1],[880,0.3,0.3]],
+      spotlight:[[880,0,0.15],[1108,0.1,0.15],[1318,0.2,0.15],[1760,0.3,0.5]],
+      levelup:[[262,0,0.1],[330,0.1,0.1],[392,0.2,0.1],[523,0.3,0.1],[659,0.4,0.1],[784,0.5,0.4]],
+    };
+    const notes=sounds[type]||sounds.correct;
+    notes.forEach(([freq,delay,dur])=>{
+      const o=ctx.createOscillator();const g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=freq;o.type='sine';
+      g.gain.setValueAtTime(0.25,ctx.currentTime+delay);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);
+      o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur);
+    });
+  }catch(e){}
+}
+
+// ── QOTD ──
+async function generateQOTD(){
+  const btn=document.getElementById('genQotdBtn');
+  btn.disabled=true;btn.textContent='Generating…';
+  document.getElementById('qotdQ').textContent='Generating question…';
+  document.getElementById('qotdOpts').innerHTML='';
+  ST.qotdWinners=[];ST.qotdAnswers={};ST.qotdRevealed=false;
+  sl('eng_qotd_w',[]);sl('eng_qotd_a',{});
+
+  const topics=['Safety','OS Basics','Storage','Networking','TCP/IP','Wireless','Security','Troubleshooting','CLI','Virtualization'];
+  const topic=topics[Math.floor(Math.random()*topics.length)];
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:400,
+        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON, no markdown.',
+        messages:[{role:'user',content:`Generate 1 CompTIA A+ 220-1202 question on the topic: "${topic}". Use a qualifier word (BEST/FIRST/MOST). Challenging but fair for high school students.
+Return JSON: {"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"...","topic":"${topic}"}`}]
+      })
+    });
+    const d=await r.json();
+    const text=d.content?.map(c=>c.text||'').join('')||'';
+    ST.qotd=JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+    sl('eng_qotd',ST.qotd);
+    renderQOTD();
+    toast(`QOTD generated: ${topic} question`,'ok');
+  }catch(e){
+    document.getElementById('qotdQ').textContent='Generation failed. Try again.';
+    toast('Generation failed','err');
+  }
+  btn.disabled=false;btn.textContent='⚡ Generate New Question';
+}
+
+function loadQOTD(){
+  const saved=ls('eng_qotd_date','');
+  const today=new Date().toDateString();
+  if(saved!==today){sl('eng_qotd',null);sl('eng_qotd_w',[]);sl('eng_qotd_a',{});}
+  if(ST.qotd) renderQOTD();
+}
+
+function renderQOTD(){
+  const q=ST.qotd;if(!q)return;
+  document.getElementById('qotdQ').textContent=q.q;
+  const revealed=ST.qotdRevealed;
+  document.getElementById('qotdOpts').innerHTML=['A','B','C','D'].map(l=>{
+    const isCorrect=l===q.answer;
+    let cls='';
+    if(revealed) cls=isCorrect?'correct':'';
+    return `<div class="qotd-opt ${cls}" onclick="submitQOTD('${l}')">
+      <span class="qotd-ltr">${l}.</span>${q.opts[l]}</div>`;
+  }).join('');
+  document.getElementById('qotdWinners').innerHTML=ST.qotdWinners.map(w=>`<div class="qotd-winner">✓ ${w}</div>`).join('');
+  document.getElementById('qotdCorrectCount').textContent=Object.values(ST.qotdAnswers).filter(a=>a===q.answer).length;
+  document.getElementById('qotdAttemptCount').textContent=Object.keys(ST.qotdAnswers).length;
+  document.getElementById('qotdWinnerCount').textContent=`${ST.qotdWinners.length}/3`;
+}
+
+function submitQOTD(letter){
+  const code=document.getElementById('qotdCode').value.trim().toUpperCase();
+  if(!code){toast('Enter your student code first','err');return;}
+  if(ST.qotdAnswers[code]){toast('Already answered!','err');return;}
+  const q=ST.qotd;if(!q)return;
+  ST.qotdAnswers[code]=letter;
+  sl('eng_qotd_a',ST.qotdAnswers);
+  const correct=letter===q.answer;
+  if(correct){
+    playSound('correct');
+    if(ST.qotdWinners.length<3){
+      ST.qotdWinners.push(code);
+      sl('eng_qotd_w',ST.qotdWinners);
+      // Award PBIS
+      const pbis=ls('pbis_students',{});
+      pbis[code]=(pbis[code]||0)+1;
+      sl('pbis_students',pbis);
+      toast(`${code} got it! +1 PBIS point 🏆`,'gold');
+      if(ST.qotdWinners.length===3) setTimeout(()=>toast('3 winners! QOTD complete 🎉','gold'),500);
+    } else {
+      toast(`${code} correct! (Winners full)`,'ok');
+    }
+    // Award XP
+    awardXP(5,`${code} answered QOTD correctly`);
+  } else {
+    playSound('wrong');
+    toast(`${code} — not quite! Try again next time.`,'err');
+  }
+  renderQOTD();
+}
+
+function startQotdTimer(secs){
+  clearInterval(ST.qotdTimer);
+  ST.qotdSecs=secs;
+  updateQotdTimer();
+  ST.qotdTimer=setInterval(()=>{
+    ST.qotdSecs--;
+    updateQotdTimer();
+    if(ST.qotdSecs<=0){clearInterval(ST.qotdTimer);revealQotd();}
+  },1000);
+}
+
+function updateQotdTimer(){
+  const el=document.getElementById('qotdTimer');
+  const m=Math.floor(ST.qotdSecs/60),s=ST.qotdSecs%60;
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='qotd-timer'+(ST.qotdSecs<=10?' warn':ST.qotdSecs===0?' done':'');
+}
+
+function revealQotd(){
+  ST.qotdRevealed=true;
+  clearInterval(ST.qotdTimer);
+  document.getElementById('qotdTimer').textContent='TIME';
+  document.getElementById('qotdTimer').className='qotd-timer done';
+  renderQOTD();
+  playSound('unlock');
+}
+
+function resetQotd(){
+  clearInterval(ST.qotdTimer);
+  ST.qotd=null;ST.qotdWinners=[];ST.qotdAnswers={};ST.qotdRevealed=false;
+  sl('eng_qotd',null);sl('eng_qotd_w',[]);sl('eng_qotd_a',{});
+  document.getElementById('qotdTimer').textContent='—';
+  document.getElementById('qotdTimer').className='qotd-timer';
+  document.getElementById('qotdQ').textContent='Generate a new question to begin.';
+  document.getElementById('qotdOpts').innerHTML='';
+  document.getElementById('qotdWinners').innerHTML='';
+}
+
+// ── CLASS XP ──
+function getCurrentLevel(){
+  const xp=ST.classXP;
+  let current=XP_LEVELS[0],next=XP_LEVELS[1];
+  for(let i=0;i<XP_LEVELS.length-1;i++){
+    if(xp>=XP_LEVELS[i].xp&&xp<XP_LEVELS[i+1].xp){current=XP_LEVELS[i];next=XP_LEVELS[i+1];break;}
+    if(xp>=XP_LEVELS[XP_LEVELS.length-1].xp){current=XP_LEVELS[XP_LEVELS.length-1];next=null;}
+  }
+  return{current,next};
+}
+
+function renderXP(){
+  const{current,next}=getCurrentLevel();
+  const prevXP=current.xp;
+  const nextXP=next?next.xp:current.xp+1000;
+  const pct=next?Math.round((ST.classXP-prevXP)/(nextXP-prevXP)*100):100;
+
+  document.getElementById('xpLevelLabel').textContent=`LEVEL ${current.level}`;
+  document.getElementById('xpTitle').textContent=current.title;
+  document.getElementById('xpFill').style.width=pct+'%';
+  document.getElementById('xpCurrent').textContent=`${ST.classXP} XP`;
+  document.getElementById('xpNext').textContent=next?`${nextXP-ST.classXP} XP to Level ${next.level}`:'MAX LEVEL';
+  document.getElementById('totalXpTag').textContent=`${ST.classXP} XP total`;
+
+  document.getElementById('xpMilestones').innerHTML=XP_LEVELS.slice(1).map(lv=>`
+    <div class="xp-ms ${ST.classXP>=lv.xp?'achieved':''}">
+      <div class="xp-ms-num">${lv.level}</div>
+      <div class="xp-ms-label">${lv.title}</div>
+    </div>`).join('');
+}
+
+function renderXpAwards(){
+  document.getElementById('xpAwardGrid').innerHTML=XP_AWARDS.map(a=>`
+    <div class="xp-award" onclick="awardXP(${a.xp},'${a.name}')">
+      <div class="xa-icon">${a.icon}</div>
+      <div class="xa-info">
+        <div class="xa-name">${a.name}</div>
+        <div class="xa-xp">+${a.xp} XP</div>
+      </div>
+      <button class="btn btn-pur btn-sm">+${a.xp}</button>
+    </div>`).join('');
+}
+
+function awardXP(amount,reason){
+  const prevLevel=getCurrentLevel().current.level;
+  ST.classXP+=amount;
+  ST.xpLog.unshift({amount,reason,ts:Date.now(),date:new Date().toLocaleTimeString()});
+  sl('eng_xp',ST.classXP);sl('eng_xp_log',ST.xpLog.slice(0,100));
+  const newLevel=getCurrentLevel().current.level;
+  renderXP();
+  toast(`+${amount} XP — ${reason}`,'ok');
+  if(newLevel>prevLevel){
+    playSound('levelup');
+    fireConfetti();
+    setTimeout(()=>toast(`🎮 CLASS LEVELED UP! Level ${newLevel}: ${getCurrentLevel().current.title}`,'gold'),500);
+  }
+}
+
+function awardCustomXp(){
+  const amt=parseInt(document.getElementById('customXp').value)||0;
+  const reason=document.getElementById('customXpReason').value.trim()||'Custom award';
+  if(!amt){toast('Enter XP amount','err');return;}
+  awardXP(amt,reason);
+  document.getElementById('customXp').value='';
+  document.getElementById('customXpReason').value='';
+}
+
+// ── HOT STREAK ──
+function addStreakAnswer(correct, code){
+  code=code||(document.getElementById('streakCode').value.trim().toUpperCase())||'CLASS';
+  if(!ST.studentStreaks[code]) ST.studentStreaks[code]={current:0,best:0,history:[]};
+  const stu=ST.studentStreaks[code];
+
+  // Update dots
+  const history=[...stu.history.slice(-4),correct?'c':'w'];
+  stu.history=history;
+
+  if(correct){
+    stu.current++;
+    if(stu.current>stu.best) stu.best=stu.current;
+    playSound('correct');
+    if(stu.current===5){
+      playSound('streak');
+      fireConfetti();
+      toast(`🔥 HOT STREAK! ${code} — 5 in a row! +1 PBIS point!`,'hot');
+      // Award PBIS
+      const pbis=ls('pbis_students',{});
+      pbis[code]=(pbis[code]||0)+1;
+      sl('pbis_students',pbis);
+      awardXP(15,'Class hot streak hit 5!');
+    } else if(stu.current>5){
+      toast(`🔥🔥 ${code} — ${stu.current} in a row!`,'hot');
+    }
+  } else {
+    playSound('wrong');
+    if(stu.current>=5) toast(`Streak broken at ${stu.current}. Keep going!`);
+    stu.current=0;
+  }
+
+  sl('eng_streaks',ST.studentStreaks);
+  renderStreakMonitor(code);
+  renderStudentStreaks();
+}
+
+function renderStreakMonitor(code){
+  const stu=ST.studentStreaks[code]||{current:0,best:0,history:[]};
+  document.getElementById('streakCount').textContent=stu.current;
+  document.getElementById('streakBest').textContent=`Best: ${stu.best} in a row`;
+  document.getElementById('myStreakTag').textContent=`${stu.current} in a row`;
+  const dots=document.getElementById('streakDots');
+  const recent=stu.history.slice(-5);
+  dots.innerHTML=Array.from({length:5},(_,i)=>{
+    const h=recent[i-Math.max(0,5-recent.length)];
+    return `<div class="sm-dot ${h==='c'?'correct':h==='w'?'wrong':''}">${h==='c'?'✓':h==='w'?'✗':'?'}</div>`;
+  }).join('');
+}
+
+function renderStudentStreaks(){
+  const sorted=Object.entries(ST.studentStreaks).sort((a,b)=>b[1].best-a[1].best).slice(0,8);
+  document.getElementById('studentStreaks').innerHTML=sorted.length?sorted.map(([code,s])=>`
+    <div class="ss-row">
+      <div class="ss-name">${code}</div>
+      <div class="ss-dots">
+        ${s.history.slice(-5).map(h=>`<div class="ss-d ${h==='c'?'c':h==='w'?'w':''}"></div>`).join('')}
+      </div>
+      <div class="ss-streak" style="color:${s.current>=5?'var(--hot)':s.current>0?'var(--amb)':'var(--tx3)'}">${s.current>=5?'🔥':''} ${s.current}</div>
+    </div>`).join(''):
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No streak data yet.</div>';
+}
+
+function resetStreak(){
+  const code=document.getElementById('streakCode').value.trim().toUpperCase()||'CLASS';
+  if(ST.studentStreaks[code]) ST.studentStreaks[code]={current:0,best:0,history:[]};
+  sl('eng_streaks',ST.studentStreaks);
+  renderStreakMonitor(code);
+  renderStudentStreaks();
+}
+
+// ── READINESS ARC ──
+function loadArc(code){
+  if(!code||code.length<3)return;
+  // Pull scores from platform
+  const answers=ls('st_ans',{});
+  const timedKeys=Object.keys(answers).filter(k=>k.startsWith('timed_')&&k.includes(code));
+  const scores=timedKeys.map(k=>{
+    const ans=answers[k]||{};
+    const total=Object.keys(ans).length;
+    return total===5?Math.round(total/5*100):0;
+  }).filter(s=>s>0);
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;
+
+  // Also check exam history
+  const examHistory=ls('es_exam_history',[]).filter(h=>h.code===code);
+  const examScore=examHistory.length?Math.round(examHistory[0].score/9):0;
+  const readiness=Math.max(avg,examScore>0?examScore:0);
+
+  renderArc(readiness,code);
+  ST.arcCache[code]=readiness;
+  sl('eng_arc_cache',ST.arcCache);
+  renderClassArcs();
+}
+
+function renderArc(pct,code){
+  const maxArc=345; // full semicircle dash
+  const offset=maxArc-(maxArc*pct/100);
+  document.getElementById('arcPath').style.strokeDashoffset=offset;
+  document.getElementById('arcPct').textContent=pct+'%';
+  const col=pct>=80?'var(--grn)':pct>=70?'var(--acc)':pct>=50?'var(--amb)':'var(--red)';
+  document.getElementById('arcPct').style.color=col;
+
+  const status=pct>=90?'Champion — Exam Ready!':pct>=80?'Exam Ready — Keep It Up!':pct>=70?'Getting Close — Final Push!':pct>=50?'Halfway There — Stay Consistent!':pct>=30?'Building Foundation — Keep Going!':'Just Getting Started — Every Day Counts!';
+  const desc=pct>=80?`Your weighted score of ${pct}% exceeds the 78% passing threshold. Stay consistent and you're on track to pass!`:
+    pct>=60?`You're at ${pct}%. The passing threshold is 78%. Focus on your weakest domains to close the gap.`:
+    `You're at ${pct}%. Complete more quizzes and the practice exam to raise your readiness score. Every session helps.`;
+
+  document.getElementById('arcStatus').textContent=status;
+  document.getElementById('arcStatus').style.color=col;
+  document.getElementById('arcDesc').textContent=desc;
+
+  document.getElementById('arcMilestones').innerHTML=[
+    {pct:50,label:'Halfway'},
+    {pct:70,label:'Getting close'},
+    {pct:78,label:'PASS threshold'},
+    {pct:90,label:'Champion'},
+  ].map(m=>`<div class="arc-ms ${pct>=m.pct?'reached':pct>=m.pct-10&&pct<m.pct?'next':''}">${pct>=m.pct?'✓ ':''} ${m.pct}% — ${m.label}</div>`).join('');
+}
+
+function renderClassArcs(){
+  const overview=document.getElementById('classArcOverview');
+  const entries=Object.entries(ST.arcCache);
+  if(!entries.length){overview.innerHTML='<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No student data loaded yet.</div>';return;}
+  const avg=Math.round(entries.reduce((s,[,v])=>s+v,0)/entries.length);
+  overview.innerHTML=`
+    <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <div style="background:var(--s2);border-radius:var(--r);padding:10px 16px;text-align:center">
+        <div style="font-family:var(--display);font-size:28px;font-weight:800;color:${avg>=78?'var(--grn)':'var(--amb)'}">${avg}%</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Class avg readiness</div>
+      </div>
+      <div style="background:var(--s2);border-radius:var(--r);padding:10px 16px;text-align:center">
+        <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--grn)">${entries.filter(([,v])=>v>=78).length}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Students at passing threshold</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${entries.sort((a,b)=>b[1]-a[1]).map(([code,pct])=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 12px;background:var(--s2);border-radius:var(--r);border-left:2px solid ${pct>=78?'var(--grn)':pct>=60?'var(--amb)':'var(--red)'}">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--tx2);min-width:70px">${code}</div>
+          <div style="flex:1;height:4px;background:var(--b1);border-radius:2px;overflow:hidden">
+            <div style="height:100%;background:${pct>=78?'var(--grn)':pct>=60?'var(--amb)':'var(--red)'};border-radius:2px;width:${pct}%;transition:width .8s ease"></div>
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:${pct>=78?'var(--grn)':pct>=60?'var(--amb)':'var(--red)'};min-width:36px;text-align:right">${pct}%</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── SPOTLIGHT ──
+function launchSpotlight(){
+  const code=document.getElementById('slCode').value.trim().toUpperCase();
+  const msg=document.getElementById('slMsg').value.trim();
+  const emoji=document.getElementById('slEmoji').value;
+  const pts=parseInt(document.getElementById('slPts').value)||2;
+  if(!code){toast('Enter a student code or nickname','err');return;}
+
+  // Show overlay
+  document.getElementById('slIconDisp').textContent=emoji;
+  document.getElementById('slNameDisp').textContent=code;
+  document.getElementById('slMsgDisp').textContent=msg||'Outstanding work today!';
+  document.getElementById('slPtsDisp').textContent=`+${pts} PBIS Points Awarded`;
+  document.getElementById('spotlightOverlay').classList.add('active');
+
+  // Award PBIS
+  const pbis=ls('pbis_students',{});
+  pbis[code]=(pbis[code]||0)+pts;
+  sl('pbis_students',pbis);
+
+  playSound('spotlight');
+  fireConfetti(80);
+
+  // Log it
+  ST.spotlights.unshift({code,msg,emoji,pts,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString()});
+  sl('eng_spotlights',ST.spotlights);
+  renderSpotlightLog();
+
+  // Award XP
+  awardXP(5,'Teacher Spotlight awarded');
+}
+
+function closeSpotlight(){document.getElementById('spotlightOverlay').classList.remove('active');}
+
+function renderSpotlightLog(){
+  document.getElementById('spotlightLog').innerHTML=ST.spotlights.length?
+    ST.spotlights.slice(0,10).map(s=>`
+      <div class="spotlight-row" style="margin-bottom:6px">
+        <div class="sr-icon">${s.emoji}</div>
+        <div class="sr-info">
+          <div class="sr-label">${s.date} · ${s.time} · +${s.pts} pts</div>
+          <div class="sr-name" style="color:var(--gold)">${s.code}</div>
+          ${s.msg?`<div style="font-size:11px;color:var(--tx2);margin-top:2px">${s.msg}</div>`:''}
+        </div>
+      </div>`).join(''):
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No spotlights yet today.</div>';
+}
+
+// ── WEEKLY REPORT ──
+function generateReport(){
+  const week=ls('arena_week',1);
+  const weeklyScores=ls('arena_weekly',{});
+  const pbisStudents=ls('pbis_students',{});
+  const bank=ls('st_bank',[]);
+  const assessments=ls('es_assessments',[]);
+  const bossHistory=ls('arena_boss',[]);
+  const challenges=ls('arena_challenges',[]);
+  const spotlights=ST.spotlights;
+  const improvements=ST.improvements;
+
+  const students=Object.keys(weeklyScores);
+  const scores=students.map(c=>weeklyScores[c]?.points||0);
+  const avgScore=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;
+  const topStudent=students.sort((a,b)=>(weeklyScores[b]?.points||0)-(weeklyScores[a]?.points||0))[0];
+  const mostImproved=findMostImproved();
+  const weekBoss=bossHistory[0];
+  const weekChallenge=challenges[0];
+  const weekAssessments=assessments.filter(a=>a.day);
+  const avgConf=weekAssessments.length?Math.round(weekAssessments.reduce((s,a)=>s+(a.conf||0),0)/weekAssessments.length*20):0;
+  const xpEarned=ST.classXP;
+  const {current}=getCurrentLevel();
+  const totalSpotlights=spotlights.filter(s=>s.date===new Date().toLocaleDateString()).length;
+
+  const grade=avgScore>=80?'A':avgScore>=70?'B':avgScore>=60?'C':avgScore>=50?'D':'F';
+  const gradeCol=avgScore>=80?'var(--grn)':avgScore>=70?'var(--acc)':avgScore>=60?'var(--amb)':'var(--red)';
+
+  document.getElementById('reportOutput').innerHTML=`
+    <div class="report-card">
+      <div class="rc-header">
+        <div>
+          <div class="rc-title">Weekly Class Report</div>
+          <div class="rc-week">Week ${week} · CompTIA A+ 220-1202 · Generated ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="rc-grade" style="color:${gradeCol}">${grade}</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">WEEKLY GRADE</div>
+        </div>
+      </div>
+      <div class="rc-body">
+
+        <div class="rc-section">
+          <div class="rc-section-title">Class Performance</div>
+          <div class="rc-stat"><span class="rc-stat-label">Average PBIS points</span><span class="rc-stat-val" style="color:${gradeCol}">${avgScore} pts</span></div>
+          <div class="rc-stat"><span class="rc-stat-label">Students tracked</span><span class="rc-stat-val">${students.length}</span></div>
+          <div class="rc-stat"><span class="rc-stat-label">Questions added to bank</span><span class="rc-stat-val">${bank.length} total</span></div>
+          <div class="rc-stat"><span class="rc-stat-label">Self-assessment responses</span><span class="rc-stat-val">${weekAssessments.length}</span></div>
+          <div class="rc-stat"><span class="rc-stat-label">Avg confidence rating</span><span class="rc-stat-val">${avgConf}%</span></div>
+        </div>
+
+        <div class="rc-section">
+          <div class="rc-section-title">🏅 This Week's Stars</div>
+          ${topStudent?`<div class="spotlight-row" style="margin-bottom:8px"><div class="sr-icon">👑</div><div class="sr-info"><div class="sr-label">Top PBIS Points</div><div class="sr-name" style="color:var(--gold)">${topStudent} — ${weeklyScores[topStudent]?.points||0} pts</div></div></div>`:''}
+          ${mostImproved.code?`<div class="spotlight-row" style="margin-bottom:8px"><div class="sr-icon">📈</div><div class="sr-info"><div class="sr-label">Most Improved</div><div class="sr-name" style="color:var(--grn)">${mostImproved.code} — +${mostImproved.gain}% improvement</div></div></div>`:''}
+          ${totalSpotlights>0?`<div class="rc-stat"><span class="rc-stat-label">Teacher spotlights given</span><span class="rc-stat-val">${totalSpotlights}</span></div>`:''}
+        </div>
+
+        <div class="rc-section">
+          <div class="rc-section-title">🎮 Competition Results</div>
+          ${weekBoss?`<div class="rc-stat"><span class="rc-stat-label">Boss Battle</span><span class="rc-stat-val" style="color:${weekBoss.tier==='GOLD'?'var(--gold)':weekBoss.tier==='SILVER'?'var(--silver)':'var(--bronze)'}">${weekBoss.chapter} — ${weekBoss.tier} (${weekBoss.pct}%)</span></div>`:'<div class="rc-stat"><span class="rc-stat-label">Boss Battles</span><span class="rc-stat-val" style="color:var(--tx3)">None this week</span></div>'}
+          ${weekChallenge?`<div class="rc-stat"><span class="rc-stat-label">Weekly Challenge</span><span class="rc-stat-val">${weekChallenge.title} — ${weekChallenge.completers?.length||0} completions</span></div>`:''}
+          <div class="rc-stat"><span class="rc-stat-label">Class XP Level</span><span class="rc-stat-val" style="color:var(--pur)">Level ${current.level}: ${current.title} (${xpEarned} XP)</span></div>
+        </div>
+
+        <div class="rc-section">
+          <div class="rc-section-title">💭 Student Voice (Self-Assessments)</div>
+          ${weekAssessments.slice(0,3).map(a=>`
+            <div style="padding:8px 12px;background:var(--s2);border-radius:var(--r);margin-bottom:6px;border-left:2px solid var(--acc)">
+              ${a.confusing?`<div style="font-size:11px;color:var(--tx2)">❓ "${a.confusing}"</div>`:''}
+              ${a.clicked?`<div style="font-size:11px;color:var(--grn);margin-top:3px">✓ "${a.clicked}"</div>`:''}
+            </div>`).join('')||'<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No reflections this week.</div>'}
+        </div>
+
+        <div class="rc-section">
+          <div class="rc-section-title">📋 Next Week Priorities</div>
+          <div style="font-size:12px;color:var(--tx2);line-height:1.8">
+            ${avgScore<60?'⚠️ Class average below target — consider a review day before moving forward.<br>':''}
+            ${bank.length<10?'• Encourage more question submissions — bank is still small.<br>':''}
+            • Continue daily QOTD to reinforce prior learning.<br>
+            • Check individual readiness arcs for students below 60%.<br>
+            ${mostImproved.code?`• Recognize ${mostImproved.code} publicly — most improved this week!`:''}
+          </div>
+        </div>
+
+      </div>
+    </div>`;
+}
+
+function copyReport(){
+  const text=document.getElementById('reportOutput').textContent;
+  navigator.clipboard.writeText(text);
+  toast('Report copied!','ok');
+}
+
+// ── MOST IMPROVED ──
+function logImprovement(){
+  const code=document.getElementById('impCode').value.trim().toUpperCase();
+  const last=parseInt(document.getElementById('impLast').value)||0;
+  const thisWeek=parseInt(document.getElementById('impThis').value)||0;
+  if(!code){toast('Enter student code','err');return;}
+  if(!ST.improvements[code]) ST.improvements[code]=[];
+  ST.improvements[code].unshift({last,thisWeek,gain:thisWeek-last,date:new Date().toLocaleDateString(),week:ls('arena_week',1)});
+  sl('eng_improvements',ST.improvements);
+  ['impCode','impLast','impThis'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderImprovementLog();
+  calculateImproved();
+  toast(`Improvement logged for ${code}`,'ok');
+}
+
+function findMostImproved(){
+  const all=Object.entries(ST.improvements).map(([code,arr])=>{
+    const recent=arr[0];
+    return{code,gain:recent?.gain||0,last:recent?.last||0,thisWeek:recent?.thisWeek||0};
+  }).filter(e=>e.gain>0).sort((a,b)=>b.gain-a.gain);
+  return all[0]||{code:'',gain:0};
+}
+
+function calculateImproved(){
+  const sorted=Object.entries(ST.improvements).map(([code,arr])=>{
+    const recent=arr[0];
+    return{code,gain:recent?.gain||0,last:recent?.last||0,now:recent?.thisWeek||0};
+  }).filter(e=>e.gain>0).sort((a,b)=>b.gain-a.gain);
+
+  document.getElementById('improvedWeek').textContent=`Week ${ls('arena_week',1)}`;
+  document.getElementById('improvedGrid').innerHTML=sorted.length?sorted.map((e,i)=>`
+    <div class="improved-row ${i===0?'top':''}">
+      <div class="ir-rank" style="color:${i===0?'var(--grn)':i===1?'var(--acc)':'var(--tx3)'}">${i===0?'🏆':i===1?'🥈':i===2?'🥉':`#${i+1}`}</div>
+      <div class="ir-name">${e.code}</div>
+      <div class="ir-scores">
+        <div class="ir-change">+${e.gain}%</div>
+        <div class="ir-from">${e.last}% → ${e.now}%</div>
+      </div>
+    </div>`).join('')+
+    (sorted.length>0?`
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-grn btn-sm" onclick="spotlightMostImproved()">🌟 Spotlight Most Improved</button>
+        <button class="btn btn-ghost btn-sm" onclick="awardImprovedPbis()">🏆 Award +5 PBIS to Most Improved</button>
+      </div>`:''
+    ):
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:16px;text-align:center">Log student scores above to calculate improvement rankings.</div>';
+}
+
+function spotlightMostImproved(){
+  const top=findMostImproved();
+  if(!top.code){toast('No improvement data yet','err');return;}
+  document.getElementById('slCode').value=top.code;
+  document.getElementById('slMsg').value=`Most Improved this week! Up ${top.gain}% — incredible growth!`;
+  document.getElementById('slEmoji').value='📈';
+  document.getElementById('slEmojiPreview').textContent='📈';
+  goTab('spotlight');
+  setTimeout(()=>launchSpotlight(),300);
+}
+
+function awardImprovedPbis(){
+  const top=findMostImproved();
+  if(!top.code){toast('No improvement data yet','err');return;}
+  const pbis=ls('pbis_students',{});
+  pbis[top.code]=(pbis[top.code]||0)+5;
+  sl('pbis_students',pbis);
+  toast(`+5 PBIS points awarded to ${top.code} — Most Improved!`,'gold');
+  playSound('unlock');
+}
+
+function renderImprovementLog(){
+  const all=Object.entries(ST.improvements);
+  document.getElementById('impLog').innerHTML=all.length?all.flatMap(([code,arr])=>arr.slice(0,1).map(e=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border-radius:var(--r);border-left:2px solid ${e.gain>0?'var(--grn)':'var(--red)'}">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--tx2);min-width:70px">${code}</span>
+      <span style="font-size:11px;color:var(--tx2)">${e.last}% → ${e.thisWeek}%</span>
+      <span style="font-family:var(--display);font-size:14px;font-weight:700;color:${e.gain>0?'var(--grn)':'var(--red)'}">+${e.gain}%</span>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-left:auto">${e.date}</span>
+    </div>`)).join(''):
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No improvements logged yet.</div>';
+}
+
+// ── CONFETTI ──
+function fireConfetti(count=40){
+  const el=document.getElementById('celebrate');
+  const colors=['#ffd700','#00ff77','#00ccff','#cc44ff','#ff4466','#ffbb00'];
+  for(let i=0;i<count;i++){
+    const piece=document.createElement('div');
+    piece.className='confetti-piece';
+    piece.style.cssText=`left:${Math.random()*100}%;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*1}s;animation-duration:${2+Math.random()*2}s;transform:rotate(${Math.random()*360}deg)`;
+    el.appendChild(piece);
+    setTimeout(()=>piece.remove(),4000);
+  }
+}
+
+// ── TOAST ──
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',4000);
+}
+
+init();
+</script>
+<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('engagement');}
+}
+</script>
+</body>
+</html>

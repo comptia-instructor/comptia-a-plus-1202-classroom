@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Exam Suite & Support Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050810;--s1:#0a0d17;--s2:#0f1220;--s3:#141828;--s4:#1a2035;
+  --b1:#1e2540;--b2:#283054;--b3:#334068;
+  --tx:#c8d0e8;--tx2:#7a85a8;--tx3:#424d6a;--tx4:#2a3350;
+  --acc:#00c8ff;--acc2:#0099cc;--acc-d:rgba(0,212,255,0.1);
+  --grn:#00ff88;--grn2:#00cc6a;--grn-d:rgba(0,255,136,0.1);
+  --amb:#ffaa00;--amb-d:rgba(255,170,0,0.1);
+  --red:#ff4466;--red-d:rgba(255,68,102,0.1);
+  --pur:#aa55ff;--pur-d:rgba(170,85,255,0.1);
+  --gold:#ffd700;--gold-d:rgba(255,215,0,0.1);
+  --mono:'JetBrains Mono',monospace;--display:'Barlow Condensed',sans-serif;--sans:'Barlow',sans-serif;
+  --r:6px;--rl:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(0,212,255,0.05),transparent 60%),
+  radial-gradient(ellipse 60% 40% at 80% 100%,rgba(170,85,255,0.04),transparent 50%),
+  repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,0.015) 39px,rgba(0,212,255,0.015) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,0.015) 39px,rgba(0,212,255,0.015) 40px);
+  pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--b1);padding:0 28px;display:flex;align-items:center;gap:14px;background:rgba(6,8,16,0.96);backdrop-filter:blur(20px);position:sticky;top:0;z-index:300;height:54px}
+.logo{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--acc);border:1px solid var(--acc);padding:4px 8px;border-radius:4px;background:var(--acc-d);letter-spacing:.5px}
+.htitle{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx)}
+.hsub{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px}
+.back-btn{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--tx2);background:var(--s2);border:1px solid var(--b1);padding:5px 12px;border-radius:5px;cursor:pointer;transition:all .15s;text-decoration:none;letter-spacing:.3px}
+.back-btn:hover{border-color:var(--b2);color:var(--tx)}
+
+/* ── NAV ── */
+nav{display:flex;gap:0;background:var(--s1);border-bottom:1px solid var(--b1);padding:0 20px;overflow-x:auto}
+nav::-webkit-scrollbar{height:2px}
+.tab{padding:13px 16px;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--tx2)}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto}
+.panel{display:none;padding:24px;max-width:1100px;margin:0 auto;flex-direction:column;gap:18px}
+.panel.active{display:flex}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.2),transparent)}
+.card-hdr{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b1);background:rgba(255,255,255,0.015);flex-wrap:wrap}
+.card-hdr h2{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx);flex:1}
+.card-body{padding:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-acc:hover{background:var(--acc2)}
+.btn-grn{background:var(--grn);color:var(--bg);font-weight:800}
+.btn-grn:hover{background:var(--grn2)}
+.btn-amb{background:var(--amb-d);border:1px solid var(--amb);color:var(--amb)}
+.btn-red{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.btn-pur{background:var(--pur-d);border:1px solid var(--pur);color:var(--pur)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{border-color:var(--b3);color:var(--tx)}
+.btn-sm{padding:5px 12px;font-size:10px;border-radius:5px}
+.btn-lg{padding:14px 28px;font-size:15px}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.3px}
+.tag.acc{background:var(--acc-d);color:var(--acc);border:1px solid var(--acc)}
+.tag.grn{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn)}
+.tag.amb{background:var(--amb-d);color:var(--amb);border:1px solid var(--amb)}
+.tag.red{background:var(--red-d);color:var(--red);border:1px solid var(--red)}
+.tag.pur{background:var(--pur-d);color:var(--pur);border:1px solid var(--pur)}
+.tag.gold{background:var(--gold-d);color:var(--gold);border:1px solid var(--gold)}
+
+/* ── EXAM SIMULATOR ── */
+.exam-start-screen{text-align:center;padding:48px 24px}
+.exam-title{font-family:var(--display);font-size:48px;font-weight:900;letter-spacing:-1px;text-transform:uppercase;color:var(--tx);margin-bottom:8px}
+.exam-sub{font-family:var(--mono);font-size:11px;color:var(--tx3);margin-bottom:28px;letter-spacing:.5px;line-height:1.8}
+.exam-domains{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:28px;text-align:left}
+.ed-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px}
+.ed-pct{font-family:var(--display);font-size:28px;font-weight:800;line-height:1}
+.ed-name{font-size:11px;color:var(--tx2);margin-top:3px;line-height:1.4}
+.ed-qs{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:4px}
+
+.exam-interface{display:flex;flex-direction:column;gap:14px}
+.exam-top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);flex-wrap:wrap;gap:8px}
+.exam-timer-big{font-family:var(--display);font-size:32px;font-weight:800;color:var(--acc);letter-spacing:2px}
+.exam-timer-big.warn{color:var(--amb);animation:pulse .8s ease infinite}
+.exam-timer-big.danger{color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.exam-progress{flex:1;margin:0 16px}
+.ep-bar{height:4px;background:var(--b1);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.ep-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .3s}
+.ep-label{font-family:var(--mono);font-size:9px;color:var(--tx3);text-align:center}
+.exam-score-display{font-family:var(--mono);font-size:11px;color:var(--tx2)}
+
+.q-nav-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:8px}
+.qn-dot{width:28px;height:28px;border-radius:5px;background:var(--s3);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;cursor:pointer;transition:all .15s;color:var(--tx3)}
+.qn-dot:hover{border-color:var(--b2)}
+.qn-dot.answered{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+.qn-dot.current{background:var(--acc);color:var(--bg);font-weight:700}
+.qn-dot.correct{background:var(--grn-d);border-color:var(--grn);color:var(--grn)}
+.qn-dot.wrong{background:var(--red-d);border-color:var(--red);color:var(--red)}
+
+/* Q blocks */
+.q-block{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px}
+.q-meta{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:6px;display:flex;gap:8px;flex-wrap:wrap}
+.q-text{font-size:13px;font-weight:500;color:var(--tx);line-height:1.65;margin-bottom:12px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:6px;border:1px solid var(--b1);cursor:pointer;transition:all .15s;background:var(--s3)}
+.opt:hover{border-color:var(--b2)}
+.opt.sel{border-color:var(--acc);background:var(--acc-d)}
+.opt.correct{border-color:var(--grn);background:var(--grn-d)}
+.opt.wrong{border-color:var(--red);background:var(--red-d)}
+.opt-ltr{width:22px;height:22px;border-radius:4px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono);font-weight:700;color:var(--tx3);flex-shrink:0}
+.opt.sel .opt-ltr{background:var(--acc);color:var(--bg)}
+.opt.correct .opt-ltr{background:var(--grn);color:var(--bg)}
+.opt.wrong .opt-ltr{background:var(--red);color:#fff}
+.opt-txt{font-size:12px;color:var(--tx2);line-height:1.5}
+.opt.sel .opt-txt,.opt.correct .opt-txt,.opt.wrong .opt-txt{color:var(--tx)}
+.rationale{margin-top:10px;padding:9px 12px;background:var(--s4);border-left:2px solid var(--grn);border-radius:4px;font-size:11px;color:var(--tx2);line-height:1.65;display:none}
+.rationale.show{display:block}
+
+/* Score result */
+.score-result{text-align:center;padding:32px 20px;background:var(--s2);border-radius:var(--rl);border:1px solid var(--b1)}
+.sr-score{font-family:var(--display);font-size:80px;font-weight:900;line-height:1;letter-spacing:-3px}
+.sr-pts{font-family:var(--mono);font-size:16px;margin-top:6px}
+.sr-status{font-family:var(--display);font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-top:8px}
+.sr-bar{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin:16px 0}
+.sr-fill{height:100%;border-radius:4px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.domain-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:16px}
+.dr-card{background:var(--s3);border-radius:var(--r);padding:10px 14px}
+.dr-name{font-size:10px;color:var(--tx2);margin-bottom:4px}
+.dr-score{font-family:var(--display);font-size:20px;font-weight:700}
+.dr-bar{height:3px;background:var(--b1);border-radius:2px;overflow:hidden;margin-top:6px}
+.dr-fill{height:100%;border-radius:2px}
+
+/* ── MICRO-LESSONS ── */
+.topic-list{display:flex;flex-direction:column;gap:8px}
+.topic-item{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+.topic-item:hover{border-color:var(--b2)}
+.topic-item.weak{border-color:var(--red)}
+.ti-icon{font-size:20px;flex-shrink:0}
+.ti-info{flex:1}
+.ti-name{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.ti-stats{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.ti-bar{width:80px;height:4px;background:var(--b1);border-radius:2px;overflow:hidden}
+.ti-fill{height:100%;border-radius:2px;transition:width .5s}
+.micro-lesson{background:var(--s2);border:1px solid var(--acc);border-radius:var(--rl);padding:20px;margin-top:4px}
+.ml-header{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+.ml-concept{font-size:13px;color:var(--tx);line-height:1.8;margin-bottom:16px;padding:12px 14px;background:var(--s3);border-radius:var(--r);border-left:2px solid var(--acc)}
+.ml-qs{display:flex;flex-direction:column;gap:8px}
+
+/* ── PARENT COMMS ── */
+.comm-config{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.cc-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cc-label{font-size:11px;color:var(--tx2);min-width:90px;flex-shrink:0;font-family:var(--mono)}
+.cc-inp{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;transition:border-color .2s;min-width:140px}
+.cc-inp:focus{border-color:var(--acc)}
+.cc-inp::placeholder{color:var(--tx3)}
+.cc-select{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:12px;outline:none}
+.comm-output{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;font-size:12px;color:var(--tx2);line-height:1.8;white-space:pre-wrap;min-height:200px;font-family:var(--sans);display:none}
+.comm-output.show{display:block}
+
+/* ── SUB MODE ── */
+.sub-hero{background:linear-gradient(135deg,var(--s2),rgba(0,212,255,0.05));border:1px solid var(--acc);border-radius:var(--rl);padding:28px;text-align:center;margin-bottom:16px}
+.sub-title{font-family:var(--display);font-size:36px;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--acc);margin-bottom:6px}
+.sub-date{font-family:var(--mono);font-size:11px;color:var(--tx3);margin-bottom:16px}
+.sub-steps{display:flex;flex-direction:column;gap:10px}
+.sub-step{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;display:flex;align-items:flex-start;gap:14px}
+.ss-num{width:32px;height:32px;border-radius:50%;background:var(--acc-d);border:1.5px solid var(--acc);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:800;color:var(--acc);flex-shrink:0}
+.ss-content{flex:1}
+.ss-title{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:4px}
+.ss-desc{font-size:12px;color:var(--tx2);line-height:1.7}
+.ss-time{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:4px}
+.ss-action{margin-top:8px}
+
+/* ── CALENDAR ── */
+.full-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-header{background:var(--s3);border-radius:5px;padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.5px}
+.cal-day{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:6px;min-height:60px;cursor:pointer;transition:all .15s;position:relative}
+.cal-day:hover{border-color:var(--b2)}
+.cal-day.today{border-color:var(--acc);background:var(--acc-d)}
+.cal-day.done{border-color:var(--grn);background:var(--grn-d);opacity:.8}
+.cal-day.empty{opacity:.2;pointer-events:none}
+.cd-date{font-family:var(--mono);font-size:8px;color:var(--tx3);margin-bottom:2px}
+.cd-daynum{font-family:var(--display);font-size:12px;font-weight:700;color:var(--acc);line-height:1}
+.cd-section{font-size:8px;color:var(--tx3);line-height:1.3;margin-top:2px}
+.cd-done{position:absolute;top:3px;right:3px;font-size:8px;color:var(--grn)}
+.cal-month{grid-column:1/-1;font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tx);padding:8px 4px;border-bottom:1px solid var(--b1);margin:8px 0 4px}
+.cal-controls{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.cc-mon-btn{padding:6px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:5px;color:var(--tx2);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s}
+.cc-mon-btn:hover{border-color:var(--b2);color:var(--tx)}
+.cal-start-config{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r)}
+
+/* ── SELF-ASSESSMENT ── */
+.sa-prompt{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.sa-q{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:12px}
+.sa-scale{display:flex;gap:6px;justify-content:center}
+.sa-btn{width:40px;height:40px;border-radius:8px;border:1px solid var(--b1);background:var(--s3);color:var(--tx2);font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.sa-btn:hover{border-color:var(--b2);color:var(--tx)}
+.sa-btn.sel{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+.sa-textarea{width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;resize:none;outline:none;line-height:1.7;transition:border-color .2s;min-height:70px}
+.sa-textarea:focus{border-color:var(--acc)}
+.sa-textarea::placeholder{color:var(--tx3)}
+.sa-history{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:7px}
+.sh-item{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px}
+.sh-date{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-bottom:6px}
+.sh-scores{display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.sh-sc{font-family:var(--mono);font-size:10px;color:var(--tx2)}
+.sh-comment{font-size:11px;color:var(--tx2);line-height:1.6;font-style:italic}
+
+/* ── RETAKE ── */
+.retake-grid{display:flex;flex-direction:column;gap:8px}
+.rt-item{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rt-code{font-family:var(--mono);font-size:11px;color:var(--acc);min-width:80px}
+.rt-quiz{font-size:12px;color:var(--tx);flex:1}
+.rt-score{font-family:var(--mono);font-size:11px;color:var(--tx2)}
+.rt-status{flex-shrink:0}
+.rt-actions{display:flex;gap:6px;flex-shrink:0}
+.retake-form{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.rf-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.rf-inp{flex:1;background:var(--s3);border:1px solid var(--b1);border-radius:5px;padding:7px 10px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;min-width:120px;transition:border-color .2s}
+.rf-inp:focus{border-color:var(--acc)}
+.rf-inp::placeholder{color:var(--tx3)}
+.rf-select{flex:1;background:var(--s3);border:1px solid var(--b1);border-radius:5px;padding:7px 10px;color:var(--tx);font-size:12px;outline:none}
+
+/* MISC */
+.divider{height:1px;background:var(--b1);margin:6px 0}
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--tx3);font-family:var(--mono);font-size:11px;padding:20px}
+.loading::before{content:'';width:14px;height:14px;border:1.5px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b1)}
+.stat-row:last-child{border-bottom:none}
+.sr-label{font-size:12px;color:var(--tx2)}
+.sr-val{font-family:var(--mono);font-size:11px;color:var(--tx)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--tx);z-index:1000;opacity:0;transform:translateY(8px);transition:all .25s}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--red);color:var(--red)}
+
+<link rel="stylesheet" href="platform.css">
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">A+ 220</div>
+  <div>
+    <div class="htitle">Exam Suite & Support Tools</div>
+    <div class="hsub">90-question simulator · Micro-lessons · Parent comms · Sub mode · Calendar · Retakes</div>
+  </div>
+  <a href="hub.html" class="back-btn">← Back to Hub</a>
+</header>
+
+<nav>
+  <div class="tab active" onclick="switchTab('exam')">🎓 Exam Simulator</div>
+  <div class="tab" onclick="switchTab('micro')">⚡ Micro-Lessons</div>
+  <div class="tab" id="tab-parent-btn" onclick="switchTab('parent')">✉️ Parent Comms</div>
+  <div class="tab" id="tab-sub-btn" onclick="switchTab('sub')">🔄 Sub Mode</div>
+  <div class="tab" id="tab-calendar-btn" onclick="switchTab('calendar')">📅 Calendar</div>
+  <div class="tab" onclick="switchTab('assess')">💭 Self-Assessment</div>
+  <div class="tab" onclick="switchTab('retake')">🔁 Retake Manager</div>
+</nav>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════
+     1. EXAM SIMULATOR (90 questions)
+═══════════════════════════════════ -->
+<div class="panel active" id="tab-exam">
+  <div id="examStartScreen">
+    <div class="card">
+      <div class="card-hdr"><h2>🎓 Full CompTIA A+ Practice Exam</h2><span class="tag red">90 Questions · 90 Min · 900-Point Scale</span></div>
+      <div class="card-body">
+        <div class="exam-start-screen">
+          <div class="exam-title">Practice Exam</div>
+          <div class="exam-sub">
+            220-1202 · Core 2 · All Domains · Timed<br>
+            Passing score: 700 / 900 points (~78%)<br>
+            Performance-based questions included
+          </div>
+          <div class="exam-domains" id="domainPreview"></div>
+          <div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px;flex-wrap:wrap">
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 20px;text-align:center">
+              <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--acc)">90</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Questions</div>
+            </div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 20px;text-align:center">
+              <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--amb)">90</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Minutes</div>
+            </div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 20px;text-align:center">
+              <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--grn)">700</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Pass Score</div>
+            </div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 20px;text-align:center">
+              <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--pur)">900</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Max Score</div>
+            </div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:8px">STUDENT CODE (optional)</div>
+            <input type="text" id="examCode" placeholder="STU-001" style="width:200px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 14px;color:var(--tx);font-family:var(--mono);font-size:14px;letter-spacing:2px;text-align:center;outline:none;transition:border-color .2s;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <button class="btn btn-grn btn-lg" onclick="startExam()" id="startExamBtn">Launch Practice Exam</button>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:10px">AI generates fresh questions across all 5 exam domains</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="examInterface" style="display:none">
+    <div class="exam-interface">
+      <div class="exam-top-bar">
+        <div>
+          <div class="exam-timer-big" id="examTimer">90:00</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Time remaining</div>
+        </div>
+        <div class="exam-progress">
+          <div class="ep-bar"><div class="ep-fill" id="examProgressFill" style="width:0%"></div></div>
+          <div class="ep-label" id="examProgressLabel">0 of 90 answered</div>
+        </div>
+        <div>
+          <div class="exam-score-display" id="liveScore">Score: —</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Scaled 0–900</div>
+        </div>
+        <button class="btn btn-grn btn-sm" onclick="submitExam()" id="submitExamBtn">Submit Exam</button>
+      </div>
+
+      <div class="q-nav-grid" id="qNavGrid"></div>
+
+      <div id="currentQ"></div>
+
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-ghost btn-sm" onclick="prevQ()" id="prevQBtn">← Prev</button>
+        <button class="btn btn-ghost btn-sm" onclick="nextQ()" id="nextQBtn">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="examResults" style="display:none"></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     2. MICRO-LESSONS
+═══════════════════════════════════ -->
+<div class="panel" id="tab-micro">
+  <div class="card">
+    <div class="card-hdr">
+      <h2>⚡ Weak Topic Micro-Lessons</h2>
+      <span class="tag red" id="weakCount">0 weak topics</span>
+      <button class="btn btn-ghost btn-sm" onclick="refreshWeakTopics()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:16px;font-family:var(--mono)">
+        Topics missed 3+ times across quizzes get a 5-minute AI micro-lesson: concept explanation + 3 targeted practice questions. No teacher action needed.
+      </div>
+      <div class="topic-list" id="topicList">
+        <div style="font-size:12px;color:var(--tx3);padding:20px;text-align:center;font-family:var(--mono)">
+          Complete quizzes to identify weak topics. Topics missed 3+ times will appear here automatically.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="microLessonArea" style="display:none">
+    <div class="card">
+      <div class="card-hdr"><h2 id="mlTitle">Micro-Lesson</h2><button class="btn btn-ghost btn-sm" onclick="closeMicroLesson()">✕ Close</button></div>
+      <div class="card-body">
+        <div class="micro-lesson" id="microLessonContent">
+          <div class="loading">Generating micro-lesson…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     3. PARENT COMMUNICATION
+═══════════════════════════════════ -->
+<div class="panel" id="tab-parent">
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hdr"><h2>✉️ Parent Communication Generator</h2></div>
+      <div class="card-body">
+        <div class="comm-config">
+          <div class="cc-row">
+            <span class="cc-label">Student Code</span>
+            <input class="cc-inp" type="text" id="pcCode" placeholder="STU-001" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div class="cc-row">
+            <span class="cc-label">Student Name</span>
+            <input class="cc-inp" type="text" id="pcName" placeholder="First name only (not stored)">
+          </div>
+          <div class="cc-row">
+            <span class="cc-label">Parent Name</span>
+            <input class="cc-inp" type="text" id="pcParent" placeholder="Parent/Guardian name">
+          </div>
+          <div class="cc-row">
+            <span class="cc-label">Message Type</span>
+            <select class="cc-select" id="pcType">
+              <option value="progress">General Progress Update</option>
+              <option value="concern">Academic Concern</option>
+              <option value="praise">Positive Achievement</option>
+              <option value="retake">Retake Opportunity</option>
+              <option value="streak">Streak/Consistency Recognition</option>
+              <option value="exam">Exam Preparation Update</option>
+            </select>
+          </div>
+          <div class="cc-row">
+            <span class="cc-label">Tone</span>
+            <select class="cc-select" id="pcTone">
+              <option value="professional">Professional</option>
+              <option value="warm">Warm & encouraging</option>
+              <option value="urgent">Urgent concern</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:5px">ADDITIONAL NOTES (optional)</div>
+            <textarea id="pcNotes" placeholder="Any specific details to include…" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;resize:none;outline:none;min-height:70px;transition:border-color .2s" onfocus="this.style.borderColor='var(--acc)'" onblur="this.style.borderColor='var(--b1)'"></textarea>
+          </div>
+          <button class="btn btn-acc" style="width:100%;justify-content:center" onclick="generateComm()" id="genCommBtn">⚡ Generate Communication</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <h2>Generated Message</h2>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="copyComm()">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="emailComm()">✉️ Open in Mail</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="commOutput" style="font-size:12px;color:var(--tx3);font-family:var(--mono);padding:20px;text-align:center">
+          Configure the student details and click Generate.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     4. SUBSTITUTE TEACHER MODE
+═══════════════════════════════════ -->
+<div class="panel" id="tab-sub">
+  <div class="sub-hero">
+    <div class="sub-title">Substitute Teacher Guide</div>
+    <div class="sub-date" id="subDate">Today's date loading…</div>
+    <div style="font-size:13px;color:var(--tx2);max-width:500px;margin:0 auto;line-height:1.7">
+      Everything is already set up. Follow these steps in order. All tools open automatically — just click the buttons below each step.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <h2>📋 Today's Class Plan</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--tx2)">Day:</span>
+        <input type="number" id="subDay" min="1" max="68" value="1" style="width:55px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:5px 8px;color:var(--tx);font-family:var(--mono);font-size:12px;outline:none;text-align:center" onchange="loadSubDay()">
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="subDayInfo" style="padding:10px;background:var(--s2);border-radius:var(--r);margin-bottom:16px;font-size:12px;color:var(--tx2);line-height:1.7"></div>
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="ss-num">1</div>
+          <div class="ss-content">
+            <div class="ss-title">Cold Retrieval (5 questions)</div>
+            <div class="ss-desc">Students open the classroom platform and complete 5 review questions from yesterday's lesson. They work independently and submit — it auto-grades. <strong>You don't need to do anything</strong> except make sure everyone is logged in.</div>
+            <div class="ss-time">⏱ 8–10 minutes</div>
+            <div class="ss-action"><button class="btn btn-acc btn-sm" onclick="window.open('comptia-classroom-v2.html','_blank')">Open Classroom Platform →</button></div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="ss-num">2</div>
+          <div class="ss-content">
+            <div class="ss-title">Watch Today's Videos</div>
+            <div class="ss-desc">Have students open Udemy and watch today's assigned videos. The classroom platform shows the video titles and links for today's day. Students take notes using the Notes tool.</div>
+            <div class="ss-time">⏱ <span id="subVideoTime">14</span> minutes of video</div>
+            <div class="ss-action">
+              <button class="btn btn-ghost btn-sm" onclick="window.open('https://www.udemy.com/course/total-comptia-a-certification/learn/','_blank')">Open Udemy →</button>
+              <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="window.open('comptia-notes-quiz.html','_blank')">Open Notes Tool →</button>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="ss-num">3</div>
+          <div class="ss-content">
+            <div class="ss-title">Student Question Submission</div>
+            <div class="ss-desc">After videos, each student writes one question from what they learned in the notes tool. They submit it — it auto-formats to CompTIA style. Takes 5 minutes max.</div>
+            <div class="ss-time">⏱ 5 minutes</div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="ss-num">4</div>
+          <div class="ss-content">
+            <div class="ss-title">Closing Quiz (5 questions)</div>
+            <div class="ss-desc">Students return to the classroom platform for the timed practice — 5 questions, auto-graded. This IS graded. They have until the end of class.</div>
+            <div class="ss-time">⏱ 10 minutes · Graded</div>
+            <div class="ss-action"><button class="btn btn-acc btn-sm" onclick="window.open('comptia-classroom-v2.html','_blank')">Open Classroom Platform →</button></div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="ss-num">5</div>
+          <div class="ss-content">
+            <div class="ss-title">If students finish early</div>
+            <div class="ss-desc">Direct students to the Student Command Center — they can review flashcards, work on Cornell notes, or take a practice exam. All self-directed.</div>
+            <div class="ss-action"><button class="btn btn-ghost btn-sm" onclick="window.open('student-command-center.html','_blank')">Student Command Center →</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:14px;background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--amb);letter-spacing:1px;margin-bottom:6px">EMERGENCY CONTACTS</div>
+        <div id="subContacts" style="font-size:12px;color:var(--tx2);line-height:1.8">
+          Teacher: <em>Update this in the settings</em><br>
+          Department: <em>Update this in the settings</em><br>
+          Tech support: <em>Update this in the settings</em>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="editSubContacts()">Edit Contacts</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     5. CLASS CALENDAR
+═══════════════════════════════════ -->
+<div class="panel" id="tab-calendar">
+  <div class="card">
+    <div class="card-hdr">
+      <h2>📅 68-Day Course Calendar</h2>
+      <div class="cal-controls" style="margin:0">
+        <button class="cc-mon-btn" onclick="calMonth--; renderFullCal()">← Prev Month</button>
+        <span id="calMonthLabel" style="font-family:var(--mono);font-size:10px;color:var(--tx2)">—</span>
+        <button class="cc-mon-btn" onclick="calMonth++; renderFullCal()">Next Month →</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCalendar()">Export CSV</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="cal-start-config">
+        <span style="font-size:12px;color:var(--tx2)">Course start date:</span>
+        <input type="date" id="calStart" style="background:var(--s3);border:1px solid var(--b1);border-radius:5px;padding:6px 10px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none" onchange="saveCalStart(this.value)">
+        <span style="font-size:11px;color:var(--tx3);font-family:var(--mono)">(Sets first Monday of the course)</span>
+      </div>
+      <div class="full-cal" id="fullCal">
+        <div class="cal-header">Mon</div>
+        <div class="cal-header">Tue</div>
+        <div class="cal-header">Wed</div>
+        <div class="cal-header">Thu</div>
+        <div class="cal-header">Fri</div>
+        <div class="cal-header">Sat</div>
+        <div class="cal-header">Sun</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     6. SELF-ASSESSMENT
+═══════════════════════════════════ -->
+<div class="panel" id="tab-assess">
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hdr">
+        <h2>💭 End-of-Class Reflection</h2>
+        <span class="tag acc" id="saDay">Day 1</span>
+        <input type="number" id="saDayInput" min="1" max="68" value="1" style="width:55px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:4px 8px;color:var(--tx);font-family:var(--mono);font-size:11px;outline:none;text-align:center" onchange="document.getElementById('saDay').textContent='Day '+this.value">
+        <input type="text" id="saCode" placeholder="STU-001" style="width:80px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:4px 8px;color:var(--tx);font-family:var(--mono);font-size:11px;outline:none;text-transform:uppercase;letter-spacing:.5px" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="card-body">
+        <div style="font-size:11px;color:var(--tx2);margin-bottom:16px;line-height:1.7;font-family:var(--mono)">3 questions · 2 minutes · Anonymous feedback for the teacher</div>
+
+        <div class="sa-prompt">
+          <div class="sa-q">1. How confident do you feel about today's content?</div>
+          <div class="sa-scale" id="saConf">
+            <button class="sa-btn" onclick="saSelect('conf',1,this)" title="Not at all">1</button>
+            <button class="sa-btn" onclick="saSelect('conf',2,this)" title="Slightly">2</button>
+            <button class="sa-btn" onclick="saSelect('conf',3,this)" title="Somewhat">3</button>
+            <button class="sa-btn" onclick="saSelect('conf',4,this)" title="Mostly">4</button>
+            <button class="sa-btn" onclick="saSelect('conf',5,this)" title="Very confident">5</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--tx3);margin-top:4px">
+            <span>Not confident</span><span>Very confident</span>
+          </div>
+        </div>
+
+        <div class="sa-prompt">
+          <div class="sa-q">2. What was the most confusing part of today's lesson?</div>
+          <textarea class="sa-textarea" id="saConfusing" placeholder="Describe what was unclear or hard to understand…" rows="3"></textarea>
+        </div>
+
+        <div class="sa-prompt">
+          <div class="sa-q">3. What clicked for you today? What made sense?</div>
+          <textarea class="sa-textarea" id="saClicked" placeholder="What concepts or ideas felt clear and understandable…" rows="3"></textarea>
+        </div>
+
+        <button class="btn btn-acc" style="width:100%;justify-content:center;margin-top:4px" onclick="submitSelfAssessment()">Submit Reflection</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <h2>📊 Teacher View — Reflections</h2>
+        <button class="btn btn-ghost btn-sm" onclick="exportAssessments()">Export</button>
+      </div>
+      <div class="card-body">
+        <div id="saStats" style="margin-bottom:14px"></div>
+        <div class="sa-history" id="saHistory">
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No reflections submitted yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     7. RETAKE MANAGER
+═══════════════════════════════════ -->
+<div class="panel" id="tab-retake">
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hdr"><h2>🔁 Log Retake Request</h2></div>
+      <div class="card-body">
+        <div class="retake-form">
+          <div class="rf-row">
+            <input class="rf-inp" type="text" id="rtCode" placeholder="Student code (STU-001)" oninput="this.value=this.value.toUpperCase()">
+            <input class="rf-inp" type="text" id="rtQuiz" placeholder="Quiz / assessment name">
+          </div>
+          <div class="rf-row">
+            <input class="rf-inp" type="number" id="rtOrigScore" placeholder="Original score (%)" min="0" max="100">
+            <select class="rf-select" id="rtStatus">
+              <option value="pending">Pending teacher approval</option>
+              <option value="approved">Approved</option>
+              <option value="denied">Denied</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div class="rf-row">
+            <input class="rf-inp" type="date" id="rtDeadline" placeholder="Retake deadline">
+            <input class="rf-inp" type="number" id="rtRetakeScore" placeholder="Retake score % (if completed)" min="0" max="100">
+          </div>
+          <div style="margin-bottom:10px">
+            <textarea placeholder="Notes / reason for retake…" id="rtNotes" style="width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:5px;padding:8px 10px;color:var(--tx);font-family:var(--sans);font-size:12px;resize:none;outline:none;min-height:56px;transition:border-color .2s" onfocus="this.style.borderColor='var(--acc)'" onblur="this.style.borderColor='var(--b1)'"></textarea>
+          </div>
+          <button class="btn btn-acc" style="width:100%;justify-content:center" onclick="logRetake()">Log Retake Request</button>
+        </div>
+
+        <div style="padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r)">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:8px">RETAKE POLICY</div>
+          <div style="font-size:11px;color:var(--tx2);line-height:1.8">
+            Max score on retake: <input type="number" id="rtMaxScore" value="70" min="0" max="100" style="width:50px;background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:2px 6px;color:var(--acc);font-family:var(--mono);font-size:11px;outline:none">%<br>
+            Retake window: <input type="number" id="rtDays" value="5" min="1" style="width:40px;background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:2px 6px;color:var(--acc);font-family:var(--mono);font-size:11px;outline:none"> school days<br>
+            Max attempts: <input type="number" id="rtMaxAttempts" value="1" min="1" max="3" style="width:40px;background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:2px 6px;color:var(--acc);font-family:var(--mono);font-size:11px;outline:none">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <h2>📋 Retake Log</h2>
+        <span class="tag amb" id="rtPendingCount">0 pending</span>
+        <button class="btn btn-ghost btn-sm" onclick="exportRetakes()">Export</button>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="filterRetakes('all')" id="rtf-all">All</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterRetakes('pending')" id="rtf-pending">Pending</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterRetakes('approved')" id="rtf-approved">Approved</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterRetakes('completed')" id="rtf-completed">Completed</button>
+        </div>
+        <div class="retake-grid" id="retakeGrid">
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No retake requests logged yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /app -->
+<div class="toast" id="toast"></div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+// ══════════════════════════════════════════════════
+// DATA & STATE
+// ══════════════════════════════════════════════════
+const DOMAINS = [
+  {name:'Mobile Devices',weight:.22,color:'var(--acc)',qs:20},
+  {name:'Networking',weight:.29,color:'var(--grn)',qs:26},
+  {name:'Hardware',weight:.27,color:'var(--amb)',qs:24},
+  {name:'Virtualization & Cloud',weight:.12,color:'var(--pur)',qs:11},
+  {name:'HW & Network Troubleshooting',weight:.10,color:'var(--red)',qs:9},
+];
+
+const DAYS_DATA=[
+  {day:1,section:'Ch.1 Safety & Professionalism',videos:['Professional Communication I','Professional Communication II'],time:14},
+  {day:2,section:'Ch.1-2',videos:['Dealing with Difficult Customers','Physical Safety','Common Safety Procedures'],time:14},
+  {day:3,section:'Ch.2 Operating Systems',videos:["What's an OS?","Users and Super Users"],time:14},
+  {day:4,section:'Ch.2 Windows',videos:['Why Windows?','Touring Windows 10 and 11'],time:14},
+  {day:5,section:'Ch.2 macOS',videos:['Touring macOS Part I & II'],time:14},
+  {day:6,section:'Ch.2 Linux',videos:['Touring macOS Part III','Touring Linux'],time:14},
+  {day:7,section:'Ch.7 Power Supplies',videos:['Power Protection','Cooling Your System'],time:14},
+  {day:8,section:'Ch.8-9 Storage',videos:['Boot Order','Understanding Partitioning'],time:14},
+  {day:9,section:'Ch.9 Partitioning',videos:['MBR Partitioning','GPT Partitioning','Understanding File Systems'],time:14},
+  {day:10,section:'Ch.9 File Systems',videos:['Popular File Systems','Formatting in Action'],time:14},
+];
+
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function sl(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+const ST = {
+  examQs: null, examAnswers: {}, examTimer: null, examSecs: 5400,
+  examCode: '', examSubmitted: false, currentQ: 0,
+  assessments: ls('es_assessments',[]),
+  retakes: ls('es_retakes',[]),
+  weakTopics: ls('es_weak',{}),
+  saScores: {},
+  calMonth: 0,
+};
+let calMonth = 0;
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+function init(){
+  buildDomainPreview();
+  document.getElementById('subDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  loadSubDay();
+  renderAssessmentHistory();
+  renderRetakeGrid('all');
+  renderWeakTopics();
+  initCalendar();
+  // Check URL hash for direct tab
+  const hash = window.location.hash.replace('#','');
+  if(hash) switchTab(hash);
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabEl = document.getElementById(`tab-${id}-btn`) || document.querySelector(`.tab[onclick*="${id}"]`);
+  if(tabEl) tabEl.classList.add('active');
+  else document.querySelectorAll('.tab').forEach((t,i)=>{if(t.textContent.toLowerCase().includes(id.toLowerCase())){t.classList.add('active');}});
+  const panel = document.getElementById(`tab-${id}`);
+  if(panel) panel.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════
+// EXAM SIMULATOR
+// ══════════════════════════════════════════════════
+function buildDomainPreview(){
+  document.getElementById('domainPreview').innerHTML = DOMAINS.map(d=>`
+    <div class="ed-card">
+      <div class="ed-pct" style="color:${d.color}">${Math.round(d.weight*100)}%</div>
+      <div class="ed-name">${d.name}</div>
+      <div class="ed-qs">${d.qs} questions</div>
+    </div>`).join('');
+}
+
+async function startExam(){
+  ST.examCode = document.getElementById('examCode').value.trim().toUpperCase() || 'STUDENT';
+  document.getElementById('examStartScreen').style.display='none';
+  document.getElementById('examInterface').style.display='block';
+  document.getElementById('examInterface').innerHTML='<div class="loading" style="padding:60px">Generating 90 exam questions across all domains… this may take a moment.</div>';
+
+  try{
+    // Generate questions in batches for reliability
+    const allQs = [];
+    for(const domain of DOMAINS){
+      const r = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',max_tokens:3000,
+          system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown or preamble.',
+          messages:[{role:'user',content:`Generate exactly ${domain.qs} CompTIA A+ 220-1202 exam questions for the domain: "${domain.name}". 
+Use qualifier words (BEST, FIRST, MOST, NEXT, LEAST). Mix of difficulty. Plausible distractors. Realistic IT scenarios.
+Return JSON array: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"...","domain":"${domain.name}"}]`}]
+        })
+      });
+      const d = await r.json();
+      const text = d.content?.map(c=>c.text||'').join('')||'';
+      const domQs = JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+      allQs.push(...domQs);
+    }
+    ST.examQs = allQs.slice(0,90).map((q,i)=>({...q,num:i+1}));
+    ST.examAnswers = {}; ST.examSubmitted = false; ST.currentQ = 0;
+    ST.examSecs = 5400;
+    buildExamInterface();
+    startExamTimer();
+  }catch(e){
+    document.getElementById('examInterface').innerHTML=`<div style="color:var(--red);font-family:var(--mono);font-size:12px;padding:28px;text-align:center">
+      Failed to load exam questions. Check your connection and try again.<br><br>
+      <button class="btn btn-acc" onclick="location.reload()">Reload</button>
+    </div>`;
+    toast('Generation failed — check connection','err');
+  }
+}
+
+function buildExamInterface(){
+  const qs = ST.examQs;
+  document.getElementById('examInterface').innerHTML = `
+    <div class="exam-interface">
+      <div class="exam-top-bar">
+        <div>
+          <div class="exam-timer-big" id="examTimer">90:00</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Time remaining</div>
+        </div>
+        <div class="exam-progress">
+          <div class="ep-bar"><div class="ep-fill" id="examProgressFill" style="width:0%"></div></div>
+          <div class="ep-label" id="examProgressLabel">0 of ${qs.length} answered</div>
+        </div>
+        <div>
+          <div class="exam-score-display" id="liveScore" style="font-family:var(--mono);font-size:11px;color:var(--tx2)">Scaled score: —</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">0–900 scale</div>
+        </div>
+        <button class="btn btn-grn btn-sm" onclick="submitExam()">Submit Exam</button>
+      </div>
+      <div class="q-nav-grid" id="qNavGrid" style="grid-template-columns:repeat(10,1fr)"></div>
+      <div id="currentQ"></div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-ghost btn-sm" onclick="prevQ()">← Prev</button>
+        <button class="btn btn-ghost btn-sm" onclick="nextQ()">Next →</button>
+      </div>
+    </div>`;
+  renderQNav(); renderCurrentQ();
+}
+
+function renderQNav(){
+  const qs = ST.examQs; if(!qs)return;
+  const nav = document.getElementById('qNavGrid');
+  if(!nav) return;
+  nav.innerHTML = qs.map((q,i)=>`
+    <div class="qn-dot ${i===ST.currentQ?'current':ST.examAnswers[i]?'answered':''}" onclick="goToQ(${i})">${i+1}</div>`).join('');
+}
+
+function renderCurrentQ(){
+  const qs = ST.examQs; if(!qs) return;
+  const q = qs[ST.currentQ];
+  const sel = ST.examAnswers[ST.currentQ];
+  const el = document.getElementById('currentQ');
+  if(!el) return;
+  el.innerHTML = `<div class="q-block">
+    <div class="q-meta">
+      <span>Question ${q.num} of ${qs.length}</span>
+      <span class="tag acc">${q.domain||'—'}</span>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="opts">
+      ${['A','B','C','D'].map(l=>`
+        <div class="opt ${sel===l?'sel':''}" onclick="examPick(${ST.currentQ},'${l}')">
+          <div class="opt-ltr">${l}</div>
+          <div class="opt-txt">${q.opts[l]}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+  updateExamProgress();
+}
+
+function examPick(i, letter){
+  if(ST.examSubmitted) return;
+  ST.examAnswers[i] = letter;
+  renderQNav(); renderCurrentQ();
+}
+
+function goToQ(i){ST.currentQ=i; renderQNav(); renderCurrentQ();}
+function prevQ(){if(ST.currentQ>0){ST.currentQ--;renderQNav();renderCurrentQ();}}
+function nextQ(){if(ST.examQs&&ST.currentQ<ST.examQs.length-1){ST.currentQ++;renderQNav();renderCurrentQ();}}
+
+function updateExamProgress(){
+  const qs = ST.examQs; if(!qs) return;
+  const answered = Object.keys(ST.examAnswers).length;
+  const pct = answered/qs.length*100;
+  const fill = document.getElementById('examProgressFill');
+  const label = document.getElementById('examProgressLabel');
+  if(fill) fill.style.width = pct+'%';
+  if(label) label.textContent = `${answered} of ${qs.length} answered`;
+  // Live score estimate
+  const correct = Object.entries(ST.examAnswers).filter(([i,a])=>a===qs[+i]?.answer).length;
+  const scaledScore = answered>0 ? Math.round((correct/answered)*900) : 0;
+  const scoreEl = document.getElementById('liveScore');
+  if(scoreEl) scoreEl.textContent = `Scaled score: ~${scaledScore}`;
+}
+
+function startExamTimer(){
+  let secs = ST.examSecs;
+  updateExamTimer(secs);
+  ST.examTimer = setInterval(()=>{
+    secs--;
+    updateExamTimer(secs);
+    if(secs<=600){const t=document.getElementById('examTimer');if(t)t.className='exam-timer-big warn';}
+    if(secs<=120){const t=document.getElementById('examTimer');if(t)t.className='exam-timer-big danger';}
+    if(secs<=0){clearInterval(ST.examTimer); submitExam();}
+  },1000);
+}
+
+function updateExamTimer(secs){
+  const m=Math.floor(secs/60),s=secs%60;
+  const el=document.getElementById('examTimer');
+  if(el) el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function submitExam(){
+  if(!ST.examQs)return;
+  clearInterval(ST.examTimer);
+  ST.examSubmitted=true;
+  const qs=ST.examQs;
+  let total=0;
+  const domainScores={};
+  DOMAINS.forEach(d=>{domainScores[d.name]={correct:0,total:0,weight:d.weight};});
+  qs.forEach((q,i)=>{
+    const correct=ST.examAnswers[i]===q.answer;
+    if(correct)total++;
+    const dom=domainScores[q.domain];
+    if(dom){dom.total++;if(correct)dom.correct++;}
+  });
+  const rawPct=total/qs.length;
+  const scaledScore=Math.round(rawPct*900);
+  const passed=scaledScore>=700;
+  const col=passed?'var(--grn)':scaledScore>=600?'var(--amb)':'var(--red)';
+
+  document.getElementById('examInterface').style.display='none';
+  const results=document.getElementById('examResults');
+  results.style.display='block';
+  results.innerHTML=`
+    <div class="score-result">
+      <div class="sr-score" style="color:${col}">${scaledScore}</div>
+      <div class="sr-pts" style="color:${col}">/ 900 points · ${total}/${qs.length} correct · ${Math.round(rawPct*100)}%</div>
+      <div class="sr-status" style="color:${passed?'var(--grn)':'var(--red)'}">${passed?'PASS — Exam Ready!':'NEEDS REVIEW'}</div>
+      <div class="sr-bar"><div class="sr-fill" style="width:${Math.min(100,rawPct*100)}%;background:${col}"></div></div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--tx3);margin-bottom:16px">Passing threshold: 700/900 (78%)</div>
+      <div class="domain-results">
+        ${DOMAINS.map(d=>{
+          const ds=domainScores[d.name];
+          const pct=ds.total?Math.round(ds.correct/ds.total*100):0;
+          const c=pct>=80?'var(--grn)':pct>=60?'var(--amb)':'var(--red)';
+          return `<div class="dr-card">
+            <div class="dr-name">${d.name} (${Math.round(d.weight*100)}%)</div>
+            <div class="dr-score" style="color:${c}">${pct}%</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">${ds.correct}/${ds.total} correct</div>
+            <div class="dr-bar"><div class="dr-fill" style="width:${pct}%;background:${c}"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:20px">
+        <button class="btn btn-ghost" onclick="reviewExam()">Review Answers</button>
+        <button class="btn btn-acc" onclick="resetExam()">Take Another Exam</button>
+      </div>
+    </div>`;
+  // Save score
+  const scoreData = {code:ST.examCode,score:scaledScore,pct:Math.round(rawPct*100),passed,date:new Date().toLocaleDateString(),ts:Date.now()};
+  const history = ls('es_exam_history',[]);
+  history.unshift(scoreData);
+  sl('es_exam_history', history);
+  if(scaledScore<700){
+    // Log weak topics
+    qs.filter((_,i)=>ST.examAnswers[i]!==qs[i].answer).forEach(q=>{
+      ST.weakTopics[q.domain]=(ST.weakTopics[q.domain]||0)+1;
+    });
+    sl('es_weak',ST.weakTopics);
+  }
+}
+
+function reviewExam(){
+  const qs=ST.examQs;
+  const results=document.getElementById('examResults');
+  let html=`<div style="margin-bottom:14px;display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="resetExam()">← New Exam</button></div>`;
+  qs.forEach((q,i)=>{
+    const sel=ST.examAnswers[i];const correct=sel===q.answer;
+    html+=`<div class="q-block" style="margin-bottom:10px">
+      <div class="q-meta"><span>Q${i+1}</span><span class="tag ${correct?'grn':'red'}">${correct?'CORRECT':'WRONG'}</span><span class="tag acc">${q.domain}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="opts">
+        ${['A','B','C','D'].map(l=>`<div class="opt ${l===q.answer?'correct':l===sel&&l!==q.answer?'wrong':''}">
+          <div class="opt-ltr">${l}</div><div class="opt-txt">${q.opts[l]}</div></div>`).join('')}
+      </div>
+      <div class="rationale show">${q.rationale}</div>
+    </div>`;
+  });
+  results.innerHTML=html;
+}
+
+function resetExam(){
+  ST.examQs=null;ST.examAnswers={};ST.examSubmitted=false;ST.currentQ=0;
+  document.getElementById('examStartScreen').style.display='block';
+  document.getElementById('examInterface').style.display='none';
+  document.getElementById('examResults').style.display='none';
+  document.getElementById('examCode').value='';
+}
+
+// ══════════════════════════════════════════════════
+// MICRO-LESSONS
+// ══════════════════════════════════════════════════
+function renderWeakTopics(){
+  const topics = Object.entries(ST.weakTopics).sort((a,b)=>b[1]-a[1]);
+  const el = document.getElementById('topicList');
+  document.getElementById('weakCount').textContent = `${topics.filter(t=>t[1]>=3).length} weak topics`;
+
+  if(!topics.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--tx3);padding:20px;text-align:center;font-family:var(--mono)">Complete quizzes and the exam simulator to identify weak topics.</div>';
+    return;
+  }
+  el.innerHTML = topics.map(([name,count])=>{
+    const pct=Math.min(100,Math.round(count/10*100));
+    const weak=count>=3;
+    return `<div class="topic-item ${weak?'weak':''}" onclick="loadMicroLesson('${name}',${count})">
+      <div class="ti-icon">${weak?'⚠️':'📊'}</div>
+      <div class="ti-info">
+        <div class="ti-name">${name}</div>
+        <div class="ti-stats">Missed ${count} time${count!==1?'s':''} · ${weak?'Micro-lesson ready':'Keep practicing'}</div>
+      </div>
+      <div>
+        <div class="ti-bar"><div class="ti-fill" style="width:${pct}%;background:${weak?'var(--red)':'var(--amb)'}"></div></div>
+        ${weak?'<button class="btn btn-red btn-sm" style="margin-top:6px;width:100%">Study Now</button>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function refreshWeakTopics(){
+  // Scan exam history for weak domains
+  const history = ls('es_exam_history',[]);
+  history.forEach(h=>{});
+  renderWeakTopics();
+  toast('Topics refreshed from quiz history');
+}
+
+async function loadMicroLesson(topic, missCount){
+  document.getElementById('microLessonArea').style.display='block';
+  document.getElementById('mlTitle').textContent = `Micro-Lesson: ${topic}`;
+  document.getElementById('microLessonContent').innerHTML = '<div class="loading">Generating 5-minute micro-lesson…</div>';
+  document.getElementById('microLessonArea').scrollIntoView({behavior:'smooth'});
+
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1500,
+        system:'You are a CompTIA A+ 220-1202 tutor. Return only valid JSON, no markdown.',
+        messages:[{role:'user',content:`Create a 5-minute micro-lesson for a student who has missed questions about "${topic}" ${missCount} times.
+
+Return JSON:
+{
+  "concept": "Clear 3-4 sentence explanation of the key concept in simple terms for a high school student",
+  "keyPoints": ["3-4 bullet points of the most important things to remember"],
+  "commonMistake": "The #1 mistake students make on the CompTIA A+ exam for this topic",
+  "questions": [
+    {"q":"MC question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."},
+    {"q":"MC question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"B","rationale":"..."},
+    {"q":"MC question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"C","rationale":"..."}
+  ]
+}`}]
+      })
+    });
+    const d = await r.json();
+    const text = d.content?.map(c=>c.text||'').join('')||'';
+    const lesson = JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+    renderMicroLesson(lesson, topic);
+    toast('Micro-lesson ready!','ok');
+  }catch(e){
+    document.getElementById('microLessonContent').innerHTML='<div style="color:var(--red);font-family:var(--mono);font-size:11px">Failed to generate. Try again.</div>';
+    toast('Generation failed','err');
+  }
+}
+
+function renderMicroLesson(lesson, topic){
+  const el = document.getElementById('microLessonContent');
+  const mlAnswers = {};
+  el.innerHTML = `
+    <div class="ml-header">📖 Key Concept</div>
+    <div class="ml-concept">${lesson.concept}</div>
+    <div style="margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:8px">KEY POINTS TO REMEMBER</div>
+      ${(lesson.keyPoints||[]).map(p=>`<div style="display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:var(--tx2)"><span style="color:var(--acc);flex-shrink:0">→</span>${p}</div>`).join('')}
+    </div>
+    <div style="background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:10px 14px;margin-bottom:16px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:.8px;margin-bottom:4px">⚠️ COMMON EXAM MISTAKE</div>
+      <div style="font-size:12px;color:var(--tx2)">${lesson.commonMistake}</div>
+    </div>
+    <div class="ml-header">🎯 Practice Questions</div>
+    <div class="ml-qs">
+      ${(lesson.questions||[]).map((q,i)=>`
+        <div class="q-block" id="mlq-${i}">
+          <div class="q-meta">Practice ${i+1}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="opts">
+            ${['A','B','C','D'].map(l=>`
+              <div class="opt" onclick="mlPick(${i},'${l}','${q.answer}',this)">
+                <div class="opt-ltr">${l}</div>
+                <div class="opt-txt">${q.opts[l]}</div>
+              </div>`).join('')}
+          </div>
+          <div class="rationale" id="mlr-${i}">${q.rationale}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function mlPick(i, letter, answer, el){
+  const opts = el.closest('.opts').querySelectorAll('.opt');
+  opts.forEach((o,j)=>{
+    const l=['A','B','C','D'][j];
+    o.className='opt'+(l===answer?' correct':l===letter&&l!==answer?' wrong':'');
+    o.querySelector('.opt-ltr').className='opt-ltr';
+  });
+  document.getElementById(`mlr-${i}`)?.classList.add('show');
+  // Update weak topic count
+  if(letter!==answer){
+    const topic = document.getElementById('mlTitle').textContent.replace('Micro-Lesson: ','');
+    ST.weakTopics[topic]=(ST.weakTopics[topic]||0)+1;
+    sl('es_weak',ST.weakTopics);
+  }
+}
+
+function closeMicroLesson(){document.getElementById('microLessonArea').style.display='none';}
+
+// ══════════════════════════════════════════════════
+// PARENT COMMUNICATION
+// ══════════════════════════════════════════════════
+async function generateComm(){
+  const code=document.getElementById('pcCode').value.trim().toUpperCase();
+  const name=document.getElementById('pcName').value.trim();
+  const parent=document.getElementById('pcParent').value.trim();
+  const type=document.getElementById('pcType').value;
+  const tone=document.getElementById('pcTone').value;
+  const notes=document.getElementById('pcNotes').value.trim();
+  if(!code||!name){toast('Enter student code and name','err');return;}
+
+  const btn=document.getElementById('genCommBtn');
+  btn.disabled=true; btn.textContent='Generating…';
+  document.getElementById('commOutput').textContent='Generating…';
+  document.getElementById('commOutput').className='comm-output show';
+
+  const typeMap={
+    progress:'a general progress update with encouragement and specific next steps',
+    concern:'a respectful but direct concern about academic performance that requests a follow-up conversation',
+    praise:'a celebration of a specific achievement that acknowledges the student\'s hard work',
+    retake:'a notification that a retake opportunity is available with clear instructions',
+    streak:'recognition of consistent daily study habits and streak milestone',
+    exam:'an update on exam preparation progress with specific domain strengths and areas to focus on',
+  };
+
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:600,
+        system:'You are a professional high school IT teacher writing a parent communication. Write naturally and professionally. Return only the email text, no subject line unless asked, no JSON.',
+        messages:[{role:'user',content:`Write ${typeMap[type]} to the parent/guardian of a student in my CompTIA A+ 220-1202 certification class.
+
+Student first name: ${name}
+Parent name: ${parent||'Parent/Guardian'}
+Student code: ${code} (do not include this in the letter)
+Tone: ${tone}
+${notes?`Additional context: ${notes}`:''}
+
+Write a complete, ready-to-send email including:
+- Greeting to ${parent||'the parent/guardian'}
+- 2-3 substantive paragraphs
+- Specific, actionable information
+- Professional closing signed "CompTIA A+ Instructor"
+
+Make it feel personal, not generic. Reference the CompTIA A+ certification naturally.`}]
+      })
+    });
+    const d=await r.json();
+    const text=d.content?.map(c=>c.text||'').join('')||'';
+    document.getElementById('commOutput').textContent=text;
+    toast('Communication generated!','ok');
+  }catch(e){
+    document.getElementById('commOutput').textContent='Generation failed. Please try again.';
+    toast('Failed','err');
+  }
+  btn.disabled=false; btn.textContent='⚡ Generate Communication';
+}
+
+function copyComm(){
+  const text=document.getElementById('commOutput').textContent;
+  if(!text||text==='Generating…')return;
+  navigator.clipboard.writeText(text);
+  toast('Copied to clipboard!','ok');
+}
+
+function emailComm(){
+  const text=document.getElementById('commOutput').textContent;
+  const parent=document.getElementById('pcParent').value||'';
+  const name=document.getElementById('pcName').value||'Student';
+  const type=document.getElementById('pcType').value;
+  const subjects={progress:`CompTIA A+ Progress Update — ${name}`,concern:`Regarding ${name}'s CompTIA A+ Progress`,praise:`Great News About ${name}!`,retake:`Retake Opportunity — ${name}`,streak:`${name}'s Study Consistency`,exam:`Exam Prep Update — ${name}`};
+  window.location.href=`mailto:?subject=${encodeURIComponent(subjects[type]||'Student Update')}&body=${encodeURIComponent(text)}`;
+}
+
+// ══════════════════════════════════════════════════
+// SUBSTITUTE MODE
+// ══════════════════════════════════════════════════
+function loadSubDay(){
+  const day=parseInt(document.getElementById('subDay').value)||1;
+  const d=DAYS_DATA[Math.min(day-1,DAYS_DATA.length-1)]||DAYS_DATA[0];
+  document.getElementById('subDayInfo').innerHTML=`
+    <strong style="color:var(--acc)">Day ${day}</strong> · ${d.section}<br>
+    Videos: ${d.videos.join(', ')}<br>
+    Total video time: ${d.time} minutes`;
+  document.getElementById('subVideoTime').textContent=d.time;
+}
+
+function editSubContacts(){
+  const t=prompt('Teacher name & contact:');if(!t)return;
+  const d=prompt('Department chair:');
+  const ts=prompt('Tech support:');
+  const el=document.getElementById('subContacts');
+  el.innerHTML=`Teacher: ${t||'—'}<br>Department: ${d||'—'}<br>Tech support: ${ts||'—'}`;
+  sl('sub_contacts',{teacher:t,dept:d,tech:ts});
+}
+
+// ══════════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════════
+function initCalendar(){
+  const saved=ls('cal_start',null);
+  if(saved) document.getElementById('calStart').value=saved;
+  renderFullCal();
+}
+
+function saveCalStart(val){sl('cal_start',val);renderFullCal();}
+
+function renderFullCal(){
+  const el=document.getElementById('fullCal');
+  const startStr=document.getElementById('calStart').value;
+  const today=new Date();
+
+  // Keep headers
+  const headers=Array.from(el.querySelectorAll('.cal-header'));
+  el.innerHTML='';
+  headers.forEach(h=>el.appendChild(h));
+
+  const displayDate=new Date(today);
+  displayDate.setMonth(displayDate.getMonth()+calMonth);
+  const year=displayDate.getFullYear();
+  const month=displayDate.getMonth();
+  document.getElementById('calMonthLabel').textContent=displayDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+
+  const firstDay=new Date(year,month,1);
+  const lastDay=new Date(year,month+1,0);
+  const startDOW=(firstDay.getDay()+6)%7; // Mon=0
+
+  // Blank cells
+  for(let i=0;i<startDOW;i++){
+    const blank=document.createElement('div');
+    blank.className='cal-day empty';
+    el.appendChild(blank);
+  }
+
+  // Calculate class day mapping
+  let classStart=null;
+  if(startStr){classStart=new Date(startStr);}
+
+  const completedDays=ls('hub_done',[]);
+
+  for(let d=1;d<=lastDay.getDate();d++){
+    const date=new Date(year,month,d);
+    const isToday=date.toDateString()===today.toDateString();
+    const isWeekend=date.getDay()===0||date.getDay()===6;
+
+    let classDay=null;
+    if(classStart&&!isWeekend){
+      const diffMs=date-classStart;
+      const diffDays=Math.floor(diffMs/86400000);
+      if(diffDays>=0){
+        const weekNum=Math.floor(diffDays/7);
+        const dayInWeek=diffDays%7;
+        if(dayInWeek<5){
+          classDay=weekNum*5+dayInWeek+1;
+          if(classDay>68)classDay=null;
+        }
+      }
+    }
+
+    const dayData=classDay?DAYS_DATA[classDay-1]:null;
+    const isDone=classDay&&completedDays.includes(classDay);
+
+    const cell=document.createElement('div');
+    cell.className=`cal-day${isToday?' today':''}${isDone?' done':''}${isWeekend?' empty':''}`;
+    cell.innerHTML=`
+      ${isDone?'<div class="cd-done">✓</div>':''}
+      <div class="cd-date">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][(date.getDay()+6)%7]} ${d}</div>
+      ${classDay?`<div class="cd-daynum">D${classDay}</div><div class="cd-section">${dayData?.section||''}</div>`:''}`;
+    if(classDay) cell.onclick=()=>toggleDayDone(classDay);
+    el.appendChild(cell);
+  }
+}
+
+function toggleDayDone(day){
+  const done=ls('hub_done',[]);
+  const idx=done.indexOf(day);
+  if(idx>=0)done.splice(idx,1);else done.push(day);
+  sl('hub_done',done);
+  renderFullCal();
+  toast(idx>=0?`Day ${day} unmarked`:`Day ${day} marked complete`,'ok');
+}
+
+function exportCalendar(){
+  const lines=['Day,Date,Section,Videos,Completed'];
+  const startStr=ls('cal_start',null);
+  const done=ls('hub_done',[]);
+  if(!startStr){toast('Set a start date first','err');return;}
+  const start=new Date(startStr);
+  DAYS_DATA.forEach((d,i)=>{
+    const weekNum=Math.floor(i/5);
+    const dayInWeek=i%5;
+    const date=new Date(start);
+    date.setDate(start.getDate()+weekNum*7+dayInWeek);
+    lines.push(`${d.day},"${date.toLocaleDateString()}","${d.section}","${(d.videos||[]).join('; ')}","${done.includes(d.day)?'Yes':'No'}"`);
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download='CompTIA_A+_Course_Calendar.csv';a.click();
+  toast('Calendar exported!','ok');
+}
+
+// ══════════════════════════════════════════════════
+// SELF-ASSESSMENT
+// ══════════════════════════════════════════════════
+function saSelect(field, val, el){
+  el.closest('.sa-scale').querySelectorAll('.sa-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  ST.saScores[field]=val;
+}
+
+function submitSelfAssessment(){
+  const conf=ST.saScores.conf;
+  const day=parseInt(document.getElementById('saDayInput').value)||1;
+  const code=document.getElementById('saCode').value.trim().toUpperCase()||'ANON';
+  const confusing=document.getElementById('saConfusing').value.trim();
+  const clicked=document.getElementById('saClicked').value.trim();
+  if(!conf){toast('Rate your confidence level','err');return;}
+  const entry={day,code,conf,confusing,clicked,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),ts:Date.now()};
+  ST.assessments.unshift(entry);
+  sl('es_assessments',ST.assessments);
+  // Reset
+  document.querySelectorAll('.sa-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('saConfusing').value='';
+  document.getElementById('saClicked').value='';
+  ST.saScores={};
+  renderAssessmentHistory();
+  toast('Reflection submitted!','ok');
+}
+
+function renderAssessmentHistory(){
+  const el=document.getElementById('saHistory');
+  const stats=document.getElementById('saStats');
+  if(!ST.assessments.length){
+    el.innerHTML='<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No reflections submitted yet.</div>';
+    stats.innerHTML='';
+    return;
+  }
+  const avgConf=(ST.assessments.reduce((s,a)=>s+(a.conf||0),0)/ST.assessments.length).toFixed(1);
+  stats.innerHTML=`<div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+    <div style="background:var(--s2);border-radius:var(--r);padding:10px 14px;text-align:center">
+      <div style="font-family:var(--display);font-size:24px;font-weight:700;color:var(--acc)">${avgConf}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Avg confidence</div>
+    </div>
+    <div style="background:var(--s2);border-radius:var(--r);padding:10px 14px;text-align:center">
+      <div style="font-family:var(--display);font-size:24px;font-weight:700;color:var(--grn)">${ST.assessments.length}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Total reflections</div>
+    </div>
+  </div>`;
+  el.innerHTML=ST.assessments.slice(0,20).map(a=>`
+    <div class="sh-item">
+      <div class="sh-date">Day ${a.day} · ${a.date} ${a.time} · ${a.code}</div>
+      <div class="sh-scores">
+        <span class="sh-sc">Confidence: ${a.conf}/5</span>
+      </div>
+      ${a.confusing?`<div class="sh-comment">❓ "${a.confusing}"</div>`:''}
+      ${a.clicked?`<div class="sh-comment" style="margin-top:4px">✓ "${a.clicked}"</div>`:''}
+    </div>`).join('');
+}
+
+function exportAssessments(){
+  const lines=['Date,Day,Code,Confidence (1-5),Most Confusing,What Clicked'];
+  ST.assessments.forEach(a=>{
+    lines.push(`"${a.date}",${a.day},"${a.code}",${a.conf},"${(a.confusing||'').replace(/"/g,'""')}","${(a.clicked||'').replace(/"/g,'""')}"`);
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const link=document.createElement('a');link.href=URL.createObjectURL(blob);
+  link.download='Self_Assessment_Data.csv';link.click();
+  toast('Assessments exported!','ok');
+}
+
+// ══════════════════════════════════════════════════
+// RETAKE MANAGER
+// ══════════════════════════════════════════════════
+function logRetake(){
+  const code=document.getElementById('rtCode').value.trim().toUpperCase();
+  const quiz=document.getElementById('rtQuiz').value.trim();
+  const orig=parseInt(document.getElementById('rtOrigScore').value)||0;
+  const status=document.getElementById('rtStatus').value;
+  const deadline=document.getElementById('rtDeadline').value;
+  const retakeScore=document.getElementById('rtRetakeScore').value;
+  const notes=document.getElementById('rtNotes').value.trim();
+  if(!code||!quiz){toast('Enter student code and quiz name','err');return;}
+  const entry={id:Date.now(),code,quiz,orig,status,deadline,retakeScore:retakeScore||null,notes,logged:new Date().toLocaleDateString(),ts:Date.now()};
+  ST.retakes.unshift(entry);
+  sl('es_retakes',ST.retakes);
+  // Reset
+  ['rtCode','rtQuiz','rtOrigScore','rtDeadline','rtRetakeScore','rtNotes'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('rtStatus').value='pending';
+  renderRetakeGrid('all');
+  toast(`Retake logged for ${code}`,'ok');
+}
+
+function renderRetakeGrid(filter){
+  const filtered=filter==='all'?ST.retakes:ST.retakes.filter(r=>r.status===filter);
+  const pending=ST.retakes.filter(r=>r.status==='pending').length;
+  document.getElementById('rtPendingCount').textContent=`${pending} pending`;
+  const el=document.getElementById('retakeGrid');
+  if(!filtered.length){el.innerHTML='<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No retake requests.</div>';return;}
+  const statusColors={pending:'var(--amb)',approved:'var(--acc)',denied:'var(--red)',completed:'var(--grn)'};
+  el.innerHTML=filtered.map(r=>`
+    <div class="rt-item">
+      <div class="rt-code">${r.code}</div>
+      <div class="rt-quiz">
+        <div style="font-weight:500">${r.quiz}</div>
+        <div style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Logged: ${r.logged}${r.deadline?` · Due: ${r.deadline}`:''}</div>
+        ${r.notes?`<div style="font-size:10px;color:var(--tx3);margin-top:2px">${r.notes}</div>`:''}
+      </div>
+      <div class="rt-score">
+        ${r.orig}%
+        ${r.retakeScore?` → ${r.retakeScore}%`:''}
+      </div>
+      <div class="rt-status"><span class="tag" style="background:rgba(0,0,0,0.2);color:${statusColors[r.status]||'var(--tx3)'};border-color:${statusColors[r.status]||'var(--b2)'}">${r.status}</span></div>
+      <div class="rt-actions">
+        ${r.status==='pending'?`<button class="btn btn-grn btn-sm" onclick="updateRetake(${r.id},'approved')">Approve</button><button class="btn btn-red btn-sm" onclick="updateRetake(${r.id},'denied')">Deny</button>`:''}
+        ${r.status==='approved'?`<button class="btn btn-acc btn-sm" onclick="updateRetake(${r.id},'completed')">Complete</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="deleteRetake(${r.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterRetakes(f){
+  document.querySelectorAll('[id^="rtf-"]').forEach(b=>b.classList.remove('btn-acc'));
+  document.getElementById(`rtf-${f}`)?.classList.add('btn-acc');
+  renderRetakeGrid(f);
+}
+
+function updateRetake(id, status){
+  const r=ST.retakes.find(r=>r.id===id);
+  if(r){r.status=status;sl('es_retakes',ST.retakes);renderRetakeGrid('all');toast(`Retake ${status}`,'ok');}
+}
+
+function deleteRetake(id){
+  ST.retakes=ST.retakes.filter(r=>r.id!==id);
+  sl('es_retakes',ST.retakes);renderRetakeGrid('all');
+}
+
+function exportRetakes(){
+  const lines=['Code,Quiz,Original Score,Status,Retake Score,Deadline,Notes,Logged'];
+  ST.retakes.forEach(r=>{
+    lines.push(`"${r.code}","${r.quiz}","${r.orig}%","${r.status}","${r.retakeScore||'—'}","${r.deadline||'—'}","${(r.notes||'').replace(/"/g,'""')}","${r.logged}"`);
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download='Retake_Log.csv';a.click();toast('Retake log exported!','ok');
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',3500);
+}
+
+init();
+</script>
+<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('exam');}
+}
+</script>
+</body>
+</html>

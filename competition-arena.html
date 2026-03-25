@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Competition Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050810;--s1:#07090f;--s2:#0b0e18;--s3:#0f1320;--s4:#141828;
+  --b1:#1a2038;--b2:#222a48;--b3:#2c3660;
+  --tx:#ccd4f0;--tx2:#6878a8;--tx3:#364060;--tx4:#1e2840;
+  --acc:#00c8ff;--acc2:#0088cc;--acc-d:rgba(0,204,255,0.1);
+  --grn:#00ff77;--grn2:#00cc5a;--grn-d:rgba(0,255,119,0.1);
+  --amb:#ffbb00;--amb2:#cc8800;--amb-d:rgba(255,187,0,0.1);
+  --red:#ff2255;--red-d:rgba(255,34,85,0.1);
+  --pur:#cc44ff;--pur-d:rgba(204,68,255,0.1);
+  --pnk:#ff44aa;--pnk-d:rgba(255,68,170,0.1);
+  --gold:#ffd700;--gold-d:rgba(255,215,0,0.12);
+  --silver:#c0c8e0;--silver-d:rgba(192,200,224,0.1);
+  --bronze:#cd7f32;--bronze-d:rgba(205,127,50,0.1);
+  --mono:'JetBrains Mono',monospace;
+  --display:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+  --r:6px;--rl:12px;--rxl:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* Atmosphere */
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 100% 50% at 50% -5%,rgba(0,204,255,0.08) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 0% 100%,rgba(204,68,255,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse 40% 30% at 100% 60%,rgba(0,255,119,0.04) 0%,transparent 50%),
+  repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(0,204,255,0.02) 59px,rgba(0,204,255,0.02) 60px),
+  repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(0,204,255,0.02) 59px,rgba(0,204,255,0.02) 60px);
+  pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--b1);padding:0 24px;display:flex;align-items:center;gap:14px;background:rgba(3,4,10,0.96);backdrop-filter:blur(24px);position:sticky;top:0;z-index:400;height:52px;flex-shrink:0}
+.logo{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--acc);border:1px solid var(--acc);padding:4px 8px;border-radius:4px;background:var(--acc-d);letter-spacing:.5px;flex-shrink:0}
+.htitle{font-family:var(--display);font-size:18px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--tx)}
+.hsub{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px}
+.hbadge{font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:20px;letter-spacing:.3px}
+.hb-week{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc)}
+.hb-challenge{background:var(--amb-d);border:1px solid var(--amb);color:var(--amb);cursor:pointer;transition:all .15s}
+.hb-challenge:hover{background:rgba(255,187,0,0.2)}
+.back{font-family:var(--mono);font-size:9px;color:var(--tx2);background:var(--s2);border:1px solid var(--b1);padding:5px 12px;border-radius:5px;cursor:pointer;text-decoration:none;transition:all .15s}
+.back:hover{border-color:var(--b2);color:var(--tx)}
+
+/* ── NAV ── */
+nav{display:flex;background:var(--s1);border-bottom:1px solid var(--b1);padding:0 20px;overflow-x:auto;flex-shrink:0}
+nav::-webkit-scrollbar{height:2px}
+.tab{padding:12px 16px;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--tx2)}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+.content{flex:1;overflow-y:auto}
+.panel{display:none;flex-direction:column;gap:18px}
+.panel.active{display:flex}
+
+/* ── LEADERBOARD (PROJECTOR MODE) ── */
+#panelLive{padding:20px;background:var(--bg)}
+.live-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.live-title{font-family:var(--display);font-size:clamp(24px,4vw,40px);font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--tx)}
+.live-title span{color:var(--acc)}
+.live-week{font-family:var(--mono);font-size:10px;color:var(--tx3);letter-spacing:1px;margin-top:2px}
+.projector-btn{padding:8px 16px;background:var(--pur-d);border:1px solid var(--pur);color:var(--pur);border-radius:var(--r);font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.projector-btn:hover{background:rgba(204,68,255,0.2)}
+
+/* Category tabs */
+.cat-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.cat-tab{padding:7px 16px;border-radius:20px;border:1px solid var(--b2);color:var(--tx3);font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.cat-tab:hover{border-color:var(--b3);color:var(--tx2)}
+.cat-tab.active{border-color:var(--acc);color:var(--acc);background:var(--acc-d)}
+
+/* Leaderboard rows */
+.lb-grid{display:flex;flex-direction:column;gap:6px}
+.lb-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:var(--rl);border:1px solid var(--b1);background:var(--s1);transition:all .3s;position:relative;overflow:hidden}
+.lb-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.lb-row.rank-1::before{background:var(--gold)}
+.lb-row.rank-2::before{background:var(--silver)}
+.lb-row.rank-3::before{background:var(--bronze)}
+.lb-row.rank-1{background:linear-gradient(90deg,rgba(255,215,0,0.06),var(--s1));border-color:rgba(255,215,0,0.2)}
+.lb-row.rank-2{background:linear-gradient(90deg,rgba(192,200,224,0.04),var(--s1));border-color:rgba(192,200,224,0.15)}
+.lb-row.rank-3{background:linear-gradient(90deg,rgba(205,127,50,0.05),var(--s1));border-color:rgba(205,127,50,0.15)}
+.lb-row.is-me{border-color:var(--acc);background:linear-gradient(90deg,rgba(0,204,255,0.05),var(--s1))}
+.lb-rank{font-family:var(--display);font-size:28px;font-weight:900;min-width:48px;text-align:center;line-height:1}
+.lb-row.rank-1 .lb-rank{color:var(--gold)}
+.lb-row.rank-2 .lb-rank{color:var(--silver)}
+.lb-row.rank-3 .lb-rank{color:var(--bronze)}
+.lb-rank-icon{font-size:20px;min-width:32px;text-align:center}
+.lb-name{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:.5px;color:var(--tx);flex:1}
+.lb-row.is-me .lb-name{color:var(--acc)}
+.lb-tag{font-family:var(--mono);font-size:9px;color:var(--tx3);background:var(--s3);border:1px solid var(--b1);padding:2px 7px;border-radius:3px}
+.lb-score{font-family:var(--display);font-size:32px;font-weight:900;letter-spacing:-1px;min-width:100px;text-align:right}
+.lb-row.rank-1 .lb-score{color:var(--gold)}
+.lb-row.rank-2 .lb-score{color:var(--silver)}
+.lb-row.rank-3 .lb-score{color:var(--bronze)}
+.lb-bar-wrap{width:120px;height:4px;background:var(--b1);border-radius:2px;overflow:hidden;flex-shrink:0}
+.lb-bar{height:100%;border-radius:2px;transition:width .8s ease}
+.lb-change{font-family:var(--mono);font-size:10px;min-width:32px;text-align:right}
+.lb-change.up{color:var(--grn)}
+.lb-change.down{color:var(--red)}
+.lb-change.same{color:var(--tx3)}
+
+/* Ticker */
+.ticker-wrap{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;display:flex;align-items:center;gap:12px;margin-bottom:14px;overflow:hidden}
+.ticker-label{font-family:var(--mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);flex-shrink:0}
+.ticker-scroll{flex:1;overflow:hidden;position:relative;height:18px}
+.ticker-inner{display:flex;gap:40px;position:absolute;white-space:nowrap;animation:ticker 20s linear infinite}
+.ticker-item{font-family:var(--mono);font-size:11px;color:var(--tx2)}
+.ticker-item span{color:var(--amb)}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* Multi-board (all 5 categories) */
+.multiboard{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.mb-col{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden}
+.mb-header{padding:10px 12px;display:flex;flex-direction:column;gap:2px;border-bottom:1px solid var(--b1)}
+.mb-header-icon{font-size:16px}
+.mb-header-title{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx)}
+.mb-rows{padding:8px}
+.mb-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;margin-bottom:3px}
+.mb-row.r1{background:var(--gold-d);border:1px solid rgba(255,215,0,0.2)}
+.mb-row.r2{background:rgba(192,200,224,0.05);border:1px solid rgba(192,200,224,0.1)}
+.mb-row.r3{background:var(--bronze-d);border:1px solid rgba(205,127,50,0.1)}
+.mb-row-rank{font-family:var(--mono);font-size:9px;min-width:14px;color:var(--tx3)}
+.mb-row.r1 .mb-row-rank{color:var(--gold)}
+.mb-row.r2 .mb-row-rank{color:var(--silver)}
+.mb-row.r3 .mb-row-rank{color:var(--bronze)}
+.mb-row-name{font-family:var(--display);font-size:13px;font-weight:700;color:var(--tx);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mb-row-score{font-family:var(--mono);font-size:10px;font-weight:700}
+.mb-row.r1 .mb-row-score{color:var(--gold)}
+.mb-row.r2 .mb-row-score{color:var(--silver)}
+.mb-row.r3 .mb-row-score{color:var(--bronze)}
+
+/* ── NICKNAME SETUP ── */
+.nickname-setup{max-width:500px;margin:0 auto;padding:48px 24px;text-align:center}
+.ns-title{font-family:var(--display);font-size:36px;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--tx);margin-bottom:8px}
+.ns-sub{font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:28px}
+.ns-input-wrap{position:relative;margin-bottom:16px}
+.ns-input{width:100%;font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:2px;text-align:center;text-transform:uppercase;background:var(--s2);border:2px solid var(--b2);border-radius:var(--r);padding:16px;color:var(--acc);outline:none;transition:border-color .2s}
+.ns-input:focus{border-color:var(--acc)}
+.ns-input::placeholder{color:var(--tx4);font-size:20px}
+.ns-code{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-bottom:20px;letter-spacing:.5px}
+.ns-rules{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--tx3);line-height:2;text-align:left;margin-bottom:20px}
+
+/* ── CHALLENGES ── */
+#panelChallenges{padding:24px;max-width:900px;margin:0 auto}
+.challenge-hero{background:linear-gradient(135deg,rgba(255,187,0,0.08),rgba(0,204,255,0.05));border:1px solid var(--amb);border-radius:var(--rxl);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.challenge-hero::before{content:'WEEKLY CHALLENGE';position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--tx4)}
+.ch-status{font-family:var(--mono);font-size:10px;color:var(--amb);letter-spacing:1px;margin-bottom:8px}
+.ch-title{font-family:var(--display);font-size:32px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--tx);margin-bottom:6px;line-height:1.1}
+.ch-desc{font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:16px}
+.ch-reward{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--gold)}
+.ch-reward-icon{font-size:16px}
+.ch-progress{margin-top:16px}
+.ch-progress-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:6px;display:flex;justify-content:space-between}
+.ch-bar{height:8px;background:var(--b1);border-radius:4px;overflow:hidden}
+.ch-fill{height:100%;background:linear-gradient(90deg,var(--amb),var(--gold));border-radius:4px;transition:width .8s ease}
+.ch-completers{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ch-completer{font-family:var(--mono);font-size:9px;background:var(--amb-d);border:1px solid var(--amb);color:var(--amb);padding:2px 8px;border-radius:3px}
+
+.challenge-list{display:flex;flex-direction:column;gap:10px}
+.challenge-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;display:flex;gap:14px;align-items:flex-start}
+.cc-icon{font-size:28px;flex-shrink:0}
+.cc-info{flex:1}
+.cc-title{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:4px}
+.cc-desc{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:6px}
+.cc-meta{display:flex;gap:8px;flex-wrap:wrap}
+.cc-pts{font-family:var(--mono);font-size:10px;background:var(--gold-d);border:1px solid var(--gold);color:var(--gold);padding:2px 8px;border-radius:3px}
+.cc-deadline{font-family:var(--mono);font-size:10px;color:var(--tx3)}
+.cc-status{font-family:var(--mono);font-size:10px}
+.cc-status.complete{color:var(--grn)}
+.cc-status.active{color:var(--acc)}
+.cc-action{flex-shrink:0;align-self:center}
+
+/* Teacher challenge creator */
+.challenge-creator{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;margin-bottom:20px}
+.cc-form{display:flex;flex-direction:column;gap:10px}
+.cf-inp{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;width:100%;transition:border-color .2s}
+.cf-inp:focus{border-color:var(--acc)}
+.cf-inp::placeholder{color:var(--tx3)}
+.cf-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── BOSS BATTLES ── */
+#panelBoss{padding:24px;max-width:900px;margin:0 auto}
+.boss-arena{background:linear-gradient(135deg,var(--red-d),rgba(204,68,255,0.06));border:1px solid var(--red);border-radius:var(--rxl);padding:28px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden}
+.boss-arena::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,34,85,0.02) 20px,rgba(255,34,85,0.02) 21px)}
+.boss-name{font-family:var(--display);font-size:clamp(28px,5vw,56px);font-weight:900;text-transform:uppercase;letter-spacing:3px;color:var(--red);margin-bottom:4px;position:relative;z-index:1}
+.boss-hp-wrap{max-width:500px;margin:0 auto 16px;position:relative;z-index:1}
+.boss-hp-bar{height:20px;background:var(--b1);border-radius:10px;overflow:hidden;border:1px solid var(--b2)}
+.boss-hp-fill{height:100%;border-radius:10px;transition:width 1s ease;background:linear-gradient(90deg,var(--grn),var(--acc))}
+.boss-hp-label{font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx);margin-top:6px;letter-spacing:1px}
+.boss-stats{display:flex;gap:16px;justify-content:center;margin-bottom:16px;position:relative;z-index:1;flex-wrap:wrap}
+.bs{text-align:center}
+.bs-num{font-family:var(--display);font-size:32px;font-weight:800;line-height:1}
+.bs-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;margin-top:2px}
+
+.boss-q{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.boss-q-label{font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:.8px;margin-bottom:6px}
+.boss-q-text{font-size:13px;font-weight:500;color:var(--tx);line-height:1.65;margin-bottom:12px}
+.boss-opts{display:flex;flex-direction:column;gap:6px}
+.boss-opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:6px;border:1px solid var(--b1);cursor:pointer;transition:all .15s;background:var(--s3)}
+.boss-opt:hover{border-color:var(--b2)}
+.boss-opt.sel{border-color:var(--acc);background:var(--acc-d)}
+.boss-opt.correct{border-color:var(--grn);background:var(--grn-d)}
+.boss-opt.wrong{border-color:var(--red);background:var(--red-d)}
+.boss-opt-ltr{width:22px;height:22px;border-radius:4px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono);font-weight:700;color:var(--tx3);flex-shrink:0}
+.boss-opt.sel .boss-opt-ltr{background:var(--acc);color:var(--bg)}
+.boss-opt.correct .boss-opt-ltr{background:var(--grn);color:var(--bg)}
+.boss-opt.wrong .boss-opt-ltr{background:var(--red);color:#fff}
+.boss-opt-txt{font-size:12px;color:var(--tx2);line-height:1.5}
+
+.battle-result{text-align:center;padding:32px;background:var(--s2);border-radius:var(--rl);border:1px solid var(--b1)}
+.br-outcome{font-family:var(--display);font-size:48px;font-weight:900;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px}
+.br-outcome.win{color:var(--grn);text-shadow:0 0 40px rgba(0,255,119,0.4)}
+.br-outcome.lose{color:var(--red);text-shadow:0 0 40px rgba(255,34,85,0.3)}
+.br-tier{font-family:var(--mono);font-size:14px;letter-spacing:2px;margin-bottom:16px}
+
+/* ── PERSONAL BESTS ── */
+#panelPersonal{padding:24px;max-width:900px;margin:0 auto}
+.pb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.pb-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;transition:all .2s;position:relative;overflow:hidden}
+.pb-card.new-record{border-color:var(--gold);animation:newRecord 1s ease}
+@keyframes newRecord{0%,100%{box-shadow:none}50%{box-shadow:0 0 30px rgba(255,215,0,0.4)}}
+.pb-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.pb-card.acc::after{background:var(--acc)}
+.pb-card.grn::after{background:var(--grn)}
+.pb-card.amb::after{background:var(--amb)}
+.pb-card.pur::after{background:var(--pur)}
+.pb-card.gold::after{background:var(--gold)}
+.pb-icon{font-size:20px;margin-bottom:8px}
+.pb-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.pb-value{font-family:var(--display);font-size:40px;font-weight:900;line-height:1;letter-spacing:-1px}
+.pb-sub{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:4px}
+.pb-date{font-family:var(--mono);font-size:8px;color:var(--tx4);margin-top:4px}
+.pb-record-badge{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:8px;background:var(--gold-d);border:1px solid var(--gold);color:var(--gold);padding:2px 6px;border-radius:3px;letter-spacing:.5px}
+
+/* ── VOTING ── */
+#panelVoting{padding:24px;max-width:900px;margin:0 auto}
+.vote-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;margin-bottom:10px;transition:all .2s}
+.vote-card:hover{border-color:var(--b2)}
+.vote-q{font-size:13px;font-weight:500;color:var(--tx);line-height:1.6;margin-bottom:8px}
+.vote-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.vote-code{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.vote-topic{font-family:var(--mono);font-size:9px;background:var(--acc-d);border:1px solid var(--acc);color:var(--acc);padding:2px 7px;border-radius:3px}
+.vote-opts-preview{font-size:11px;color:var(--tx3);line-height:1.8;margin-bottom:12px;font-family:var(--mono)}
+.vote-actions{display:flex;align-items:center;gap:10px}
+.vote-btn{padding:7px 16px;border-radius:var(--r);border:1px solid var(--b2);color:var(--tx2);font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent}
+.vote-btn:hover{border-color:var(--grn);color:var(--grn)}
+.vote-btn.voted{background:var(--grn-d);border-color:var(--grn);color:var(--grn)}
+.vote-btn.down{color:var(--red)}
+.vote-btn.down:hover{border-color:var(--red);color:var(--red)}
+.vote-count{font-family:var(--display);font-size:20px;font-weight:800;color:var(--tx)}
+.vote-bar-wrap{flex:1;height:4px;background:var(--b1);border-radius:2px;overflow:hidden}
+.vote-bar{height:100%;background:var(--grn);border-radius:2px;transition:width .5s}
+
+/* ── MISC ── */
+.btn{padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-grn{background:var(--grn);color:var(--bg)}
+.btn-gold{background:var(--gold);color:var(--bg)}
+.btn-red{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{border-color:var(--b3);color:var(--tx)}
+.btn-pur{background:var(--pur-d);border:1px solid var(--pur);color:var(--pur)}
+.btn-sm{padding:5px 12px;font-size:10px;border-radius:5px}
+.btn-lg{padding:13px 28px;font-size:15px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.3px;border:1px solid}
+.tag.acc{background:var(--acc-d);color:var(--acc);border-color:var(--acc)}
+.tag.grn{background:var(--grn-d);color:var(--grn);border-color:var(--grn)}
+.tag.amb{background:var(--amb-d);color:var(--amb);border-color:var(--amb)}
+.tag.red{background:var(--red-d);color:var(--red);border-color:var(--red)}
+.tag.gold{background:var(--gold-d);color:var(--gold);border-color:var(--gold)}
+.divider{height:1px;background:var(--b1);margin:8px 0}
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--tx3);font-family:var(--mono);font-size:11px;padding:24px}
+.loading::before{content:'';width:14px;height:14px;border:1.5px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--tx);z-index:2000;opacity:0;transform:translateY(8px);transition:all .25s;max-width:300px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.toast.gold{border-color:var(--gold);color:var(--gold)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Projector fullscreen */
+.projector-mode{position:fixed;inset:0;z-index:999;background:var(--bg);overflow-y:auto;padding:32px;display:none}
+.projector-mode.active{display:block}
+.proj-exit{position:fixed;top:16px;right:16px;background:var(--red-d);border:1px solid var(--red);color:var(--red);padding:8px 16px;border-radius:var(--r);cursor:pointer;font-family:var(--mono);font-size:10px;z-index:1000;transition:all .15s}
+.proj-exit:hover{background:rgba(255,34,85,0.2)}
+
+<link rel="stylesheet" href="platform.css">
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">A+ 220</div>
+  <div>
+    <div class="htitle">Competition <span style="color:var(--acc)">Arena</span></div>
+    <div class="hsub">Leaderboards · Challenges · Boss Battles · Personal Bests</div>
+  </div>
+  <div class="hright">
+    <span class="hbadge hb-week" id="hWeek">Week 1</span>
+    <span class="hbadge hb-challenge" id="hChallenge" onclick="switchTab('challenges')">⚡ Challenge Active</span>
+    <a href="hub.html" class="back">← Hub</a>
+  </div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="switchTab('live')">🏆 Live Leaderboard</div>
+  <div class="tab" onclick="switchTab('challenges')">⚡ Weekly Challenges</div>
+  <div class="tab" onclick="switchTab('boss')">👹 Boss Battles</div>
+  <div class="tab" onclick="switchTab('personal')">🌟 Personal Bests</div>
+  <div class="tab" onclick="switchTab('voting')">🗳️ Question Voting</div>
+  <div class="tab" onclick="switchTab('setup')">⚙️ Setup</div>
+</nav>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════
+     LIVE LEADERBOARD
+══════════════════════════════════════ -->
+<div class="panel active" id="panelLive" style="padding:20px">
+
+  <div class="live-header">
+    <div>
+      <div class="live-title">Class <span>Leaderboard</span></div>
+      <div class="live-week" id="weekLabel">Week 1 · Resets Monday</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="refreshLeaderboard()">↻ Refresh</button>
+      <button class="projector-btn" onclick="toggleProjector()">📺 Projector Mode</button>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker-label">Live Feed</div>
+    <div class="ticker-scroll"><div class="ticker-inner" id="tickerInner"></div></div>
+  </div>
+
+  <!-- Category tabs -->
+  <div class="cat-tabs">
+    <div class="cat-tab active" onclick="showCat('points',this)">🏆 PBIS Points</div>
+    <div class="cat-tab" onclick="showCat('readiness',this)">🎓 Exam Readiness</div>
+    <div class="cat-tab" onclick="showCat('streak',this)">🔥 Study Streak</div>
+    <div class="cat-tab" onclick="showCat('questions',this)">💬 Questions Banked</div>
+    <div class="cat-tab" onclick="showCat('notes',this)">📝 Notes Complete</div>
+    <div class="cat-tab" onclick="showCat('all',this)">📊 All Categories</div>
+  </div>
+
+  <!-- Single category board -->
+  <div class="lb-grid" id="lbGrid"></div>
+
+  <!-- All categories multi-board -->
+  <div class="multiboard" id="multiBoard" style="display:none"></div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     WEEKLY CHALLENGES
+══════════════════════════════════════ -->
+<div class="panel" id="panelChallenges">
+
+  <!-- Active challenge hero -->
+  <div class="challenge-hero">
+    <div class="ch-status">⚡ THIS WEEK'S CHALLENGE · <span id="chDaysLeft">—</span></div>
+    <div class="ch-title" id="chTitle">No active challenge</div>
+    <div class="ch-desc" id="chDesc">Your teacher hasn't set a challenge yet this week.</div>
+    <div class="ch-reward" id="chReward" style="display:none">
+      <span class="ch-reward-icon">🏆</span>
+      <span id="chRewardText">+0 PBIS points for everyone who completes it</span>
+    </div>
+    <div class="ch-progress">
+      <div class="ch-progress-label">
+        <span>Class progress</span>
+        <span id="chProgressLabel">0 / 0 completed</span>
+      </div>
+      <div class="ch-bar"><div class="ch-fill" id="chFill" style="width:0%"></div></div>
+    </div>
+    <div class="ch-completers" id="chCompleters"></div>
+  </div>
+
+  <!-- Teacher challenge creator -->
+  <div class="challenge-creator">
+    <div style="font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--amb);margin-bottom:12px">🎯 Set This Week's Challenge (Teacher)</div>
+    <div class="cc-form">
+      <input class="cf-inp" id="chNewTitle" placeholder="Challenge title (e.g. Networking Domination)">
+      <textarea class="cf-inp" id="chNewDesc" placeholder="What students need to do to complete it (e.g. Score 80%+ on 3 quizzes covering networking chapters)" style="resize:none;min-height:60px;line-height:1.6"></textarea>
+      <div class="cf-row">
+        <input class="cf-inp" type="number" id="chNewPts" placeholder="PBIS reward points" min="1" max="50" style="flex:0 0 160px">
+        <input class="cf-inp" type="date" id="chNewDeadline" style="flex:0 0 160px">
+        <select class="cf-inp" id="chNewType" style="flex:1">
+          <option value="quiz">Quiz score challenge</option>
+          <option value="streak">Streak challenge</option>
+          <option value="notes">Notes completion challenge</option>
+          <option value="questions">Question submission challenge</option>
+          <option value="custom">Custom challenge</option>
+        </select>
+      </div>
+      <button class="btn btn-gold" onclick="setChallenge()">⚡ Set Challenge</button>
+    </div>
+  </div>
+
+  <!-- Past challenges -->
+  <div style="font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:12px">Past Challenges</div>
+  <div class="challenge-list" id="challengeList">
+    <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No past challenges yet.</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     BOSS BATTLES
+══════════════════════════════════════ -->
+<div class="panel" id="panelBoss">
+
+  <!-- Boss arena -->
+  <div class="boss-arena">
+    <div class="boss-name" id="bossName">Chapter Boss</div>
+    <div class="boss-stats">
+      <div class="bs"><div class="bs-num" id="bossChapter" style="color:var(--red)">—</div><div class="bs-label">Chapter</div></div>
+      <div class="bs"><div class="bs-num" id="bossQCount" style="color:var(--acc)">10</div><div class="bs-label">Questions</div></div>
+      <div class="bs"><div class="bs-num" id="bossTimer" style="color:var(--amb)">5:00</div><div class="bs-label">Time Limit</div></div>
+      <div class="bs"><div class="bs-num" id="bossClassAvg" style="color:var(--grn)">—</div><div class="bs-label">Class Avg</div></div>
+    </div>
+    <div class="boss-hp-wrap">
+      <div class="boss-hp-bar"><div class="boss-hp-fill" id="bossHpFill" style="width:100%"></div></div>
+      <div class="boss-hp-label" id="bossHpLabel">Boss HP: 100%</div>
+    </div>
+    <div style="font-size:12px;color:var(--tx2);line-height:1.6;max-width:500px;margin:0 auto">
+      The class fights the boss together. Every correct answer deals damage. Hit the tier threshold to earn class-wide PBIS points!
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+      <select id="bossChapterSel" style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:8px 14px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none">
+        <option value="Ch.1">Ch.1 Safety & Professionalism</option>
+        <option value="Ch.2">Ch.2 Intro to Computers & OS</option>
+        <option value="Ch.7">Ch.7 Power Supplies</option>
+        <option value="Ch.9">Ch.9 Implementing Mass Storage</option>
+        <option value="Ch.10">Ch.10 Essential Peripherals</option>
+        <option value="Ch.11">Ch.11 Installing & Upgrading OS</option>
+        <option value="Ch.12">Ch.12 Working with OS</option>
+        <option value="Ch.13">Ch.13 Users, Groups & Permissions</option>
+        <option value="Ch.14">Ch.14 Maintaining OS</option>
+        <option value="Ch.15">Ch.15 CLI</option>
+        <option value="Ch.16">Ch.16 Troubleshooting</option>
+        <option value="Ch.18">Ch.18 Essentials of Networking</option>
+        <option value="Ch.19">Ch.19 TCP/IP Basics</option>
+        <option value="Ch.20">Ch.20 OS Networking</option>
+        <option value="Ch.21">Ch.21 Wireless Networking</option>
+        <option value="Ch.22">Ch.22 Internet & SOHO</option>
+        <option value="Ch.23">Ch.23 Virtualization & Cloud</option>
+        <option value="Ch.28">Ch.28 Essential Security</option>
+        <option value="Ch.29">Ch.29 Securing Endpoints</option>
+        <option value="Ch.30">Ch.30 Operational Procedures</option>
+      </select>
+      <button class="btn btn-red btn-lg" onclick="startBossBattle()" id="startBossBtn">⚔️ Start Boss Battle</button>
+    </div>
+  </div>
+
+  <!-- Battle interface -->
+  <div id="bossInterface" style="display:none"></div>
+
+  <!-- Battle history -->
+  <div style="font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:12px">Battle History</div>
+  <div id="bossHistory" style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No battles yet. Challenge a chapter boss to begin!</div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     PERSONAL BESTS
+══════════════════════════════════════ -->
+<div class="panel" id="panelPersonal">
+
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;flex-wrap:wrap">
+    <div style="font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);flex:1">Your Personal Records</div>
+    <input type="text" id="pbCodeInput" placeholder="Enter your code (STU-001)"
+      style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 12px;color:var(--acc);font-family:var(--mono);font-size:12px;letter-spacing:1px;outline:none;width:180px;text-transform:uppercase"
+      oninput="this.value=this.value.toUpperCase()" onchange="loadPersonalBests(this.value)">
+    <button class="btn btn-acc btn-sm" onclick="loadPersonalBests(document.getElementById('pbCodeInput').value)">Load</button>
+  </div>
+  <div style="font-size:12px;color:var(--tx2);margin-bottom:16px">Your best scores ever. A new record triggers a PBIS point award automatically.</div>
+
+  <div class="pb-grid" id="pbGrid">
+    <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);grid-column:1/-1;padding:20px;text-align:center">Enter your student code above to see your personal records.</div>
+  </div>
+
+  <!-- Class personal best wall -->
+  <div style="font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:12px;margin-top:8px">🌟 Class Record Wall</div>
+  <div id="recordWall" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px"></div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     QUESTION VOTING
+══════════════════════════════════════ -->
+<div class="panel" id="panelVoting">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+    <div>
+      <div style="font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx)">Question Quality Vote</div>
+      <div style="font-size:12px;color:var(--tx2);margin-top:3px;line-height:1.6">Vote on student-submitted questions. Best questions earn bonus PBIS points for their creator. Top questions get added to permanent cold retrieval rotation.</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <select id="voteFilter" onchange="renderVoting()" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-size:11px;outline:none;font-family:var(--mono)">
+        <option value="all">All questions</option>
+        <option value="top">Top rated</option>
+        <option value="new">Newest first</option>
+        <option value="unvoted">Not yet voted</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <input type="text" id="voterCode" placeholder="Your code to vote" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 12px;color:var(--acc);font-family:var(--mono);font-size:11px;letter-spacing:1px;outline:none;width:150px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+    <span class="tag acc" id="voteCount">0 questions</span>
+    <span class="tag gold" id="topQCount">0 top-rated</span>
+  </div>
+
+  <div id="votingList">
+    <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:20px;text-align:center">No questions in the bank yet. Students submit questions during class to populate this list.</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     SETUP
+══════════════════════════════════════ -->
+<div class="panel" id="panelSetup" style="padding:24px;max-width:700px;margin:0 auto">
+
+  <div style="font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:16px">⚙️ Arena Setup</div>
+
+  <!-- Nickname registration -->
+  <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;margin-bottom:14px">
+    <div style="font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc);margin-bottom:12px">Register Nickname</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <input type="text" id="regCode" placeholder="STU-001" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--acc);font-family:var(--mono);font-size:13px;letter-spacing:1px;outline:none;width:120px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      <input type="text" id="regNick" placeholder="NICKNAME (max 12 chars)" maxlength="12" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:1px;outline:none;text-transform:uppercase;min-width:140px" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9_]/g,'')">
+      <button class="btn btn-acc btn-sm" onclick="registerNickname()">Register</button>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);line-height:1.8">Letters, numbers, underscores only · No real names · Max 12 characters</div>
+    <div id="nickPreview" style="margin-top:10px;font-family:var(--display);font-size:28px;font-weight:800;color:var(--acc);letter-spacing:2px;display:none"></div>
+  </div>
+
+  <!-- Registered nicknames -->
+  <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;margin-bottom:14px">
+    <div style="font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc);margin-bottom:12px">Registered Nicknames</div>
+    <div id="nickList" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="clearNicknames()">Clear All</button>
+  </div>
+
+  <!-- Week control -->
+  <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;margin-bottom:14px">
+    <div style="font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc);margin-bottom:12px">Week Controls</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--tx2)">Current week:</span>
+      <input type="number" id="weekNum" min="1" max="20" value="1" style="width:60px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:6px;color:var(--tx);font-family:var(--mono);font-size:13px;text-align:center;outline:none">
+      <button class="btn btn-acc btn-sm" onclick="setWeek()">Set Week</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetWeeklyScores()">Reset Weekly Scores</button>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:8px">Weekly leaderboard resets Monday. Cumulative PBIS points never reset.</div>
+  </div>
+
+  <!-- Import from platform -->
+  <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px">
+    <div style="font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc);margin-bottom:12px">Add Test Data (Demo)</div>
+    <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.7">Populate the leaderboard with demo data to preview how it looks. Remove before using in class.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="loadDemoData()">Load Demo Data</button>
+      <button class="btn btn-red btn-sm" onclick="clearAllData()">Clear All Data</button>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /content -->
+</div><!-- /app -->
+
+<!-- Projector Mode Overlay -->
+<div class="projector-mode" id="projectorMode">
+  <button class="proj-exit" onclick="toggleProjector()">✕ Exit Projector</button>
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <div style="font-family:var(--display);font-size:clamp(32px,5vw,64px);font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--tx)">Class <span style="color:var(--acc)">Leaderboard</span></div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--tx3);letter-spacing:1px;margin-top:4px" id="projWeekLabel">Week 1</div>
+      </div>
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--acc);letter-spacing:1px">CompTIA A+ 220-1202</div>
+    </div>
+    <div class="multiboard" id="projMultiBoard" style="margin-bottom:24px"></div>
+    <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:16px 20px;display:flex;align-items:center;gap:12px">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:1.5px;color:var(--acc)">LIVE FEED</div>
+      <div style="flex:1;overflow:hidden;height:18px;position:relative">
+        <div class="ticker-inner" id="projTicker" style="font-family:var(--mono);font-size:11px;color:var(--tx2)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+// ══════════════════════════════════════════════════
+// STATE & STORAGE
+// ══════════════════════════════════════════════════
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function sl(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+const ST = {
+  nicknames: ls('arena_nicks',{}),        // {code: nickname}
+  weeklyScores: ls('arena_weekly',{}),    // {code: {points,readiness,streak,questions,notes}}
+  allTimeScores: ls('arena_alltime',{}),  // {code: {points}}
+  challenges: ls('arena_challenges',[]),
+  activeChallenge: ls('arena_active_ch',null),
+  bossHistory: ls('arena_boss',[]),
+  personalBests: ls('arena_pb',{}),       // {code: {bestQuiz, bestExam, bestStreak, ...}}
+  votes: ls('arena_votes',{}),            // {questionId: {up:[], down:[]}}
+  tickerEvents: ls('arena_ticker',[]),
+  currentWeek: ls('arena_week',1),
+  currentCat: 'points',
+};
+
+const CATS = [
+  {id:'points', label:'PBIS Points', icon:'🏆', unit:'pts', color:'var(--gold)'},
+  {id:'readiness', label:'Exam Readiness', icon:'🎓', unit:'%', color:'var(--acc)'},
+  {id:'streak', label:'Study Streak', icon:'🔥', unit:'days', color:'var(--amb)'},
+  {id:'questions', label:'Questions Banked', icon:'💬', unit:'Qs', color:'var(--grn)'},
+  {id:'notes', label:'Notes Complete', icon:'📝', unit:'chs', color:'var(--pur)'},
+];
+
+// ── INIT ──
+function init(){
+  updateWeekLabel();
+  renderLeaderboard('points');
+  renderTicker();
+  renderChallenges();
+  renderBossHistory();
+  renderNickList();
+  renderVoting();
+  renderRecordWall();
+  document.getElementById('weekNum').value=ST.currentWeek;
+  // Load PBIS data from platform
+  syncFromPlatform();
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabs=['live','challenges','boss','personal','voting','setup'];
+  const idx=tabs.indexOf(id);
+  if(idx>=0) document.querySelectorAll('.tab')[idx]?.classList.add('active');
+  document.getElementById('panel'+id.charAt(0).toUpperCase()+id.slice(1))?.classList.add('active');
+}
+
+// ── SYNC FROM PLATFORM ──
+function syncFromPlatform(){
+  // Pull PBIS data from platform localStorage
+  const pbisStudents=ls('pbis_students',{});
+  const pbisLog=ls('pbis_log',[]);
+  const answers=ls('st_ans',{});
+  const streak=ls('scc_streak',{current:0});
+  const bank=ls('st_bank',[]);
+  const notes=ls('cn_notes',{});
+
+  Object.entries(pbisStudents).forEach(([code,pts])=>{
+    if(!ST.weeklyScores[code]) ST.weeklyScores[code]={points:0,readiness:0,streak:0,questions:0,notes:0};
+    ST.weeklyScores[code].points=pts;
+    ST.allTimeScores[code]={points:pts};
+  });
+
+  // Count questions per student
+  bank.forEach(q=>{
+    if(q.code){
+      if(!ST.weeklyScores[q.code]) ST.weeklyScores[q.code]={points:0,readiness:0,streak:0,questions:0,notes:0};
+      ST.weeklyScores[q.code].questions=(ST.weeklyScores[q.code].questions||0)+1;
+    }
+  });
+
+  sl('arena_weekly',ST.weeklyScores);
+  sl('arena_alltime',ST.allTimeScores);
+}
+
+// ── NICKNAME ──
+function displayName(code){
+  return ST.nicknames[code]||code;
+}
+
+function registerNickname(){
+  const code=document.getElementById('regCode').value.trim().toUpperCase();
+  const nick=document.getElementById('regNick').value.trim().toUpperCase().replace(/[^A-Z0-9_]/g,'').substring(0,12);
+  if(!code||!nick){toast('Enter both code and nickname','err');return;}
+  if(Object.values(ST.nicknames).includes(nick)){toast('That nickname is taken — choose another','err');return;}
+  ST.nicknames[code]=nick;
+  sl('arena_nicks',ST.nicknames);
+  renderNickList();
+  document.getElementById('nickPreview').textContent=nick;
+  document.getElementById('nickPreview').style.display='block';
+  toast(`${code} → ${nick} registered!`,'ok');
+  renderLeaderboard(ST.currentCat);
+}
+
+function renderNickList(){
+  document.getElementById('nickList').innerHTML=Object.entries(ST.nicknames).map(([code,nick])=>`
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:5px 10px;display:flex;align-items:center;gap:8px">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--tx3)">${code}</span>
+      <span style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--acc)">${nick}</span>
+      <span onclick="deleteNick('${code}')" style="font-size:10px;color:var(--tx3);cursor:pointer;margin-left:4px">✕</span>
+    </div>`).join('')||'<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No nicknames registered yet.</div>';
+}
+
+function deleteNick(code){delete ST.nicknames[code];sl('arena_nicks',ST.nicknames);renderNickList();renderLeaderboard(ST.currentCat);}
+function clearNicknames(){if(confirm('Clear all nicknames?')){ST.nicknames={};sl('arena_nicks',{});renderNickList();renderLeaderboard(ST.currentCat);}}
+
+// ── LEADERBOARD ──
+function showCat(cat, el){
+  ST.currentCat=cat;
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  el?.classList.add('active');
+  const grid=document.getElementById('lbGrid');
+  const multi=document.getElementById('multiBoard');
+  if(cat==='all'){grid.style.display='none';multi.style.display='grid';renderMultiBoard('multiBoard');}
+  else{grid.style.display='flex';multi.style.display='none';renderLeaderboard(cat);}
+}
+
+function renderLeaderboard(cat){
+  const scores=ST.weeklyScores;
+  const catInfo=CATS.find(c=>c.id===cat)||CATS[0];
+  const sorted=Object.entries(scores)
+    .map(([code,s])=>({code,name:displayName(code),score:s[cat]||0,raw:s}))
+    .sort((a,b)=>b.score-a.score)
+    .filter(e=>e.score>0);
+
+  const maxScore=sorted[0]?.score||1;
+  const myCode=ls('scc_code',null);
+
+  document.getElementById('lbGrid').innerHTML=sorted.length?sorted.map((e,i)=>{
+    const rank=i+1;
+    const rankClass=rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
+    const isMe=e.code===myCode;
+    const barPct=Math.round(e.score/maxScore*100);
+    const rankIcon=rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'';
+    return `<div class="lb-row ${rankClass} ${isMe?'is-me':''}" style="animation:fadeUp .3s ease ${i*.04}s both">
+      <div class="lb-rank">${rank<=3?'':`#${rank}`}</div>
+      <div class="lb-rank-icon">${rankIcon||''}</div>
+      <div>
+        <div class="lb-name">${e.name}${isMe?` <span style="font-family:var(--mono);font-size:9px;color:var(--acc)">(you)</span>`:''}</div>
+        ${e.code!==e.name?`<div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">${e.code}</div>`:''}
+      </div>
+      <div style="flex:1"></div>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${catInfo.color}"></div></div>
+      <div class="lb-score" style="color:${rank<=3?'':'var(--tx2)'}">${e.score}<span style="font-size:14px;font-weight:400"> ${catInfo.unit}</span></div>
+    </div>`;
+  }).join(''):`<div style="text-align:center;padding:48px 20px;color:var(--tx3);font-family:var(--mono)">No scores yet for this category.<br>Complete activities in the classroom platform to appear here.</div>`;
+}
+
+function renderMultiBoard(elId){
+  document.getElementById(elId).innerHTML=CATS.map(cat=>{
+    const sorted=Object.entries(ST.weeklyScores)
+      .map(([code,s])=>({code,name:displayName(code),score:s[cat.id]||0}))
+      .sort((a,b)=>b.score-a.score)
+      .filter(e=>e.score>0)
+      .slice(0,5);
+    return `<div class="mb-col">
+      <div class="mb-header">
+        <div class="mb-header-icon">${cat.icon}</div>
+        <div class="mb-header-title">${cat.label}</div>
+      </div>
+      <div class="mb-rows">
+        ${sorted.map((e,i)=>`
+          <div class="mb-row ${i===0?'r1':i===1?'r2':i===2?'r3':''}">
+            <div class="mb-row-rank">${i===0?'👑':i===1?'🥈':i===2?'🥉':`#${i+1}`}</div>
+            <div class="mb-row-name">${e.name}</div>
+            <div class="mb-row-score">${e.score}${cat.unit}</div>
+          </div>`).join('')||`<div style="padding:8px;font-size:10px;color:var(--tx3);font-family:var(--mono)">No data yet</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function refreshLeaderboard(){syncFromPlatform();renderLeaderboard(ST.currentCat);toast('Refreshed from platform data','ok');}
+
+// ── TICKER ──
+function renderTicker(){
+  const events=ST.tickerEvents.slice(0,20);
+  if(!events.length){
+    addTickerEvent('Welcome to the Competition Arena! Earn points by completing activities.','🏟️');
+    return;
+  }
+  const html=events.map(e=>`<div class="ticker-item">${e.icon} <span>${e.name}</span> ${e.msg} · ${e.time}</div>`).join('');
+  ['tickerInner','projTicker'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.innerHTML=html+html; // duplicate for seamless loop
+  });
+}
+
+function addTickerEvent(msg, icon='⭐', name=''){
+  const event={msg,icon,name:name||'System',time:new Date().toLocaleTimeString()};
+  ST.tickerEvents.unshift(event);
+  ST.tickerEvents=ST.tickerEvents.slice(0,50);
+  sl('arena_ticker',ST.tickerEvents);
+  renderTicker();
+}
+
+// ── CHALLENGES ──
+function setChallenge(){
+  const title=document.getElementById('chNewTitle').value.trim();
+  const desc=document.getElementById('chNewDesc').value.trim();
+  const pts=parseInt(document.getElementById('chNewPts').value)||5;
+  const deadline=document.getElementById('chNewDeadline').value;
+  const type=document.getElementById('chNewType').value;
+  if(!title||!desc){toast('Enter title and description','err');return;}
+  const ch={id:Date.now(),title,desc,pts,deadline,type,created:new Date().toLocaleDateString(),completers:[],active:true};
+  ST.challenges.unshift(ch);
+  ST.activeChallenge=ch;
+  sl('arena_challenges',ST.challenges);
+  sl('arena_active_ch',ch);
+  ['chNewTitle','chNewDesc','chNewPts','chNewDeadline'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderChallenges();
+  addTickerEvent(`New challenge: "${title}" — ${pts} PBIS pts for completing!`,'⚡','Teacher');
+  toast('Challenge set!','ok');
+}
+
+function renderChallenges(){
+  const ch=ST.activeChallenge;
+  if(ch){
+    document.getElementById('chTitle').textContent=ch.title;
+    document.getElementById('chDesc').textContent=ch.desc;
+    document.getElementById('chReward').style.display='flex';
+    document.getElementById('chRewardText').textContent=`+${ch.pts} PBIS points for everyone who completes it`;
+    const completers=ch.completers||[];
+    const studentCount=Object.keys(ST.weeklyScores).length||1;
+    const pct=Math.round(completers.length/Math.max(studentCount,1)*100);
+    document.getElementById('chFill').style.width=pct+'%';
+    document.getElementById('chProgressLabel').textContent=`${completers.length} / ${studentCount} completed`;
+    document.getElementById('chCompleters').innerHTML=completers.map(c=>`<div class="ch-completer">✓ ${displayName(c)}</div>`).join('');
+    const daysLeft=ch.deadline?Math.ceil((new Date(ch.deadline)-new Date())/86400000):null;
+    document.getElementById('chDaysLeft').textContent=daysLeft?`${daysLeft} days left`:'No deadline';
+  }
+
+  const past=ST.challenges.filter(c=>!c.active||c!==ST.activeChallenge);
+  document.getElementById('challengeList').innerHTML=past.length?past.map(ch=>`
+    <div class="challenge-card">
+      <div class="cc-icon">${ch.type==='quiz'?'🎯':ch.type==='streak'?'🔥':ch.type==='notes'?'📝':ch.type==='questions'?'💬':'⚡'}</div>
+      <div class="cc-info">
+        <div class="cc-title">${ch.title}</div>
+        <div class="cc-desc">${ch.desc}</div>
+        <div class="cc-meta">
+          <span class="cc-pts">+${ch.pts} pts</span>
+          <span class="cc-deadline">${ch.deadline||'No deadline'}</span>
+          <span class="cc-status complete">${ch.completers?.length||0} completed</span>
+        </div>
+      </div>
+      <div class="cc-action">
+        <button class="btn btn-ghost btn-sm" onclick="markComplete(${ch.id})">Mark Complete</button>
+      </div>
+    </div>`).join(''):
+    '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No past challenges yet.</div>';
+}
+
+function markComplete(id){
+  const code=prompt('Student code who completed:');
+  if(!code)return;
+  const ch=ST.challenges.find(c=>c.id===id)||ST.activeChallenge;
+  if(!ch)return;
+  if(!ch.completers) ch.completers=[];
+  if(!ch.completers.includes(code.toUpperCase())){
+    ch.completers.push(code.toUpperCase());
+    sl('arena_challenges',ST.challenges);
+    sl('arena_active_ch',ST.activeChallenge);
+    // Award PBIS points
+    const pbis=ls('pbis_students',{});
+    pbis[code.toUpperCase()]=(pbis[code.toUpperCase()]||0)+ch.pts;
+    sl('pbis_students',pbis);
+    addTickerEvent(`completed the challenge "${ch.title}"! +${ch.pts} pts`,'⚡',displayName(code.toUpperCase()));
+    renderChallenges();
+    syncFromPlatform();
+    renderLeaderboard(ST.currentCat);
+    toast(`${code} marked complete · +${ch.pts} PBIS points awarded!`,'gold');
+  }
+}
+
+// ── BOSS BATTLES ──
+let bossState={qs:null,answers:{},timer:null,secs:300,submitted:false,idx:0};
+
+async function startBossBattle(){
+  const chapter=document.getElementById('bossChapterSel').value;
+  const btn=document.getElementById('startBossBtn');
+  btn.disabled=true; btn.textContent='Summoning boss…';
+  document.getElementById('bossInterface').style.display='block';
+  document.getElementById('bossInterface').innerHTML='<div class="loading">Generating 10 boss battle questions…</div>';
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:2500,
+        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown.',
+        messages:[{role:'user',content:`Generate 10 challenging CompTIA A+ 220-1202 questions for the chapter: "${chapter}". 
+These are for a class competition — make them challenging but fair. Use qualifier words. Plausible distractors.
+Return JSON: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."}]`}]
+      })
+    });
+    const d=await r.json();
+    const text=d.content?.map(c=>c.text||'').join('')||'';
+    bossState.qs=JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+    bossState.answers={};bossState.submitted=false;bossState.idx=0;bossState.secs=300;
+    document.getElementById('bossChapter').textContent=chapter;
+    document.getElementById('bossName').textContent=chapter.replace('Ch.','Chapter ')+' BOSS';
+    renderBossInterface();
+    startBossTimer();
+    addTickerEvent(`started a Boss Battle against ${chapter}!`,'👹','Class');
+  }catch(e){
+    document.getElementById('bossInterface').innerHTML='<div style="color:var(--red);font-family:var(--mono);font-size:11px;padding:16px">Failed to summon boss. Check connection.</div>';
+    toast('Boss generation failed','err');
+  }
+  btn.disabled=false; btn.textContent='⚔️ Start Boss Battle';
+}
+
+function renderBossInterface(){
+  const qs=bossState.qs;if(!qs)return;
+  const answered=Object.keys(bossState.answers).length;
+  const correct=Object.entries(bossState.answers).filter(([i,a])=>a===qs[+i]?.answer).length;
+  const hpPct=bossState.submitted?Math.max(0,100-Math.round(correct/qs.length*100)):100;
+  document.getElementById('bossHpFill').style.width=hpPct+'%';
+  document.getElementById('bossHpFill').style.background=hpPct<30?'var(--red)':hpPct<60?'var(--amb)':'linear-gradient(90deg,var(--grn),var(--acc))';
+  document.getElementById('bossHpLabel').textContent=`Boss HP: ${hpPct}%`;
+
+  if(bossState.submitted){
+    renderBossResult(correct,qs.length);return;
+  }
+
+  const q=qs[bossState.idx];
+  const sel=bossState.answers[bossState.idx];
+  document.getElementById('bossInterface').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      ${qs.map((_,i)=>`<div style="width:24px;height:24px;border-radius:4px;background:${i===bossState.idx?'var(--red)':bossState.answers[i]?'var(--acc-d)':'var(--s3)'};border:1px solid ${i===bossState.idx?'var(--red)':bossState.answers[i]?'var(--acc)':'var(--b1)'};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;cursor:pointer;color:var(--tx3)" onclick="bossGoTo(${i})">${i+1}</div>`).join('')}
+    </div>
+    <div class="boss-q">
+      <div class="boss-q-label">Boss Question ${bossState.idx+1} of ${qs.length}</div>
+      <div class="boss-q-text">${q.q}</div>
+      <div class="boss-opts">
+        ${['A','B','C','D'].map(l=>`
+          <div class="boss-opt ${sel===l?'sel':''}" onclick="bossPick(${bossState.idx},'${l}')">
+            <div class="boss-opt-ltr">${l}</div>
+            <div class="boss-opt-txt">${q.opts[l]}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+      <button class="btn btn-ghost btn-sm" onclick="bossGoTo(Math.max(0,bossState.idx-1))">← Prev</button>
+      <button class="btn btn-ghost btn-sm" onclick="bossGoTo(Math.min(bossState.qs.length-1,bossState.idx+1))">Next →</button>
+      <button class="btn btn-red" onclick="submitBoss()">⚔️ Deal Damage! (${answered}/${qs.length} answered)</button>
+    </div>`;
+}
+
+function bossPick(i,l){bossState.answers[i]=l;renderBossInterface();}
+function bossGoTo(i){bossState.idx=i;renderBossInterface();}
+
+function startBossTimer(){
+  clearInterval(bossState.timer);
+  bossState.timer=setInterval(()=>{
+    bossState.secs--;
+    const m=Math.floor(bossState.secs/60),s=bossState.secs%60;
+    document.getElementById('bossTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(bossState.secs<=60) document.getElementById('bossTimer').style.color='var(--red)';
+    if(bossState.secs<=0){clearInterval(bossState.timer);submitBoss();}
+  },1000);
+}
+
+function submitBoss(){
+  clearInterval(bossState.timer);
+  bossState.submitted=true;
+  const qs=bossState.qs;
+  const correct=Object.entries(bossState.answers).filter(([i,a])=>a===qs[+i]?.answer).length;
+  renderBossResult(correct,qs.length);
+}
+
+function renderBossResult(correct,total){
+  const pct=Math.round(correct/total*100);
+  const tier=pct>=90?{label:'GOLD',color:'var(--gold)',pts:15,icon:'👑'}:
+              pct>=70?{label:'SILVER',color:'var(--silver)',pts:10,icon:'🥈'}:
+              pct>=50?{label:'BRONZE',color:'var(--bronze)',pts:5,icon:'🥉'}:
+              {label:'DEFEATED',color:'var(--red)',pts:0,icon:'💀'};
+  const won=pct>=50;
+
+  document.getElementById('bossInterface').innerHTML=`
+    <div class="battle-result">
+      <div class="br-outcome ${won?'win':'lose'}">${won?'BOSS DEFEATED!':'YOU LOSE'}</div>
+      <div class="br-tier" style="color:${tier.color}">${tier.icon} ${tier.label} TIER · ${correct}/${total} correct · ${pct}%</div>
+      ${tier.pts>0?`<div style="font-family:var(--mono);font-size:12px;color:var(--gold);margin-bottom:16px">+${tier.pts} PBIS points awarded to the class!</div>`:''}
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;line-height:1.7">
+        ${pct>=90?'Incredible! The entire class crushed this chapter.':
+          pct>=70?'Strong performance! Review the missed questions.':
+          pct>=50?'You beat the boss, but study the rationale below.':
+          'The boss won this one. Review all questions carefully.'}
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
+        <button class="btn btn-ghost btn-sm" onclick="showBossReview()">Review Answers</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bossInterface').style.display='none'">Close</button>
+      </div>
+    </div>`;
+
+  // Save to history
+  const hist={chapter:document.getElementById('bossChapterSel').value,correct,total,pct,tier:tier.label,pts:tier.pts,date:new Date().toLocaleDateString(),ts:Date.now()};
+  ST.bossHistory.unshift(hist);
+  sl('arena_boss',ST.bossHistory);
+
+  // Award PBIS to all students
+  if(tier.pts>0){
+    const pbis=ls('pbis_students',{});
+    Object.keys(ST.weeklyScores).forEach(code=>{pbis[code]=(pbis[code]||0)+tier.pts;});
+    sl('pbis_students',pbis);
+    syncFromPlatform();
+    renderLeaderboard(ST.currentCat);
+  }
+
+  addTickerEvent(`Boss Battle result: ${tier.icon} ${tier.label} — ${correct}/${total} correct! ${tier.pts>0?`+${tier.pts} pts each!`:''}`, '👹','Class');
+  renderBossHistory();
+  document.getElementById('bossHpFill').style.width=Math.max(0,100-pct)+'%';
+  document.getElementById('bossClassAvg').textContent=pct+'%';
+}
+
+function showBossReview(){
+  const qs=bossState.qs;if(!qs)return;
+  let html='<div style="margin-top:10px">';
+  qs.forEach((q,i)=>{
+    const sel=bossState.answers[i];const correct=sel===q.answer;
+    html+=`<div class="boss-q" style="margin-bottom:8px">
+      <div class="boss-q-label">Q${i+1} · ${correct?'✓ CORRECT':'✗ WRONG'}</div>
+      <div class="boss-q-text">${q.q}</div>
+      <div style="font-size:11px;color:var(--tx2);margin-top:6px">Correct: <strong style="color:var(--grn)">${q.answer}. ${q.opts[q.answer]}</strong></div>
+      <div style="font-size:10px;color:var(--tx3);margin-top:4px;line-height:1.6">${q.rationale}</div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('bossInterface').innerHTML+=html;
+}
+
+function renderBossHistory(){
+  const el=document.getElementById('bossHistory');
+  if(!ST.bossHistory.length){el.innerHTML='<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No battles yet.</div>';return;}
+  el.innerHTML=ST.bossHistory.slice(0,8).map(h=>`
+    <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:20px">${h.tier==='GOLD'?'👑':h.tier==='SILVER'?'🥈':h.tier==='BRONZE'?'🥉':'💀'}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx)">${h.chapter}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">${h.date} · ${h.correct}/${h.total} correct · ${h.pct}%</div>
+      </div>
+      <div style="font-family:var(--display);font-size:16px;font-weight:700;color:${h.tier==='GOLD'?'var(--gold)':h.tier==='SILVER'?'var(--silver)':h.tier==='BRONZE'?'var(--bronze)':'var(--red)'}">${h.tier}</div>
+      ${h.pts>0?`<div style="font-family:var(--mono);font-size:10px;color:var(--gold)">+${h.pts} pts</div>`:''}
+    </div>`).join('');
+}
+
+// ── PERSONAL BESTS ──
+function loadPersonalBests(code){
+  if(!code)return;
+  code=code.toUpperCase();
+  const pb=ST.personalBests[code]||{};
+  const scores=ls('st_ans',{});
+  const bank=ls('st_bank',[]);
+
+  // Calculate bests from platform data
+  const timedKeys=Object.keys(scores).filter(k=>k.startsWith('timed_')&&k.includes(code));
+  const timedScores=timedKeys.map(k=>{
+    const ans=scores[k]||{};
+    return Object.keys(ans).length===5?Math.round(Object.keys(ans).length/5*100):0;
+  }).filter(s=>s>0);
+  const bestTimed=timedScores.length?Math.max(...timedScores):pb.bestTimed||0;
+
+  const coldKeys=Object.keys(scores).filter(k=>k.startsWith('cold_')&&k.includes(code));
+  const coldScores=coldKeys.map(k=>{
+    const ans=scores[k]||{};
+    return Object.keys(ans).length===5?Math.round(Object.keys(ans).length/5*100):0;
+  }).filter(s=>s>0);
+  const bestCold=coldScores.length?Math.max(...coldScores):pb.bestCold||0;
+
+  const examHistory=ls('es_exam_history',[]).filter(h=>h.code===code);
+  const bestExam=examHistory.length?Math.max(...examHistory.map(h=>h.score)):pb.bestExam||0;
+  const streak=ls('scc_streak',{current:0}).current||0;
+  const questionsSubmitted=bank.filter(q=>q.code===code).length;
+
+  const newBests={bestTimed,bestCold,bestExam,bestStreak:Math.max(streak,pb.bestStreak||0),bestQuestions:Math.max(questionsSubmitted,pb.bestQuestions||0)};
+
+  // Check for new records
+  let newRecordMsg='';
+  if(bestTimed>(pb.bestTimed||0)&&bestTimed>0) newRecordMsg=`New record: ${bestTimed}% on timed practice!`;
+  if(bestExam>(pb.bestExam||0)&&bestExam>0) newRecordMsg=`New record: ${bestExam}/900 on practice exam!`;
+
+  ST.personalBests[code]=newBests;
+  sl('arena_pb',ST.personalBests);
+
+  if(newRecordMsg){
+    addTickerEvent(newRecordMsg,'🌟',displayName(code));
+    toast(`🌟 New personal record! ${newRecordMsg}`,'gold');
+    // Award PBIS point
+    const pbis=ls('pbis_students',{});
+    pbis[code]=(pbis[code]||0)+2;
+    sl('pbis_students',pbis);
+    syncFromPlatform();
+  }
+
+  renderPBCards(code,newBests);
+  renderRecordWall();
+}
+
+function renderPBCards(code,pb){
+  const cards=[
+    {id:'bestTimed',label:'Best Timed Practice',val:pb.bestTimed||0,unit:'%',icon:'⏱',color:'acc'},
+    {id:'bestCold',label:'Best Cold Retrieval',val:pb.bestCold||0,unit:'%',icon:'❄️',color:'pur'},
+    {id:'bestExam',label:'Best Practice Exam',val:pb.bestExam||0,unit:'/900',icon:'🎓',color:'grn'},
+    {id:'bestStreak',label:'Longest Streak',val:pb.bestStreak||0,unit:'days',icon:'🔥',color:'amb'},
+    {id:'bestQuestions',label:'Questions Submitted',val:pb.bestQuestions||0,unit:'Qs',icon:'💬',color:'acc'},
+  ];
+  document.getElementById('pbGrid').innerHTML=cards.map(c=>`
+    <div class="pb-card ${c.color}" style="animation:fadeUp .3s ease both">
+      ${c.val>0?'<div class="pb-record-badge">PERSONAL BEST</div>':''}
+      <div class="pb-icon">${c.icon}</div>
+      <div class="pb-label">${c.label}</div>
+      <div class="pb-value" style="color:var(--${c.color})">${c.val||'—'}</div>
+      <div class="pb-sub">${c.unit}</div>
+    </div>`).join('');
+}
+
+function renderRecordWall(){
+  const wall=document.getElementById('recordWall');
+  const allBests=Object.entries(ST.personalBests);
+  if(!allBests.length){wall.innerHTML='<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No personal records yet.</div>';return;}
+
+  // Find class records
+  const classRecords={
+    bestTimed:{code:'',val:0},bestExam:{code:'',val:0},bestStreak:{code:'',val:0},bestQuestions:{code:'',val:0}
+  };
+  allBests.forEach(([code,pb])=>{
+    if((pb.bestTimed||0)>classRecords.bestTimed.val){classRecords.bestTimed={code,val:pb.bestTimed};}
+    if((pb.bestExam||0)>classRecords.bestExam.val){classRecords.bestExam={code,val:pb.bestExam};}
+    if((pb.bestStreak||0)>classRecords.bestStreak.val){classRecords.bestStreak={code,val:pb.bestStreak};}
+    if((pb.bestQuestions||0)>classRecords.bestQuestions.val){classRecords.bestQuestions={code,val:pb.bestQuestions};}
+  });
+
+  wall.innerHTML=[
+    {icon:'⏱',label:'Best Timed Practice',rec:classRecords.bestTimed,unit:'%'},
+    {icon:'🎓',label:'Best Practice Exam',rec:classRecords.bestExam,unit:'/900'},
+    {icon:'🔥',label:'Longest Streak',rec:classRecords.bestStreak,unit:' days'},
+    {icon:'💬',label:'Most Questions',rec:classRecords.bestQuestions,unit:' Qs'},
+  ].map(r=>`
+    <div style="background:var(--s1);border:1px solid var(--gold);border-radius:var(--r);padding:14px;background:linear-gradient(135deg,var(--gold-d),var(--s1))">
+      <div style="font-size:20px;margin-bottom:6px">${r.icon} 👑</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:4px">${r.label}</div>
+      <div style="font-family:var(--display);font-size:32px;font-weight:900;color:var(--gold);line-height:1">${r.rec.val||'—'}${r.rec.val?r.unit:''}</div>
+      <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx);margin-top:4px">${r.rec.code?displayName(r.rec.code):'—'}</div>
+    </div>`).join('');
+}
+
+// ── VOTING ──
+function renderVoting(){
+  const bank=ls('st_bank',[]);
+  const filter=document.getElementById('voteFilter')?.value||'all';
+  document.getElementById('voteCount').textContent=`${bank.length} questions`;
+  const topCount=bank.filter(q=>{const v=ST.votes[q.ts]||{up:[],down:[]};return v.up.length>=3;}).length;
+  document.getElementById('topQCount').textContent=`${topCount} top-rated`;
+
+  let questions=[...bank];
+  if(filter==='top') questions.sort((a,b)=>(ST.votes[b.ts]?.up?.length||0)-(ST.votes[a.ts]?.up?.length||0));
+  else if(filter==='new') questions.sort((a,b)=>b.ts-a.ts);
+  else if(filter==='unvoted'){
+    const vc=ls('arena_voted',[]);
+    questions=questions.filter(q=>!vc.includes(q.ts));
+  }
+
+  const el=document.getElementById('votingList');
+  if(!bank.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3);font-family:var(--mono)">No questions submitted yet. Students submit questions during class activities.</div>';return;}
+
+  el.innerHTML=questions.slice(0,30).map(q=>{
+    const votes=ST.votes[q.ts]||{up:[],down:[]};
+    const netVotes=votes.up.length-votes.down.length;
+    const maxVotes=Math.max(...Object.values(ST.votes).map(v=>v.up.length),1);
+    const barPct=Math.round(votes.up.length/maxVotes*100);
+    const isTop=votes.up.length>=3;
+    return `<div class="vote-card" ${isTop?'style="border-color:var(--gold);background:linear-gradient(90deg,var(--gold-d),var(--s1))"':''}>
+      ${isTop?'<div style="font-family:var(--mono);font-size:8px;color:var(--gold);letter-spacing:1px;margin-bottom:6px">⭐ TOP RATED — Added to cold retrieval pool</div>':''}
+      <div class="vote-q">${q.cleaned||q.raw}</div>
+      <div class="vote-meta">
+        <span class="vote-code">by ${displayName(q.code)}</span>
+        ${q.topic?`<span class="vote-topic">${q.topic}</span>`:''}
+        <span style="font-family:var(--mono);font-size:9px;color:var(--tx3)">${new Date(q.ts).toLocaleDateString()}</span>
+      </div>
+      ${q.opts?`<div class="vote-opts-preview">A. ${q.opts.A||'—'} · B. ${q.opts.B||'—'} · C. ${q.opts.C||'—'} · D. ${q.opts.D||'—'}</div>`:''}
+      <div class="vote-actions">
+        <button class="vote-btn" onclick="castVote(${q.ts},'up',this)">👍 ${votes.up.length}</button>
+        <button class="vote-btn down" onclick="castVote(${q.ts},'down',this)">👎 ${votes.down.length}</button>
+        <div class="vote-bar-wrap"><div class="vote-bar" style="width:${barPct}%"></div></div>
+        <div class="vote-count" style="color:${netVotes>0?'var(--grn)':netVotes<0?'var(--red)':'var(--tx2)'}">${netVotes>0?'+':''}${netVotes}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function castVote(id, dir, btn){
+  const voterCode=document.getElementById('voterCode').value.trim().toUpperCase();
+  if(!voterCode){toast('Enter your code to vote','err');return;}
+  if(!ST.votes[id]) ST.votes[id]={up:[],down:[]};
+  const v=ST.votes[id];
+  // Remove existing vote
+  v.up=v.up.filter(c=>c!==voterCode);
+  v.down=v.down.filter(c=>c!==voterCode);
+  // Add new vote
+  v[dir].push(voterCode);
+  sl('arena_votes',ST.votes);
+  // Award points if top-rated
+  const bank=ls('st_bank',[]);
+  const q=bank.find(q=>q.ts===id);
+  if(q&&v.up.length===3){
+    const pbis=ls('pbis_students',{});
+    pbis[q.code]=(pbis[q.code]||0)+5;
+    sl('pbis_students',pbis);
+    addTickerEvent(`"${(q.cleaned||q.raw).substring(0,40)}…" reached top-rated! +5 PBIS pts`,'⭐',displayName(q.code));
+    syncFromPlatform();
+    toast(`Top-rated! ${displayName(q.code)} earns +5 PBIS points!`,'gold');
+  }
+  renderVoting();
+}
+
+// ── WEEK ──
+function updateWeekLabel(){
+  const today=new Date();
+  const weekStart=new Date(today);
+  const dow=(today.getDay()+6)%7;
+  weekStart.setDate(today.getDate()-dow);
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+4);
+  const label=`Week ${ST.currentWeek} · ${weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${weekEnd.toLocaleDateString('en-US',{month:'short',day:'numeric'})} · Resets Monday`;
+  document.getElementById('weekLabel').textContent=label;
+  document.getElementById('projWeekLabel').textContent=`Week ${ST.currentWeek}`;
+  document.getElementById('hWeek').textContent=`Week ${ST.currentWeek}`;
+}
+
+function setWeek(){
+  ST.currentWeek=parseInt(document.getElementById('weekNum').value)||1;
+  sl('arena_week',ST.currentWeek);
+  updateWeekLabel();
+  toast(`Week ${ST.currentWeek} set`,'ok');
+}
+
+function resetWeeklyScores(){
+  if(!confirm('Reset weekly scores? PBIS points are NOT affected.'))return;
+  Object.keys(ST.weeklyScores).forEach(code=>{
+    const pts=ST.weeklyScores[code].points||0;
+    ST.weeklyScores[code]={points:pts,readiness:0,streak:0,questions:0,notes:0};
+  });
+  sl('arena_weekly',ST.weeklyScores);
+  renderLeaderboard(ST.currentCat);
+  toast('Weekly scores reset · PBIS points preserved','ok');
+}
+
+// ── PROJECTOR ──
+function toggleProjector(){
+  const el=document.getElementById('projectorMode');
+  el.classList.toggle('active');
+  if(el.classList.contains('active')){
+    renderMultiBoard('projMultiBoard');
+    renderTicker();
+    document.body.style.overflow='hidden';
+  } else {
+    document.body.style.overflow='';
+  }
+}
+
+// ── DEMO DATA ──
+function loadDemoData(){
+  const codes=['STU-001','STU-002','STU-003','STU-004','STU-005','STU-006','STU-007','STU-008'];
+  const nicks={
+    'STU-001':'NETKING','STU-002':'IRONBYTE','STU-003':'CLICMD',
+    'STU-004':'PROXSTAR','STU-005':'RAIDLORD','STU-006':'SSHQUEEN',
+    'STU-007':'BSODKID','STU-008':'NTFSACE'
+  };
+  ST.nicknames={...ST.nicknames,...nicks};
+  codes.forEach((code,i)=>{
+    ST.weeklyScores[code]={
+      points:Math.floor(Math.random()*80)+20,
+      readiness:Math.floor(Math.random()*40)+45,
+      streak:Math.floor(Math.random()*10)+1,
+      questions:Math.floor(Math.random()*12)+2,
+      notes:Math.floor(Math.random()*8)+1,
+    };
+  });
+  sl('arena_nicks',ST.nicknames);
+  sl('arena_weekly',ST.weeklyScores);
+  renderLeaderboard(ST.currentCat);
+  renderNickList();
+  renderRecordWall();
+  toast('Demo data loaded!','ok');
+}
+
+function clearAllData(){
+  if(!confirm('Clear ALL competition data?'))return;
+  ['arena_nicks','arena_weekly','arena_alltime','arena_challenges','arena_active_ch','arena_boss','arena_pb','arena_votes','arena_ticker'].forEach(k=>localStorage.removeItem(k));
+  location.reload();
+}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',4000);
+}
+
+init();
+</script>
+<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('arena');}
+}
+</script>
+</body>
+</html>

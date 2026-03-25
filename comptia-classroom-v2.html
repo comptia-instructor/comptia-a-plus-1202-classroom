@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ 220-1202 · Classroom</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050810; --s1:#0e1118; --s2:#141820; --s3:#1b2030; --s4:#222840;
+  --b1:#1e2535; --b2:#2a3248; --b3:#374060;
+  --acc:#00c8ff; --acc2:#7db3ff; --acc-d:rgba(91,156,246,0.12);
+  --grn:#34d399; --grn-d:rgba(52,211,153,0.12);
+  --amb:#fbbf24; --amb-d:rgba(251,191,36,0.12);
+  --red:#f87171; --red-d:rgba(248,113,113,0.12);
+  --pur:#c084fc; --pur-d:rgba(192,132,252,0.12);
+  --cya:#22d3ee; --cya-d:rgba(34,211,238,0.12);
+  --pnk:#f472b6; --pnk-d:rgba(244,114,182,0.12);
+  --tx:#dde2f0; --tx2:#8892aa; --tx3:#4a5270; --tx4:#2d3450;
+  --mono:'JetBrains Mono',monospace; --sans:'Barlow',sans-serif;
+  --r:8px; --rl:14px; --rxl:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;font-size:14px}
+
+/* Scanline texture */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:1000}
+
+/* Grid */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(91,156,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(91,156,246,0.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--b1);padding:12px 24px;display:flex;align-items:center;gap:12px;background:rgba(8,10,15,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:500}
+.logo{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--acc);border:1px solid var(--acc);padding:4px 8px;border-radius:4px;letter-spacing:1px;flex-shrink:0}
+.header-title{font-size:13px;font-weight:600;letter-spacing:.3px}
+.header-sub{font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:1px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.mode-toggle{display:flex;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:2px;gap:2px}
+.mode-btn{padding:5px 14px;border-radius:4px;border:none;background:transparent;color:var(--tx3);font-family:var(--sans);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.mode-btn.active{background:var(--acc);color:#fff}
+.day-pill{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc2);padding:4px 12px;border-radius:20px;font-size:10px;font-family:var(--mono);font-weight:700}
+
+/* ── LAYOUT ── */
+main{display:grid;grid-template-columns:260px 1fr;flex:1}
+
+/* ── SIDEBAR ── */
+.sidebar{border-right:1px solid var(--b1);display:flex;flex-direction:column;position:sticky;top:57px;height:calc(100vh - 57px);overflow:hidden;background:var(--s1)}
+.sidebar-search{padding:12px;border-bottom:1px solid var(--b1)}
+.search-inp{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;transition:border-color .2s}
+.search-inp:focus{border-color:var(--acc)}
+.search-inp::placeholder{color:var(--tx3)}
+.sidebar-list{flex:1;overflow-y:auto;padding:6px}
+.sidebar-list::-webkit-scrollbar{width:3px}
+.sidebar-list::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.ch-group{}
+.ch-header{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:background .15s;margin-bottom:2px}
+.ch-header:hover{background:var(--s2)}
+.ch-label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--tx3);flex:1}
+.ch-arrow{font-size:8px;color:var(--tx3);transition:transform .2s}
+.ch-group.collapsed .ch-arrow{transform:rotate(-90deg)}
+.ch-group.collapsed .ch-days{display:none}
+
+.day-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .15s;margin-bottom:1px;border:1px solid transparent}
+.day-row:hover{background:var(--s2)}
+.day-row.active{background:var(--acc-d);border-color:var(--acc)}
+.day-row.done{opacity:.55}
+.dr-num{font-family:var(--mono);font-size:9px;color:var(--tx3);min-width:24px}
+.dr-title{font-size:11px;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day-row.active .dr-title{color:var(--tx)}
+.dr-dot{width:6px;height:6px;border-radius:50%;background:var(--b3);flex-shrink:0;transition:background .2s}
+.dr-dot.done{background:var(--grn)}
+.dr-dot.partial{background:var(--amb)}
+
+/* ── CONTENT ── */
+.content{display:flex;flex-direction:column;min-height:0;background:var(--bg)}
+
+/* ── TOP NAV ── */
+.top-nav{display:flex;gap:2px;padding:10px 20px;border-bottom:1px solid var(--b1);background:var(--s1);overflow-x:auto;flex-shrink:0}
+.top-nav::-webkit-scrollbar{height:2px}
+.nav-btn{padding:6px 14px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--tx3);font-family:var(--sans);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.nav-btn:hover{color:var(--tx2);background:var(--s2)}
+.nav-btn.active{background:var(--acc-d);border-color:var(--acc);color:var(--acc2)}
+.nav-btn.complete{border-color:var(--grn);color:var(--grn);background:var(--grn-d)}
+
+/* ── PANELS ── */
+.panel{display:none;padding:24px;flex-direction:column;gap:16px;overflow-y:auto;max-height:calc(100vh - 57px - 53px)}
+.panel.active{display:flex}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden}
+.card-top{padding:14px 18px;background:var(--s2);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card-top h2{font-size:13px;font-weight:600;flex:1}
+.card-body{padding:18px}
+
+/* ── TAGS / PILLS ── */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.3px;border:1px solid var(--b2);color:var(--tx3);background:var(--s3)}
+.tag.blue{background:var(--acc-d);color:var(--acc2);border-color:var(--acc)}
+.tag.green{background:var(--grn-d);color:var(--grn);border-color:var(--grn)}
+.tag.amber{background:var(--amb-d);color:var(--amb);border-color:var(--amb)}
+.tag.red{background:var(--red-d);color:var(--red);border-color:var(--red)}
+.tag.purple{background:var(--pur-d);color:var(--pur);border-color:var(--pur)}
+.tag.cyan{background:var(--cya-d);color:var(--cya);border-color:var(--cya)}
+.tag.pink{background:var(--pnk-d);color:var(--pnk);border-color:var(--pnk)}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-acc{background:var(--acc);color:#fff}
+.btn-acc:hover{background:var(--acc2)}
+.btn-grn{background:var(--grn);color:#052e1a;font-weight:700}
+.btn-grn:hover{background:#4ade80}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{border-color:var(--b3);color:var(--tx)}
+.btn-red{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.btn-amb{background:var(--amb-d);border:1px solid var(--amb);color:var(--amb)}
+.btn-pur{background:var(--pur-d);border:1px solid var(--pur);color:var(--pur)}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:6px}
+.btn-xs{padding:3px 8px;font-size:10px;border-radius:5px}
+
+/* ── QUIZ / QUESTIONS ── */
+.q-block{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:10px;transition:border-color .2s}
+.q-label{font-size:9px;font-family:var(--mono);color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.q-text{font-size:13px;font-weight:500;color:var(--tx);line-height:1.65;margin-bottom:12px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:7px;border:1px solid var(--b1);cursor:pointer;transition:all .15s;background:var(--s3)}
+.opt:hover{border-color:var(--b2);background:var(--s4)}
+.opt.sel{border-color:var(--acc);background:var(--acc-d)}
+.opt.correct{border-color:var(--grn);background:var(--grn-d)}
+.opt.wrong{border-color:var(--red);background:var(--red-d)}
+.opt.missed{border-color:var(--amb);background:var(--amb-d);opacity:.7}
+.opt-ltr{width:22px;height:22px;border-radius:5px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono);font-weight:700;color:var(--tx3);flex-shrink:0}
+.opt.sel .opt-ltr{background:var(--acc);color:#fff}
+.opt.correct .opt-ltr{background:var(--grn);color:#052e1a}
+.opt.wrong .opt-ltr{background:var(--red);color:#fff}
+.opt.missed .opt-ltr{background:var(--amb);color:#3a1a00}
+.opt-txt{font-size:12px;color:var(--tx2);line-height:1.5}
+.opt.sel .opt-txt,.opt.correct .opt-txt,.opt.wrong .opt-txt{color:var(--tx)}
+.rationale{margin-top:10px;padding:10px 12px;background:var(--s3);border-radius:6px;font-size:11px;color:var(--tx2);line-height:1.7;border-left:2px solid var(--grn);display:none}
+.rationale.show{display:block}
+
+/* ── SCORE ── */
+.score-card{text-align:center;padding:28px 20px;background:var(--s2);border-radius:var(--rl);border:1px solid var(--b1);margin-bottom:16px}
+.score-num{font-size:52px;font-weight:700;font-family:var(--mono);line-height:1}
+.score-pct{font-size:13px;color:var(--tx2);margin-top:6px}
+.score-bar-wrap{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin:14px 0}
+.score-bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.score-msg{font-size:12px;color:var(--tx2)}
+
+/* ── NOTES ── */
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.note-section{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden}
+.note-section-header{padding:10px 14px;background:var(--s3);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px}
+.note-section-icon{font-size:13px}
+.note-section-title{font-size:11px;font-weight:600;color:var(--tx2)}
+.note-textarea{width:100%;background:transparent;border:none;padding:12px 14px;color:var(--tx);font-family:var(--sans);font-size:12px;resize:none;outline:none;line-height:1.8;min-height:100px}
+.note-textarea::placeholder{color:var(--tx3)}
+
+/* ── FLASHCARDS ── */
+.flashcard-scene{perspective:1000px;cursor:pointer;margin-bottom:16px}
+.flashcard{width:100%;min-height:200px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:200px}
+.fc-back{transform:rotateY(180deg);background:var(--s3)}
+.fc-label{font-size:9px;font-family:var(--mono);color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.fc-text{font-size:14px;font-weight:500;color:var(--tx);line-height:1.6;max-width:480px}
+.fc-answer{font-size:13px;color:var(--grn);line-height:1.6;max-width:480px}
+.fc-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px}
+.fc-counter{font-family:var(--mono);font-size:11px;color:var(--tx3)}
+.fc-result-btns{display:flex;gap:8px;justify-content:center}
+
+/* ── STUDY GUIDE ── */
+.sg-section{margin-bottom:20px}
+.sg-section h3{font-size:12px;font-weight:700;color:var(--acc2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;font-family:var(--mono)}
+.sg-term{display:flex;gap:10px;padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:6px}
+.sg-term-word{font-weight:600;color:var(--cya);min-width:140px;font-size:12px}
+.sg-term-def{font-size:12px;color:var(--tx2);line-height:1.6}
+.sg-tip{padding:10px 14px;background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);margin-bottom:6px;font-size:12px;color:var(--amb);line-height:1.6;display:flex;gap:8px}
+.sg-concept{padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:6px;font-size:12px;color:var(--tx2);line-height:1.7}
+
+/* ── DISCUSSION ── */
+.disc-prompt{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.disc-prompt-text{padding:14px;font-size:13px;color:var(--tx);line-height:1.65}
+.disc-response{padding:0 14px 12px}
+.disc-response textarea{width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:6px;padding:8px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;resize:none;outline:none;min-height:52px;line-height:1.6;transition:border-color .2s}
+.disc-response textarea:focus{border-color:var(--acc)}
+.disc-response textarea::placeholder{color:var(--tx3)}
+.disc-wall{padding:10px 14px;background:var(--s3);border-top:1px solid var(--b1);display:none}
+.disc-wall.show{display:block}
+.disc-wall-title{font-size:9px;font-family:var(--mono);color:var(--tx3);letter-spacing:.8px;margin-bottom:8px}
+.disc-response-item{padding:6px 10px;background:var(--s2);border-radius:5px;font-size:11px;color:var(--tx2);margin-bottom:4px;border-left:2px solid var(--acc-d)}
+
+/* ── READINESS ── */
+.readiness-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.readiness-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
+.readiness-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.readiness-card.pass::before{background:var(--grn)}
+.readiness-card.warn::before{background:var(--amb)}
+.readiness-card.fail::before{background:var(--red)}
+.rc-code{font-family:var(--mono);font-size:11px;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.rc-score{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.rc-bar{height:3px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.rc-bar-fill{height:100%;border-radius:2px;transition:width .8s ease}
+.rc-stats{font-size:10px;color:var(--tx3);line-height:1.8}
+.rc-topics{margin-top:8px;font-size:10px;color:var(--red);line-height:1.7}
+.rc-remediation{margin-top:8px;padding:8px 10px;background:var(--amb-d);border:1px solid var(--amb);border-radius:5px;font-size:10px;color:var(--amb);line-height:1.6}
+
+/* ── EXAM SIM ── */
+.exam-timer{font-family:var(--mono);font-size:32px;font-weight:700;text-align:center;color:var(--acc2);padding:16px;background:var(--s2);border-radius:var(--r);border:1px solid var(--b1);margin-bottom:16px;letter-spacing:2px}
+.exam-timer.warning{color:var(--amb);border-color:var(--amb);animation:pulse-border 1s ease infinite}
+.exam-timer.danger{color:var(--red);border-color:var(--red)}
+@keyframes pulse-border{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ── MISC ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.divider{height:1px;background:var(--b1);margin:6px 0}
+.loading-bar{display:flex;align-items:center;gap:10px;color:var(--tx3);font-size:12px;padding:16px 0;font-family:var(--mono)}
+.loading-bar::before{content:'';width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:48px 20px;color:var(--tx3)}
+.empty-state .ei{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-state h3{font-size:15px;font-weight:600;color:var(--tx2);margin-bottom:5px}
+.empty-state p{font-size:12px;line-height:1.7;max-width:300px;margin:0 auto}
+input[type=text],input[type=password]{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 14px;color:var(--tx);font-family:var(--sans);font-size:13px;outline:none;width:100%;transition:border-color .2s}
+input[type=text]:focus,input[type=password]:focus{border-color:var(--acc)}
+input::placeholder{color:var(--tx3)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--tx2);padding:4px 0}
+.stat-row span:last-child{font-family:var(--mono);color:var(--tx);font-size:11px}
+.mini-bar{height:3px;background:var(--s3);border-radius:2px;overflow:hidden;margin-top:3px;margin-bottom:8px}
+.mini-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 16px;font-size:12px;color:var(--tx);z-index:1000;transform:translateY(12px);opacity:0;transition:all .25s;max-width:280px;font-family:var(--mono)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.video-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:8px}
+.vi-icon{width:38px;height:26px;background:var(--s3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx3);flex-shrink:0;font-family:var(--mono)}
+.vi-info{flex:1;min-width:0}
+.vi-title{font-size:12px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vi-meta{font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:2px}
+.progress-ring{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:conic-gradient(var(--grn) calc(var(--pct,0) * 1%),var(--s3) 0);position:relative}
+.progress-ring::after{content:'';position:absolute;width:44px;height:44px;border-radius:50%;background:var(--s2)}
+.pr-num{position:relative;z-index:1;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--tx)}
+
+/* Student Login */
+.login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 57px);gap:20px;padding:40px}
+.login-screen h2{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.login-screen p{font-size:13px;color:var(--tx2);text-align:center;max-width:320px;line-height:1.7}
+.login-code-input{width:220px;text-align:center;font-family:var(--mono);font-size:20px;letter-spacing:3px;padding:14px;text-transform:uppercase;border-radius:var(--r);background:var(--s2);border:1px solid var(--b1);color:var(--tx);outline:none;transition:border-color .2s}
+.login-code-input:focus{border-color:var(--acc)}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease forwards}
+
+<link rel="stylesheet" href="platform.css">
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">A+ 220</div>
+  <div>
+    <div class="header-title">CompTIA A+ Classroom</div>
+    <div class="header-sub">220-1202 · 68 days · 147 videos</div>
+  </div>
+  <div class="header-right">
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="setMode('teacher')" id="mTeacher">Teacher</button>
+      <button class="mode-btn" onclick="setMode('student')" id="mStudent">Student</button>
+    </div>
+    <div class="day-pill" id="hDayPill">Day 1</div>
+  </div>
+</header>
+
+<main>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-search">
+    <input class="search-inp" placeholder="Search days or topics…" oninput="filterSidebar(this.value)">
+  </div>
+  <div class="sidebar-list" id="sidebarList"></div>
+</aside>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- TEACHER VIEW -->
+  <div id="tvTeacher">
+    <div class="top-nav" id="teacherNav"></div>
+
+    <!-- 1. OVERVIEW -->
+    <div class="panel active" id="tp-overview">
+      <div class="two-col">
+        <div class="card fade-up">
+          <div class="card-top">
+            <span class="tag cyan" id="ovDayTag">Day 1</span>
+            <h2 id="ovTitle">Loading…</h2>
+          </div>
+          <div class="card-body">
+            <div id="ovVideos"></div>
+            <div class="divider" style="margin:14px 0"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" id="ovMeta"></div>
+            <div style="margin-top:14px;display:flex;gap:8px">
+              <button class="btn btn-grn" onclick="startClass()" style="flex:1">▶ Start Class</button>
+              <button class="btn btn-ghost btn-sm" onclick="markDayComplete()">✓ Mark Done</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card fade-up" style="margin-bottom:12px">
+            <div class="card-top"><h2>Class overview</h2></div>
+            <div class="card-body" id="ovStats"></div>
+          </div>
+          <div class="card fade-up">
+            <div class="card-top"><h2>Student codes</h2>
+              <button class="btn btn-ghost btn-xs" onclick="genCodes()">Auto-generate</button>
+            </div>
+            <div class="card-body" id="ovCodes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. COLD RETRIEVAL -->
+    <div class="panel" id="tp-cold">
+      <div class="card">
+        <div class="card-top">
+          <span class="tag blue">Phase 1</span>
+          <h2>Cold Retrieval · 5 Questions · Not Graded</h2>
+          <span class="tag" id="coldTag">Ready</span>
+          <button class="btn btn-acc btn-sm" onclick="genCold()" id="btnCold">Generate</button>
+        </div>
+        <div class="card-body" id="coldBody">
+          <div class="empty-state"><div class="ei">❄️</div><h3>Ready to generate</h3><p>Questions pulled from student question bank, cleaned to CompTIA A+ format.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SCENARIOS -->
+    <div class="panel" id="tp-scenario">
+      <div class="card">
+        <div class="card-top">
+          <span class="tag purple">Phase 2</span>
+          <h2>Scenario Questions · 2 Scenarios</h2>
+          <button class="btn btn-acc btn-sm" onclick="genScenarios()" id="btnScenario">Generate</button>
+        </div>
+        <div class="card-body" id="scenarioBody">
+          <div class="empty-state"><div class="ei">🎯</div><h3>Ready to generate</h3><p>Scenario questions based on today's video topics.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. DISCUSSION -->
+    <div class="panel" id="tp-discussion">
+      <div class="card">
+        <div class="card-top">
+          <span class="tag amber">Phase 3</span>
+          <h2>Discussion Prompts</h2>
+          <div style="display:flex;gap:6px;margin-left:auto">
+            <button class="btn btn-ghost btn-sm" onclick="showDisc('pre')" id="dbtn-pre">Pre-video</button>
+            <button class="btn btn-ghost btn-sm" onclick="showDisc('during')" id="dbtn-during">During</button>
+            <button class="btn btn-ghost btn-sm" onclick="showDisc('post')" id="dbtn-post">Post-video</button>
+            <button class="btn btn-acc btn-sm" onclick="genDiscussion()">Generate</button>
+          </div>
+        </div>
+        <div class="card-body" id="discBody">
+          <div class="empty-state"><div class="ei">💬</div><h3>Ready to generate</h3><p>Pre, during, and post-video discussion prompts.</p></div>
+        </div>
+        <div id="discWall" style="padding:14px;border-top:1px solid var(--b1);display:none">
+          <div class="disc-wall-title">LIVE STUDENT RESPONSES</div>
+          <div id="discWallContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. VIDEOS -->
+    <div class="panel" id="tp-video">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-top"><span class="tag pink">Phase 4</span><h2>Today's Videos</h2></div>
+          <div class="card-body" id="videoBody"></div>
+        </div>
+        <div class="card">
+          <div class="card-top"><span class="tag amber">During Video</span><h2>Research Prompts</h2></div>
+          <div class="card-body" id="duringBody">
+            <div class="empty-state"><div class="ei">🔍</div><h3>Generate discussion first</h3></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. STUDENT QUESTIONS -->
+    <div class="panel" id="tp-sq">
+      <div class="card">
+        <div class="card-top">
+          <span class="tag green">Phase 5</span>
+          <h2>Student Question Submissions</h2>
+          <span class="tag" id="sqCountTag">0 today</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px">Students submit questions from today's lesson. Each is auto-cleaned to CompTIA A+ format and added to the bank for future cold retrieval.</p>
+          <div id="sqList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. TIMED PRACTICE -->
+    <div class="panel" id="tp-timed">
+      <div class="card">
+        <div class="card-top">
+          <span class="tag red">Phase 6</span>
+          <h2>Timed Practice · Closing 5 · Graded</h2>
+          <span class="tag" id="timedTag">Ready</span>
+          <button class="btn btn-acc btn-sm" onclick="genTimed()" id="btnTimed">Generate from Notes</button>
+        </div>
+        <div class="card-body" id="timedBody">
+          <div class="empty-state"><div class="ei">⏱</div><h3>Ready to generate</h3><p>Questions generated from student notes from today's session.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. STUDY GUIDE -->
+    <div class="panel" id="tp-guide">
+      <div class="card">
+        <div class="card-top">
+          <span class="tag cyan">Study Guide</span>
+          <h2>Chapter Study Guide</h2>
+          <button class="btn btn-acc btn-sm" onclick="genStudyGuide()" id="btnGuide">Generate</button>
+          <button class="btn btn-ghost btn-sm" onclick="printGuide()">Print</button>
+        </div>
+        <div class="card-body" id="guideBody">
+          <div class="empty-state"><div class="ei">📖</div><h3>Ready to generate</h3><p>Auto-generated key terms, concepts, and exam tips for today's chapter.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. READINESS / PROGRESS -->
+    <div class="panel" id="tp-readiness">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-top"><h2>Exam Readiness Dashboard</h2>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">Export CSV</button>
+        </div>
+        <div class="card-body" id="readinessBody">
+          <div class="empty-state"><div class="ei">📊</div><h3>No data yet</h3><p>Readiness scores appear after students complete timed practice.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tvTeacher -->
+
+  <!-- STUDENT VIEW -->
+  <div id="tvStudent" style="display:none">
+    <!-- Login -->
+    <div class="login-screen" id="sLogin">
+      <div style="font-family:var(--mono);font-size:48px;color:var(--acc);letter-spacing:-2px">A+</div>
+      <h2>Enter Your Code</h2>
+      <p>Your teacher gave you a unique code. No names are ever stored — only your code.</p>
+      <input class="login-code-input" id="sCodeInput" placeholder="STU-001" maxlength="8" oninput="this.value=this.value.toUpperCase()">
+      <button class="btn btn-grn" onclick="studentLogin()" style="width:220px;justify-content:center">Enter Classroom</button>
+    </div>
+    <!-- Dashboard -->
+    <div id="sDash" style="display:none">
+      <div class="top-nav" id="studentNav"></div>
+      <!-- s-cold -->
+      <div class="panel active" id="sp-cold">
+        <div class="card">
+          <div class="card-top"><span class="tag blue">Cold Retrieval</span><h2>5 Questions · Practice Only</h2><span class="tag" id="sColdTag">Waiting</span></div>
+          <div class="card-body" id="sColdBody"><div class="empty-state"><div class="ei">⏳</div><h3>Waiting for teacher</h3></div></div>
+        </div>
+      </div>
+      <!-- s-scenario -->
+      <div class="panel" id="sp-scenario">
+        <div class="card">
+          <div class="card-top"><span class="tag purple">Scenarios</span><h2>2 Scenario Questions</h2></div>
+          <div class="card-body" id="sScenBody"><div class="empty-state"><div class="ei">⏳</div><h3>Waiting for teacher</h3></div></div>
+        </div>
+      </div>
+      <!-- s-notes (STRUCTURED) -->
+      <div class="panel" id="sp-notes">
+        <div class="card">
+          <div class="card-top"><span class="tag amber">Notes</span><h2>Guided Notes</h2>
+            <button class="btn btn-acc btn-sm" onclick="saveNotes()">Save</button>
+          </div>
+          <div class="card-body">
+            <p style="font-size:11px;color:var(--tx3);margin-bottom:14px;line-height:1.6;font-family:var(--mono)">Fill in each section while watching. Your notes power the closing questions.</p>
+            <div class="notes-grid">
+              <div class="note-section">
+                <div class="note-section-header"><span class="note-section-icon">🔑</span><span class="note-section-title">Key Terms & Definitions</span></div>
+                <textarea class="note-textarea" id="nTerms" placeholder="Term: definition&#10;Term: definition&#10;…" rows="6"></textarea>
+              </div>
+              <div class="note-section">
+                <div class="note-section-header"><span class="note-section-icon">⚙️</span><span class="note-section-title">How It Works</span></div>
+                <textarea class="note-textarea" id="nHow" placeholder="Explain the main process or concept in your own words…" rows="6"></textarea>
+              </div>
+              <div class="note-section">
+                <div class="note-section-header"><span class="note-section-icon">🌐</span><span class="note-section-title">Real-World Connection</span></div>
+                <textarea class="note-textarea" id="nReal" placeholder="Where would a technician use this? What problem does it solve?" rows="5"></textarea>
+              </div>
+              <div class="note-section">
+                <div class="note-section-header"><span class="note-section-icon">⚠️</span><span class="note-section-title">Common Mistakes / Traps</span></div>
+                <textarea class="note-textarea" id="nTraps" placeholder="What might trip you up on the exam? What are easy mistakes?" rows="5"></textarea>
+              </div>
+            </div>
+            <div class="note-section" style="margin-top:12px">
+              <div class="note-section-header"><span class="note-section-icon">❓</span><span class="note-section-title">My Question (for the bank)</span></div>
+              <textarea class="note-textarea" id="nQuestion" placeholder="Write one question you could ask a classmate about today's content…" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- s-discussion -->
+      <div class="panel" id="sp-discussion">
+        <div class="card">
+          <div class="card-top"><span class="tag amber">Discussion</span><h2>Respond to Prompts</h2></div>
+          <div class="card-body" id="sDiscBody"><div class="empty-state"><div class="ei">💬</div><h3>Waiting for teacher</h3></div></div>
+        </div>
+      </div>
+      <!-- s-sq -->
+      <div class="panel" id="sp-sq">
+        <div class="card">
+          <div class="card-top"><span class="tag green">Submit Question</span><h2>Create a Question</h2></div>
+          <div class="card-body">
+            <p style="font-size:12px;color:var(--tx2);margin-bottom:14px;line-height:1.7">Write a question from today's lesson. It gets cleaned to CompTIA format and may appear on a future cold retrieval!</p>
+            <input type="text" id="sqQ" placeholder="Your question…" style="margin-bottom:8px">
+            <div class="two-col" style="gap:8px;margin-bottom:8px">
+              <input type="text" id="sqA" placeholder="Option A">
+              <input type="text" id="sqB" placeholder="Option B">
+              <input type="text" id="sqC" placeholder="Option C">
+              <input type="text" id="sqD" placeholder="Option D">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <span style="font-size:12px;color:var(--tx3)">Correct:</span>
+              <select id="sqCorrect" style="background:var(--s3);border:1px solid var(--b1);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;outline:none">
+                <option>A</option><option>B</option><option>C</option><option>D</option>
+              </select>
+              <button class="btn btn-grn btn-sm" onclick="submitSQ()" style="margin-left:auto">Submit Question</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- s-timed -->
+      <div class="panel" id="sp-timed">
+        <div class="card">
+          <div class="card-top"><span class="tag red">Timed Practice</span><h2>Closing 5 · Graded</h2><span class="tag" id="sTimedTag">Waiting</span></div>
+          <div class="card-body" id="sTimedBody"><div class="empty-state"><div class="ei">⏳</div><h3>Waiting for teacher</h3></div></div>
+        </div>
+      </div>
+      <!-- s-flashcards -->
+      <div class="panel" id="sp-flash">
+        <div class="card">
+          <div class="card-top"><span class="tag cyan">Flashcards</span><h2>Question Bank Drill</h2>
+            <select id="flashFilter" onchange="initFlash()" style="background:var(--s3);border:1px solid var(--b1);border-radius:6px;padding:5px 10px;color:var(--tx);font-size:11px;outline:none">
+              <option value="all">All questions</option>
+              <option value="missed">Missed only</option>
+            </select>
+          </div>
+          <div class="card-body" id="flashBody">
+            <div class="empty-state"><div class="ei">🃏</div><h3>No questions yet</h3><p>Questions appear here as students submit them throughout the course.</p></div>
+          </div>
+        </div>
+      </div>
+      <!-- s-exam -->
+      <div class="panel" id="sp-exam">
+        <div class="card">
+          <div class="card-top"><span class="tag red">Exam Sim</span><h2>Practice Exam · 10 Questions · 20 min</h2></div>
+          <div class="card-body" id="examBody">
+            <div class="empty-state">
+              <div class="ei">🎓</div>
+              <h3>Ready for a practice exam?</h3>
+              <p>10 random questions from across all chapters. Timed. Scored like the real thing.</p>
+              <button class="btn btn-grn" onclick="startExam()" style="margin-top:16px">Start Practice Exam</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- s-guide -->
+      <div class="panel" id="sp-guide">
+        <div class="card">
+          <div class="card-top"><span class="tag cyan">Study Guide</span><h2>My Study Guide</h2></div>
+          <div class="card-body" id="sGuideBody">
+            <div class="empty-state"><div class="ei">📖</div><h3>No guide yet</h3><p>Your teacher will generate the study guide for today's chapter.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tvStudent -->
+
+</div><!-- /content -->
+</main>
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+// ════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════
+const DAYS = [{"day":1,"videos":[{"num":7,"title":"Professional Communication, Part I","min":8,"section":"Chapter 1: Safety and Professionalism","minutes_today":8},{"num":8,"title":"Professional Communication, Part II","min":7,"section":"Chapter 1: Safety and Professionalism","minutes_today":6}],"total_min":14},{"day":2,"videos":[{"num":8,"title":"Professional Communication, Part II","min":7,"section":"Chapter 1: Safety and Professionalism","minutes_today":1},{"num":9,"title":"Dealing with Difficult Customers","min":6,"section":"Chapter 1: Safety and Professionalism","minutes_today":6},{"num":10,"title":"Physical Safety","min":3,"section":"Chapter 1: Safety and Professionalism","minutes_today":3},{"num":11,"title":"Common Safety Procedures","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":4}],"total_min":14},{"day":3,"videos":[{"num":11,"title":"Common Safety Procedures","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":2},{"num":12,"title":"What's an Operating System?","min":8,"section":"Chapter 2: Introduction to Computers","minutes_today":8},{"num":13,"title":"Users and Super Users","min":5,"section":"Chapter 2: Introduction to Computers","minutes_today":4}],"total_min":14},{"day":4,"videos":[{"num":13,"title":"Users and Super Users","min":5,"section":"Chapter 2: Introduction to Computers","minutes_today":1},{"num":14,"title":"Why Windows?","min":7,"section":"Chapter 2: Introduction to Computers","minutes_today":7},{"num":15,"title":"Touring Windows 10 and 11","min":9,"section":"Chapter 2: Introduction to Computers","minutes_today":6}],"total_min":14},{"day":5,"videos":[{"num":15,"title":"Touring Windows 10 and 11","min":9,"section":"Chapter 2: Introduction to Computers","minutes_today":3},{"num":16,"title":"Touring the macOS, Part I","min":10,"section":"Chapter 2: Introduction to Computers","minutes_today":10},{"num":17,"title":"Touring the macOS, Part II","min":7,"section":"Chapter 2: Introduction to Computers","minutes_today":1}],"total_min":14},{"day":6,"videos":[{"num":17,"title":"Touring the macOS, Part II","min":7,"section":"Chapter 2: Introduction to Computers","minutes_today":6},{"num":18,"title":"Touring the macOS, Part III","min":3,"section":"Chapter 2: Introduction to Computers","minutes_today":3},{"num":19,"title":"Touring Linux","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":5}],"total_min":14},{"day":7,"videos":[{"num":19,"title":"Touring Linux","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":1},{"num":20,"title":"Power Protection","min":8,"section":"Chapter 7: Power Supplies","minutes_today":8},{"num":21,"title":"Cooling Your System","min":8,"section":"Chapter 7: Power Supplies","minutes_today":5}],"total_min":14},{"day":8,"videos":[{"num":21,"title":"Cooling Your System","min":8,"section":"Chapter 7: Power Supplies","minutes_today":3},{"num":22,"title":"Boot Order","min":7,"section":"Chapter 8: Mass Storage Technologies","minutes_today":7},{"num":23,"title":"Understanding Partitioning","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":4}],"total_min":14},{"day":9,"videos":[{"num":23,"title":"Understanding Partitioning","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":3},{"num":24,"title":"MBR Partitioning","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6},{"num":25,"title":"GPT Partitioning","min":5,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5}],"total_min":14},{"day":10,"videos":[{"num":26,"title":"Understanding File Systems","min":8,"section":"Chapter 9: Implementing Mass Storage","minutes_today":8},{"num":27,"title":"Popular File Systems","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6}],"total_min":14},{"day":11,"videos":[{"num":27,"title":"Popular File Systems","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":1},{"num":28,"title":"Formatting in Action","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6},{"num":29,"title":"Dynamic Disks","min":5,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5},{"num":30,"title":"New Installation - First Drive","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":2}],"total_min":14},{"day":12,"videos":[{"num":30,"title":"New Installation - First Drive","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5},{"num":31,"title":"Hardware RAID","min":8,"section":"Chapter 9: Implementing Mass Storage","minutes_today":8},{"num":32,"title":"Software RAID in Storage Spaces","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":1}],"total_min":14},{"day":13,"videos":[{"num":32,"title":"Software RAID in Storage Spaces","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6},{"num":33,"title":"Encrypting Mass Storage","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":7},{"num":34,"title":"Maintaining Storage Disks","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":1}],"total_min":14},{"day":14,"videos":[{"num":34,"title":"Maintaining Storage Disks","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5},{"num":35,"title":"Understanding USB","min":8,"section":"Chapter 10: Essential Peripherals","minutes_today":8},{"num":36,"title":"Webcams and Videoconferencing","min":6,"section":"Chapter 10: Essential Peripherals","minutes_today":1}],"total_min":14},{"day":15,"videos":[{"num":36,"title":"Webcams and Videoconferencing","min":6,"section":"Chapter 10: Essential Peripherals","minutes_today":5},{"num":37,"title":"Windows 11 Editions and Features","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":6},{"num":38,"title":"Boot from Everything","min":5,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":3}],"total_min":14},{"day":16,"videos":[{"num":38,"title":"Boot from Everything","min":5,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":2},{"num":39,"title":"Installing and Upgrading Windows","min":7,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":7},{"num":40,"title":"Post-installation Tasks","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":5}],"total_min":14},{"day":17,"videos":[{"num":40,"title":"Post-installation Tasks","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":1},{"num":41,"title":"Linux Features and Tools","min":8,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":8},{"num":42,"title":"Installing and Upgrading Linux","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":5}],"total_min":14},{"day":18,"videos":[{"num":42,"title":"Installing and Upgrading Linux","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":1},{"num":43,"title":"Upgrading macOS","min":5,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":5},{"num":44,"title":"The Task Manager","min":8,"section":"Chapter 12: Working with Operating Systems","minutes_today":8}],"total_min":14},{"day":19,"videos":[{"num":45,"title":"Windows Settings","min":6,"section":"Chapter 12: Working with Operating Systems","minutes_today":6},{"num":46,"title":"MMC and Additional Tools","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":7},{"num":47,"title":"What is the Registry?","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":1}],"total_min":14},{"day":20,"videos":[{"num":47,"title":"What is the Registry?","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":6},{"num":48,"title":"macOS Core Tools","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":7},{"num":50,"title":"Introduction to Users and Groups","min":8,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":1}],"total_min":14},{"day":21,"videos":[{"num":50,"title":"Introduction to Users and Groups","min":8,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":7},{"num":51,"title":"Managing Users and Groups","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":6},{"num":52,"title":"NTFS Permissions","min":7,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":1}],"total_min":14},{"day":22,"videos":[{"num":52,"title":"NTFS Permissions","min":7,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":6},{"num":53,"title":"Linux and macOS Permissions","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":6},{"num":54,"title":"File Explorer","min":5,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":2}],"total_min":14},{"day":23,"videos":[{"num":54,"title":"File Explorer","min":5,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":3},{"num":55,"title":"Sharing Resources","min":7,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":7},{"num":56,"title":"Security Policies","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":4}],"total_min":14},{"day":24,"videos":[{"num":56,"title":"Security Policies","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":2},{"num":57,"title":"Maintaining Windows","min":5,"section":"Chapter 14: Maintaining OS","minutes_today":5},{"num":58,"title":"Maintaining macOS","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":7}],"total_min":14},{"day":25,"videos":[{"num":59,"title":"Maintaining Linux","min":6,"section":"Chapter 14: Maintaining OS","minutes_today":6},{"num":60,"title":"Working with Applications","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":7},{"num":61,"title":"Backing Up Your Data in Windows","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":1}],"total_min":14},{"day":26,"videos":[{"num":61,"title":"Backing Up Your Data in Windows","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":6},{"num":62,"title":"Backing Up in Linux and macOS","min":6,"section":"Chapter 14: Maintaining OS","minutes_today":6},{"num":63,"title":"Understanding the CLI","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":2}],"total_min":14},{"day":27,"videos":[{"num":63,"title":"Understanding the CLI","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":6},{"num":64,"title":"Navigating the CLI","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":65,"title":"Working with Folders","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":3}],"total_min":14},{"day":28,"videos":[{"num":65,"title":"Working with Folders","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":66,"title":"Working with Files","min":6,"section":"Chapter 15: Command-Line Interface","minutes_today":6},{"num":67,"title":"Working with Drives","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":3}],"total_min":14},{"day":29,"videos":[{"num":67,"title":"Working with Drives","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":2},{"num":68,"title":"Super Copy Commands","min":7,"section":"Chapter 15: Command-Line Interface","minutes_today":7},{"num":69,"title":"Command-Line Permissions","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":5}],"total_min":14},{"day":30,"videos":[{"num":69,"title":"Command-Line Permissions","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":3},{"num":70,"title":"Advanced Windows Commands","min":7,"section":"Chapter 15: Command-Line Interface","minutes_today":7},{"num":71,"title":"Advanced Linux Commands, Part I","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":4}],"total_min":14},{"day":31,"videos":[{"num":71,"title":"Advanced Linux Commands, Part I","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":1},{"num":72,"title":"Advanced Linux Commands, Part II","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":73,"title":"Introduction to Scripting","min":7,"section":"Chapter 15: Command-Line Interface","minutes_today":7},{"num":74,"title":"Interpreted Languages","min":6,"section":"Chapter 15: Command-Line Interface","minutes_today":1}],"total_min":14},{"day":32,"videos":[{"num":74,"title":"Interpreted Languages","min":6,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":75,"title":"Scripting and the Terminal","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":76,"title":"Windows Recovery Environment","min":5,"section":"Chapter 16: Troubleshooting","minutes_today":4}],"total_min":14},{"day":33,"videos":[{"num":76,"title":"Windows Recovery Environment","min":5,"section":"Chapter 16: Troubleshooting","minutes_today":1},{"num":77,"title":"Advanced Windows Startup Options","min":8,"section":"Chapter 16: Troubleshooting","minutes_today":8},{"num":78,"title":"Troubleshooting Boot Problems","min":8,"section":"Chapter 16: Troubleshooting","minutes_today":5}],"total_min":14},{"day":34,"videos":[{"num":78,"title":"Troubleshooting Boot Problems","min":8,"section":"Chapter 16: Troubleshooting","minutes_today":3},{"num":79,"title":"Troubleshooting at the GUI","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":6},{"num":80,"title":"Troubleshooting Applications","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":5}],"total_min":14},{"day":35,"videos":[{"num":80,"title":"Troubleshooting Applications","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":1},{"num":81,"title":"Kernel Panic","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":6},{"num":82,"title":"Graphics Cards and Connections","min":8,"section":"Chapter 17: Display Technologies","minutes_today":7}],"total_min":14},{"day":36,"videos":[{"num":82,"title":"Graphics Cards and Connections","min":8,"section":"Chapter 17: Display Technologies","minutes_today":1},{"num":83,"title":"Multiple Monitors","min":5,"section":"Chapter 17: Display Technologies","minutes_today":5},{"num":84,"title":"Introduction to Networking","min":7,"section":"Chapter 18: Essentials of Networking","minutes_today":7},{"num":85,"title":"Hexadecimal","min":6,"section":"Chapter 18: Essentials of Networking","minutes_today":1}],"total_min":14},{"day":37,"videos":[{"num":85,"title":"Hexadecimal","min":6,"section":"Chapter 18: Essentials of Networking","minutes_today":5},{"num":86,"title":"Introduction to TCP/IP","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":6},{"num":87,"title":"Network IDs and Subnet Masks","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":3}],"total_min":14},{"day":38,"videos":[{"num":87,"title":"Network IDs and Subnet Masks","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":3},{"num":88,"title":"Special IP Addresses","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":7},{"num":89,"title":"Network Address Translation (NAT)","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":4}],"total_min":14},{"day":39,"videos":[{"num":89,"title":"Network Address Translation (NAT)","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":3},{"num":90,"title":"Dynamic IP Addressing","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":7},{"num":91,"title":"Working with Connections","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":4}],"total_min":14},{"day":40,"videos":[{"num":91,"title":"Working with Connections","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":2},{"num":92,"title":"Working with DNS","min":7,"section":"Chapter 20: OS Networking","minutes_today":7},{"num":93,"title":"Windows Naming","min":5,"section":"Chapter 20: OS Networking","minutes_today":5}],"total_min":14},{"day":41,"videos":[{"num":94,"title":"Working with Workgroups","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":95,"title":"Working with Active Directory","min":7,"section":"Chapter 20: OS Networking","minutes_today":7},{"num":96,"title":"Windows Sharing with macOS and Linux","min":6,"section":"Chapter 20: OS Networking","minutes_today":1}],"total_min":14},{"day":42,"videos":[{"num":96,"title":"Windows Sharing with macOS and Linux","min":6,"section":"Chapter 20: OS Networking","minutes_today":5},{"num":97,"title":"The net Command","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":98,"title":"Routers","min":6,"section":"Chapter 20: OS Networking","minutes_today":3}],"total_min":14},{"day":43,"videos":[{"num":98,"title":"Routers","min":6,"section":"Chapter 20: OS Networking","minutes_today":3},{"num":99,"title":"Basic Router Configuration","min":5,"section":"Chapter 20: OS Networking","minutes_today":5},{"num":100,"title":"Firewall Configuration","min":6,"section":"Chapter 20: OS Networking","minutes_today":6}],"total_min":14},{"day":44,"videos":[{"num":101,"title":"Windows Firewall","min":5,"section":"Chapter 20: OS Networking","minutes_today":5},{"num":102,"title":"Port Forwarding","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":103,"title":"Advanced Router Configuration","min":6,"section":"Chapter 20: OS Networking","minutes_today":3}],"total_min":14},{"day":45,"videos":[{"num":103,"title":"Advanced Router Configuration","min":6,"section":"Chapter 20: OS Networking","minutes_today":3},{"num":104,"title":"Virtual LANs (VLANs)","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":105,"title":"Wireless Network Hardware","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":5}],"total_min":14},{"day":46,"videos":[{"num":105,"title":"Wireless Network Hardware","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":2},{"num":106,"title":"Basic WAP Setup","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6},{"num":107,"title":"Wireless Encryption","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6}],"total_min":14},{"day":47,"videos":[{"num":108,"title":"Connecting to a Wi-Fi Network","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6},{"num":109,"title":"Enterprise Wireless","min":5,"section":"Chapter 21: Wireless Networking","minutes_today":5},{"num":110,"title":"Beyond Wi-Fi","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":3}],"total_min":14},{"day":48,"videos":[{"num":110,"title":"Beyond Wi-Fi","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":4},{"num":111,"title":"Troubleshooting Wireless Connections","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6},{"num":112,"title":"Telnet and SSH","min":6,"section":"Chapter 22: Internet and SOHO","minutes_today":4}],"total_min":14},{"day":49,"videos":[{"num":112,"title":"Telnet and SSH","min":6,"section":"Chapter 22: Internet and SOHO","minutes_today":2},{"num":113,"title":"Remote Desktop Connections","min":6,"section":"Chapter 22: Internet and SOHO","minutes_today":6},{"num":114,"title":"The World Wide Web","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":6}],"total_min":14},{"day":50,"videos":[{"num":114,"title":"The World Wide Web","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":1},{"num":115,"title":"File Transfer Protocol (FTP)","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":7},{"num":116,"title":"Proxy Servers","min":8,"section":"Chapter 22: Internet and SOHO","minutes_today":6}],"total_min":14},{"day":51,"videos":[{"num":116,"title":"Proxy Servers","min":8,"section":"Chapter 22: Internet and SOHO","minutes_today":2},{"num":117,"title":"Virtual Private Networks (VPN)","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":7},{"num":118,"title":"Internet of Things (IoT)","min":5,"section":"Chapter 22: Internet and SOHO","minutes_today":5}],"total_min":14},{"day":52,"videos":[{"num":119,"title":"Troubleshooting Internet Connections","min":8,"section":"Chapter 22: Internet and SOHO","minutes_today":8},{"num":120,"title":"Browser Security","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":6}],"total_min":14},{"day":53,"videos":[{"num":120,"title":"Browser Security","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":1},{"num":121,"title":"Application Integration","min":5,"section":"Chapter 23: Virtualization and Cloud","minutes_today":5},{"num":122,"title":"AI Policies and Procedures","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":6},{"num":123,"title":"Limitations","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":2}],"total_min":14},{"day":54,"videos":[{"num":123,"title":"Limitations","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":4},{"num":124,"title":"Private vs. Public","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":6},{"num":125,"title":"Laptop Features","min":6,"section":"Chapter 24: Portable Computing","minutes_today":4}],"total_min":14},{"day":55,"videos":[{"num":125,"title":"Laptop Features","min":6,"section":"Chapter 24: Portable Computing","minutes_today":2},{"num":126,"title":"Laptop Hardware Troubleshooting","min":6,"section":"Chapter 24: Portable Computing","minutes_today":6},{"num":127,"title":"Power Management","min":6,"section":"Chapter 24: Portable Computing","minutes_today":6}],"total_min":14},{"day":56,"videos":[{"num":128,"title":"Touring Android","min":7,"section":"Chapter 25: Mobile Devices","minutes_today":7},{"num":129,"title":"Touring iOS","min":7,"section":"Chapter 25: Mobile Devices","minutes_today":7}],"total_min":14},{"day":57,"videos":[{"num":130,"title":"Maintaining Mobile Devices","min":5,"section":"Chapter 26: Securing Mobile Devices","minutes_today":5},{"num":131,"title":"Mobile Devices and E-mail","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":6},{"num":132,"title":"Mobile Synchronization","min":7,"section":"Chapter 26: Securing Mobile Devices","minutes_today":3}],"total_min":14},{"day":58,"videos":[{"num":132,"title":"Mobile Synchronization","min":7,"section":"Chapter 26: Securing Mobile Devices","minutes_today":4},{"num":133,"title":"Mobile Device Security","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":6},{"num":134,"title":"Mobile Security Troubleshooting","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":4}],"total_min":14},{"day":59,"videos":[{"num":134,"title":"Mobile Security Troubleshooting","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":2},{"num":135,"title":"Installing a Local Printer","min":8,"section":"Chapter 27: Printers","minutes_today":8},{"num":136,"title":"Sharing Printers","min":6,"section":"Chapter 27: Printers","minutes_today":4}],"total_min":14},{"day":60,"videos":[{"num":136,"title":"Sharing Printers","min":6,"section":"Chapter 27: Printers","minutes_today":2},{"num":137,"title":"Threats","min":7,"section":"Chapter 28: Essential Security","minutes_today":7},{"num":138,"title":"Dealing with Threats","min":7,"section":"Chapter 28: Essential Security","minutes_today":5}],"total_min":14},{"day":61,"videos":[{"num":138,"title":"Dealing with Threats","min":7,"section":"Chapter 28: Essential Security","minutes_today":2},{"num":139,"title":"Physical Security","min":6,"section":"Chapter 28: Essential Security","minutes_today":6},{"num":140,"title":"Passwords and Authentication","min":7,"section":"Chapter 28: Essential Security","minutes_today":6}],"total_min":14},{"day":62,"videos":[{"num":141,"title":"Multifactor Authentication (MFA)","min":6,"section":"Chapter 28: Essential Security","minutes_today":6},{"num":142,"title":"Malware, Part I","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":7},{"num":143,"title":"Malware, Part II","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":1}],"total_min":14},{"day":63,"videos":[{"num":143,"title":"Malware, Part II","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":6},{"num":144,"title":"Anti-Malware","min":5,"section":"Chapter 29: Securing Endpoints","minutes_today":5},{"num":145,"title":"Social Engineering","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":3}],"total_min":14},{"day":64,"videos":[{"num":145,"title":"Social Engineering","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":4},{"num":146,"title":"Licensing","min":8,"section":"Chapter 29: Securing Endpoints","minutes_today":8},{"num":147,"title":"Incident Response","min":8,"section":"Chapter 29: Securing Endpoints","minutes_today":2}],"total_min":14},{"day":65,"videos":[{"num":147,"title":"Incident Response","min":8,"section":"Chapter 29: Securing Endpoints","minutes_today":6},{"num":148,"title":"Environmental Controls","min":6,"section":"Chapter 29: Securing Endpoints","minutes_today":6},{"num":149,"title":"Documents You Need to Know","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":2}],"total_min":14},{"day":66,"videos":[{"num":149,"title":"Documents You Need to Know","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":3},{"num":150,"title":"Data You Need to Know","min":6,"section":"Chapter 30: Operational Procedures","minutes_today":6},{"num":151,"title":"Change Management","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":5}],"total_min":14},{"day":67,"videos":[{"num":152,"title":"The Zen of Backup","min":8,"section":"Chapter 30: Operational Procedures","minutes_today":8},{"num":153,"title":"Recycling and Data Destruction","min":7,"section":"Chapter 30: Operational Procedures","minutes_today":6}],"total_min":14},{"day":68,"videos":[{"num":153,"title":"Recycling and Data Destruction","min":7,"section":"Chapter 30: Operational Procedures","minutes_today":1},{"num":154,"title":"Ticketing Systems","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":5}],"total_min":6}];
+
+const T_PHASES=[{id:'overview',label:'📋 Overview'},{id:'cold',label:'❄️ Cold Retrieval'},{id:'scenario',label:'🎯 Scenarios'},{id:'discussion',label:'💬 Discussion'},{id:'video',label:'📹 Videos'},{id:'sq',label:'✍️ Submissions'},{id:'timed',label:'⏱ Timed Practice'},{id:'guide',label:'📖 Study Guide'},{id:'readiness',label:'📊 Readiness'}];
+const S_PHASES=[{id:'cold',label:'❄️ Cold Retrieval'},{id:'scenario',label:'🎯 Scenarios'},{id:'notes',label:'📝 Notes'},{id:'discussion',label:'💬 Discussion'},{id:'sq',label:'✍️ Submit Q'},{id:'timed',label:'⏱ Timed Practice'},{id:'flash',label:'🃏 Flashcards'},{id:'exam',label:'🎓 Practice Exam'},{id:'guide',label:'📖 Study Guide'}];
+
+// ── STATE ──
+const ST = {
+  day:1, mode:'teacher', code:null,
+  students: ls('st_codes',["STU-001","STU-002","STU-003","STU-004","STU-005"]),
+  dd: ls('st_dd',{}),
+  bank: ls('st_bank',[]),
+  ans: ls('st_ans',{}),
+  notes: ls('st_notes',{}),
+  gc: {},
+  disc: null,
+  examState: null,
+  fcIdx:0, fcDeck:[], fcMissed:new Set(),
+  examTimer:null,
+};
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function sv(){['st_codes','st_dd','st_bank','st_ans','st_notes'].forEach(k=>localStorage.setItem(k,JSON.stringify(ST[k==='st_codes'?'students':k==='st_dd'?'dd':k==='st_bank'?'bank':k==='st_ans'?'ans':'notes'])))}
+// fix sv
+function saveAll(){
+  localStorage.setItem('st_codes',JSON.stringify(ST.students));
+  localStorage.setItem('st_dd',JSON.stringify(ST.dd));
+  localStorage.setItem('st_bank',JSON.stringify(ST.bank));
+  localStorage.setItem('st_ans',JSON.stringify(ST.ans));
+  localStorage.setItem('st_notes',JSON.stringify(ST.notes));
+}
+
+// ── API ──
+async function ai(prompt,sys='You are a CompTIA A+ 220-1202 instructor. Return only valid JSON, no markdown, no preamble.'){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2500,system:sys,messages:[{role:'user',content:prompt}]})});
+  const d=await r.json();
+  const t=d.content?.map(c=>c.text||'').join('')||'';
+  return t.replace(/```json\n?|\n?```/g,'').trim();
+}
+
+// ── INIT ──
+function init(){buildSidebar();buildNavs();loadDay(1)}
+
+// ── SIDEBAR ──
+function buildSidebar(){
+  const el=document.getElementById('sidebarList');
+  const groups={};
+  DAYS.forEach(d=>{
+    const s=d.videos[0]?.section||'Other';
+    if(!groups[s])groups[s]=[];
+    groups[s].push(d);
+  });
+  el.innerHTML=Object.entries(groups).map(([sec,days])=>`
+    <div class="ch-group">
+      <div class="ch-header" onclick="this.closest('.ch-group').classList.toggle('collapsed')">
+        <span class="ch-label">${sec.replace('Chapter ','Ch.')}</span>
+        <span class="ch-arrow">▾</span>
+      </div>
+      <div class="ch-days">
+        ${days.map(d=>`
+          <div class="day-row ${ST.day===d.day?'active':''} ${ST.dd[d.day]?.done?'done':''}" 
+               onclick="loadDay(${d.day})" id="dr-${d.day}">
+            <span class="dr-num">D${d.day}</span>
+            <span class="dr-title">${d.videos[0]?.title}</span>
+            <span class="dr-dot ${ST.dd[d.day]?.done?'done':ST.dd[d.day]?.started?'partial':''}"></span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function filterSidebar(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.day-row').forEach(el=>{
+    el.style.display=(!q||el.querySelector('.dr-title').textContent.toLowerCase().includes(q)||el.querySelector('.dr-num').textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+
+// ── NAVS ──
+function buildNavs(){
+  document.getElementById('teacherNav').innerHTML=T_PHASES.map(p=>
+    `<button class="nav-btn ${p.id==='overview'?'active':''}" onclick="tPhase('${p.id}')" id="tnb-${p.id}">${p.label}</button>`).join('');
+  document.getElementById('studentNav').innerHTML=S_PHASES.map(p=>
+    `<button class="nav-btn ${p.id==='cold'?'active':''}" onclick="sPhase('${p.id}')" id="snb-${p.id}">${p.label}</button>`).join('');
+}
+
+function tPhase(id){
+  document.querySelectorAll('#teacherNav .nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tnb-'+id)?.classList.add('active');
+  document.querySelectorAll('#tvTeacher .panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tp-'+id)?.classList.add('active');
+  if(id==='readiness')renderReadiness();
+  if(id==='sq')renderSQList();
+}
+
+function sPhase(id){
+  document.querySelectorAll('#studentNav .nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('snb-'+id)?.classList.add('active');
+  document.querySelectorAll('#sDash .panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('sp-'+id)?.classList.add('active');
+  if(id==='flash')initFlash();
+  if(id==='guide'){const gc=ST.gc[ST.day];if(gc?.guide)renderGuide(gc.guide,true);}
+}
+
+// ── LOAD DAY ──
+function loadDay(n){
+  ST.day=n;
+  const day=DAYS[n-1];
+  document.getElementById('hDayPill').textContent=`Day ${n}`;
+  document.getElementById('ovDayTag').textContent=`Day ${n}`;
+  document.getElementById('ovTitle').textContent=day.videos.map(v=>v.title).join(' · ');
+  document.getElementById('ovVideos').innerHTML=day.videos.map(v=>`
+    <div class="video-item">
+      <div class="vi-icon">#${v.num}</div>
+      <div class="vi-info">
+        <div class="vi-title">${v.title}</div>
+        <div class="vi-meta">${v.section} · ${v.minutes_today}min today</div>
+      </div>
+      <a href="https://www.udemy.com/course/total-comptia-a-certification/learn/" target="_blank" class="btn btn-ghost btn-xs" style="text-decoration:none">▶ Udemy</a>
+    </div>`).join('');
+  document.getElementById('ovMeta').innerHTML=`
+    <span class="tag cyan">⏱ ${day.total_min} min</span>
+    <span class="tag">${day.videos.length} video${day.videos.length>1?'s':''}</span>
+    <span class="tag blue">${day.videos[0]?.section}</span>
+    ${ST.dd[n]?.done?'<span class="tag green">✓ Completed</span>':''}`;
+  document.getElementById('videoBody').innerHTML=day.videos.map(v=>`
+    <div class="video-item">
+      <div class="vi-icon">#${v.num}</div>
+      <div class="vi-info">
+        <div class="vi-title">${v.title}</div>
+        <div class="vi-meta">${v.minutes_today}min · ${v.section}</div>
+      </div>
+      <a href="https://www.udemy.com/course/total-comptia-a-certification/learn/" target="_blank" class="btn btn-acc btn-xs" style="text-decoration:none" onclick="markWatched(${n})">▶ Watch</a>
+    </div>`).join('');
+  document.querySelectorAll('.day-row').forEach(el=>el.classList.remove('active'));
+  document.getElementById('dr-'+n)?.classList.add('active');
+  document.getElementById('dr-'+n)?.scrollIntoView({block:'nearest',behavior:'smooth'});
+  renderOvStats();
+  renderOvCodes();
+  loadGC();
+}
+
+function markWatched(n){
+  ST.dd[n]=ST.dd[n]||{};ST.dd[n].started=true;saveAll();
+  document.getElementById('dr-'+n)?.querySelector('.dr-dot')?.classList.add('partial');
+}
+
+function markDayComplete(){
+  ST.dd[ST.day]=ST.dd[ST.day]||{};ST.dd[ST.day].done=true;saveAll();
+  document.getElementById('dr-'+ST.day)?.querySelector('.dr-dot')?.classList.remove('partial');
+  document.getElementById('dr-'+ST.day)?.querySelector('.dr-dot')?.classList.add('done');
+  document.getElementById('dr-'+ST.day)?.classList.add('done');
+  toast('Day marked complete ✓','ok');
+  renderOvStats();
+}
+
+function loadGC(){
+  const gc=ST.gc[ST.day]||{};
+  if(gc.cold)renderCold(gc.cold);
+  if(gc.scenarios)renderScenarios(gc.scenarios);
+  if(gc.disc){ST.disc=gc.disc;showDisc('pre');}
+  if(gc.timed)renderTimed(gc.timed);
+  if(gc.guide)renderGuide(gc.guide);
+  renderSQList();
+  document.getElementById('duringBody').innerHTML=gc.disc?.during?.map((p,i)=>`
+    <div class="disc-prompt"><div class="disc-prompt-text"><strong>${i+1}.</strong> ${p}</div></div>`).join('')||
+    '<div class="empty-state"><div class="ei">🔍</div><h3>Generate discussion first</h3></div>';
+}
+
+// ── OVERVIEW STATS ──
+function renderOvStats(){
+  const done=Object.values(ST.dd).filter(d=>d.done).length;
+  const total=DAYS.length;
+  const pct=Math.round(done/total*100);
+  document.getElementById('ovStats').innerHTML=`
+    <div class="stat-row"><span>Course progress</span><span>${done}/${total} days</span></div>
+    <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:var(--grn)"></div></div>
+    <div class="stat-row"><span>Question bank</span><span>${ST.bank.length} questions</span></div>
+    <div class="stat-row" style="margin-top:6px"><span>Current day</span><span>Day ${ST.day}</span></div>
+    <div class="stat-row"><span>Students</span><span>${ST.students.length}</span></div>
+    <div class="stat-row"><span>Today's videos</span><span>${DAYS[ST.day-1]?.total_min}min</span></div>`;
+}
+
+function renderOvCodes(){
+  document.getElementById('ovCodes').innerHTML=`
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+      ${ST.students.map(c=>`<span class="tag blue">${c}</span>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-xs" onclick="addCode()">+ Add</button>
+      <button class="btn btn-ghost btn-xs" onclick="genCodes()">Auto 20</button>
+    </div>`;
+}
+
+function addCode(){const c=prompt('Student code:');if(c?.trim()){ST.students.push(c.trim().toUpperCase());saveAll();renderOvCodes();}}
+function genCodes(){ST.students=Array.from({length:20},(_,i)=>`STU-${String(i+1).padStart(3,'0')}`);saveAll();renderOvCodes();toast('20 codes generated','ok');}
+
+// ── START CLASS ──
+function startClass(){tPhase('cold');if(!ST.gc[ST.day]?.cold)genCold();}
+
+// ── GENERATE: COLD ──
+async function genCold(){
+  const btn=document.getElementById('btnCold');
+  btn.disabled=true;btn.textContent='Generating…';
+  document.getElementById('coldBody').innerHTML='<div class="loading-bar">Pulling from question bank · formatting to CompTIA A+ style…</div>';
+  const topics=DAYS[ST.day-1].videos.map(v=>v.title).join(', ');
+  const bankSample=ST.bank.slice(-15).map(q=>q.cleaned||q.raw).filter(Boolean).slice(0,8).join('\n');
+  try{
+    const j=await ai(`Generate 5 CompTIA A+ 220-1202 cold retrieval MC questions for Day ${ST.day}.
+Topics: ${topics}
+${bankSample?`Draw from these student questions and reformat:\n${bankSample}`:'Generate from topics above.'}
+Return JSON array of 5: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."}]
+Rules: qualifier words, plausible distractors, no obvious answers.`);
+    const qs=JSON.parse(j);
+    ST.gc[ST.day]=ST.gc[ST.day]||{};ST.gc[ST.day].cold=qs;
+    renderCold(qs);
+    document.getElementById('coldTag').textContent='5 ready';
+    toast('Cold retrieval generated','ok');
+  }catch(e){document.getElementById('coldBody').innerHTML=`<div style="color:var(--red);font-size:12px">Failed: ${e.message}</div>`;}
+  btn.disabled=false;btn.textContent='Regenerate';
+}
+
+function renderCold(qs,isS=false,code=null){
+  const el=document.getElementById(isS?'sColdBody':'coldBody');
+  const key=`cold_${ST.day}_${isS?code:'t'}`;
+  const saved=ST.ans[key]||{};
+  const done=Object.keys(saved).length===5;
+  let html='';
+  if(isS&&!done)html+='<p style="font-size:11px;color:var(--tx2);margin-bottom:14px;line-height:1.7;font-family:var(--mono)">Practice only — not graded. Answer honestly to track your own progress.</p>';
+  if(isS&&done){
+    const sc=Object.entries(saved).filter(([i,a])=>a===qs[+i]?.answer).length;
+    html+=scoreCard(sc,5,false,'Cold retrieval complete');
+  }
+  qs.forEach((q,i)=>{
+    const sel=saved[i];const rev=done||!isS;
+    html+=`<div class="q-block"><div class="q-label">Question ${i+1} of 5</div><div class="q-text">${q.q}</div><div class="opts">`;
+    ['A','B','C','D'].forEach(l=>{
+      let cls='';
+      if(rev){cls=l===q.answer?'correct':(sel===l?'wrong':sel&&l===q.answer?'missed':'');}
+      else if(sel===l)cls='sel';
+      html+=`<div class="opt ${cls}" onclick="${isS&&!done?`pickOpt('${key}',${i},'${l}',${JSON.stringify(qs).replace(/'/g,"\\'")},'cold','${code}')`:''}" >
+        <div class="opt-ltr">${l}</div><div class="opt-txt">${q.opts[l]}</div></div>`;
+    });
+    html+='</div>';
+    if(rev&&q.rationale)html+=`<div class="rationale show">${q.rationale}</div>`;
+    html+='</div>';
+  });
+  if(isS&&!done)html+=`<button class="btn btn-grn" onclick="submitQuiz('${key}',5,'cold','${code}')">Submit Cold Retrieval</button>`;
+  el.innerHTML=html;
+  if(isS)document.getElementById('sColdTag').textContent=done?'Completed':'In progress';
+}
+
+// ── PICK OPT ──
+function pickOpt(key,i,l,qs,type,code){
+  const s=ST.ans[key]||{};
+  if(Object.keys(s).length>=qs.length)return;
+  s[i]=l;ST.ans[key]=s;
+  if(type==='cold')renderCold(qs,true,code);
+  else if(type==='timed')renderTimed(qs,true,code);
+  else if(type==='exam')renderExamQ();
+}
+
+// ── SUBMIT QUIZ ──
+function submitQuiz(key,total,type,code){
+  const s=ST.ans[key]||{};
+  if(Object.keys(s).length<total){toast(`Answer all ${total} questions first`,'err');return;}
+  saveAll();
+  const gc=ST.gc[ST.day];
+  if(type==='cold'&&gc?.cold)renderCold(gc.cold,true,code);
+  if(type==='timed'&&gc?.timed){renderTimed(gc.timed,true,code);checkRemediation(code);}
+  toast(type==='timed'?'Submitted and graded!':'Practice submitted!','ok');
+}
+
+// ── SCENARIOS ──
+async function genScenarios(){
+  const btn=document.getElementById('btnScenario');btn.disabled=true;btn.textContent='Generating…';
+  document.getElementById('scenarioBody').innerHTML='<div class="loading-bar">Generating scenario questions…</div>';
+  const topics=DAYS[ST.day-1].videos.map(v=>v.title).join(', ');
+  try{
+    const j=await ai(`Generate 2 CompTIA A+ 220-1202 scenario-based questions for Day ${ST.day}.
+Topics: ${topics}
+Return JSON: [{"scenario":"2-4 sentence IT scenario with constraint and qualifier (BEST/FIRST/MOST/NEXT)","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","explanation":"why correct, scenario clues, why others wrong"}]`);
+    const sc=JSON.parse(j);
+    ST.gc[ST.day]=ST.gc[ST.day]||{};ST.gc[ST.day].scenarios=sc;
+    renderScenarios(sc);
+    toast('Scenarios generated','ok');
+  }catch(e){document.getElementById('scenarioBody').innerHTML=`<div style="color:var(--red);font-size:12px">Failed.</div>`;}
+  btn.disabled=false;btn.textContent='Regenerate';
+}
+
+function renderScenarios(sc,isS=false){
+  const el=document.getElementById(isS?'sScenBody':'scenarioBody');
+  let html=`<div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--amb);line-height:1.8;font-family:var(--mono)">
+    THINKING PROCESS: 1. Find qualifier word · 2. Extract evidence · 3. Pick BEST answer · 4. Explain why others fail</div>`;
+  sc.forEach((q,i)=>{
+    html+=`<div class="q-block"><div class="q-label">Scenario ${i+1} of 2</div><div class="q-text">${q.scenario}</div><div class="opts">`;
+    ['A','B','C','D'].forEach(l=>{
+      html+=`<div class="opt" onclick="this.closest('.opts').querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));this.classList.add('sel')">
+        <div class="opt-ltr">${l}</div><div class="opt-txt">${q.opts[l]}</div></div>`;
+    });
+    html+='</div>';
+    if(!isS)html+=`<div class="rationale show"><strong>Answer: ${q.answer}</strong><br>${q.explanation}</div>`;
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+// ── DISCUSSION ──
+async function genDiscussion(){
+  document.getElementById('discBody').innerHTML='<div class="loading-bar">Generating discussion prompts…</div>';
+  const topics=DAYS[ST.day-1].videos.map(v=>v.title).join(', ');
+  try{
+    const j=await ai(`Generate discussion prompts for CompTIA A+ Day ${ST.day}.
+Topics: ${topics}
+Return JSON: {"pre":["3 pre-video prompts to activate prior knowledge"],"during":["3 research prompts for while watching"],"post":["4 post-video comprehension prompts"]}`);
+    const disc=JSON.parse(j);
+    ST.disc=disc;ST.gc[ST.day]=ST.gc[ST.day]||{};ST.gc[ST.day].disc=disc;
+    showDisc('pre');
+    document.getElementById('duringBody').innerHTML=disc.during.map((p,i)=>`
+      <div class="disc-prompt"><div class="disc-prompt-text"><strong>${i+1}.</strong> ${p}</div></div>`).join('');
+    // Push to student discussion
+    renderStudentDisc(disc);
+    toast('Discussion prompts generated','ok');
+  }catch(e){document.getElementById('discBody').innerHTML='<div style="color:var(--red);font-size:12px">Failed.</div>';}
+}
+
+function showDisc(type){
+  const disc=ST.disc||ST.gc[ST.day]?.disc;if(!disc){genDiscussion();return;}
+  ['pre','during','post'].forEach(t=>document.getElementById('dbtn-'+t)?.classList.toggle('btn-acc',t===type));
+  ['pre','during','post'].forEach(t=>document.getElementById('dbtn-'+t)?.classList.toggle('btn-ghost',t!==type));
+  const prompts=disc[type]||[];
+  document.getElementById('discBody').innerHTML=`
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      ${['pre','during','post'].map(t=>`<button class="btn btn-sm ${t===type?'btn-acc':'btn-ghost'}" onclick="showDisc('${t}')">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+    </div>
+    ${prompts.map((p,i)=>`
+      <div class="disc-prompt">
+        <div class="disc-prompt-text"><strong>${i+1}.</strong> ${p}</div>
+        <div class="disc-response">
+          <textarea placeholder="Student responses appear here…" readonly style="color:var(--tx3);cursor:default"></textarea>
+        </div>
+      </div>`).join('')}
+    <button class="btn btn-ghost btn-sm" onclick="toggleDiscWall()">Show Student Response Wall</button>`;
+}
+
+function toggleDiscWall(){
+  const w=document.getElementById('discWall');
+  const show=w.style.display==='none'||!w.style.display;
+  w.style.display=show?'block':'none';
+  if(show){
+    const responses=Object.entries(ST.ans).filter(([k])=>k.startsWith(`disc_${ST.day}_`));
+    document.getElementById('discWallContent').innerHTML=responses.length?
+      responses.map(([k,v])=>Object.entries(v).map(([qi,r])=>`<div class="disc-response-item">${r}</div>`).join('')).join(''):
+      '<div style="font-size:11px;color:var(--tx3)">No responses yet.</div>';
+  }
+}
+
+function renderStudentDisc(disc){
+  const el=document.getElementById('sDiscBody');if(!el)return;
+  const allPrompts=[...disc.pre,...disc.post];
+  const key=`disc_${ST.day}_${ST.code}`;
+  const saved=ST.ans[key]||{};
+  el.innerHTML=`<p style="font-size:11px;color:var(--tx3);margin-bottom:14px;font-family:var(--mono)">Type a one-sentence response to each prompt. Teacher sees responses anonymously.</p>`+
+    allPrompts.map((p,i)=>`
+      <div class="disc-prompt">
+        <div class="disc-prompt-text"><strong>${i+1}.</strong> ${p}</div>
+        <div class="disc-response">
+          <textarea placeholder="Your response…" onchange="saveDiscResp(${i},this.value)">${saved[i]||''}</textarea>
+        </div>
+      </div>`).join('');
+}
+
+function saveDiscResp(i,val){
+  const key=`disc_${ST.day}_${ST.code}`;
+  ST.ans[key]=ST.ans[key]||{};ST.ans[key][i]=val;saveAll();
+}
+
+// ── TIMED ──
+async function genTimed(){
+  const btn=document.getElementById('btnTimed');btn.disabled=true;btn.textContent='Generating…';
+  document.getElementById('timedBody').innerHTML='<div class="loading-bar">Generating from student notes and today\'s topics…</div>';
+  const topics=DAYS[ST.day-1].videos.map(v=>v.title).join(', ');
+  const notesSample=Object.entries(ST.notes).filter(([k])=>k.startsWith(`n_${ST.day}_`))
+    .map(([,v])=>Object.values(v).join(' ')).join(' ').substring(0,600);
+  try{
+    const j=await ai(`Generate 5 GRADED CompTIA A+ 220-1202 timed practice questions for Day ${ST.day}. Harder than cold retrieval.
+Topics: ${topics}
+${notesSample?`Student notes:\n${notesSample}`:''}
+Return JSON: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."}]`);
+    const qs=JSON.parse(j);
+    ST.gc[ST.day]=ST.gc[ST.day]||{};ST.gc[ST.day].timed=qs;
+    renderTimed(qs);document.getElementById('timedTag').textContent='5 ready';
+    toast('Timed practice generated','ok');
+  }catch(e){document.getElementById('timedBody').innerHTML='<div style="color:var(--red);font-size:12px">Failed.</div>';}
+  btn.disabled=false;btn.textContent='Regenerate from Notes';
+}
+
+function renderTimed(qs,isS=false,code=null){
+  const el=document.getElementById(isS?'sTimedBody':'timedBody');
+  const key=`timed_${ST.day}_${isS?code:'t'}`;
+  const saved=ST.ans[key]||{};const done=Object.keys(saved).length===5;
+  let html='';
+  if(isS&&!done)html+='<div style="background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--red);font-family:var(--mono)">⚠ THIS IS GRADED · Use your notes · Take your time</div>';
+  if(isS&&done){
+    const sc=Object.entries(saved).filter(([i,a])=>a===qs[+i]?.answer).length;
+    html+=scoreCard(sc,5,true,'Timed practice graded');
+  }
+  qs.forEach((q,i)=>{
+    const sel=saved[i];const rev=done||!isS;
+    html+=`<div class="q-block">${!isS?'<span class="tag red" style="margin-bottom:8px;display:inline-flex">GRADED</span>':''}<div class="q-label">Question ${i+1} of 5</div><div class="q-text">${q.q}</div><div class="opts">`;
+    ['A','B','C','D'].forEach(l=>{
+      let cls='';
+      if(rev){cls=l===q.answer?'correct':(sel===l?'wrong':'');}
+      else if(sel===l)cls='sel';
+      html+=`<div class="opt ${cls}" onclick="${isS&&!done?`pickOpt('${key}',${i},'${l}',${JSON.stringify(qs).replace(/'/g,"\\'")},'timed','${code}')`:''}" >
+        <div class="opt-ltr">${l}</div><div class="opt-txt">${q.opts[l]}</div></div>`;
+    });
+    html+='</div>';
+    if(rev&&q.rationale)html+=`<div class="rationale show">${q.rationale}</div>`;
+    html+='</div>';
+  });
+  if(isS&&!done)html+=`<button class="btn btn-grn" onclick="submitQuiz('${key}',5,'timed','${code}')">Submit for Grade</button>`;
+  el.innerHTML=html;
+  if(isS)document.getElementById('sTimedTag').textContent=done?'Graded':'In progress';
+}
+
+function scoreCard(sc,total,graded,label){
+  const pct=Math.round(sc/total*100);
+  const col=pct>=80?'var(--grn)':pct>=60?'var(--amb)':'var(--red)';
+  const msg=pct>=80?'Excellent work!':pct>=60?'Good effort — review missed items':pct>=40?'Keep studying — review is recommended':'Below passing — remediation generated';
+  return `<div class="score-card">
+    <div class="score-num" style="color:${col}">${sc}/${total}</div>
+    <div class="score-pct">${pct}% ${graded?'· Graded':''}</div>
+    <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+    <div class="score-msg">${msg}</div>
+  </div>`;
+}
+
+// ── AUTO REMEDIATION ──
+async function checkRemediation(code){
+  const key=`timed_${ST.day}_${code}`;
+  const saved=ST.ans[key]||{};
+  const qs=ST.gc[ST.day]?.timed||[];
+  const sc=Object.entries(saved).filter(([i,a])=>a===qs[+i]?.answer).length;
+  const pct=Math.round(sc/5*100);
+  if(pct<70){
+    const missed=qs.filter((_,i)=>saved[i]!==qs[i].answer);
+    if(missed.length===0)return;
+    try{
+      const j=await ai(`A student scored ${pct}% on CompTIA A+ Day ${ST.day} timed practice. Generate 3 easier remediation questions targeting their weak areas.
+Missed topics: ${missed.map(q=>q.q.substring(0,60)).join('; ')}
+Return JSON: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"clear simple explanation"}]`);
+      const remQs=JSON.parse(j);
+      const remKey=`rem_${ST.day}_${code}`;
+      ST.gc[remKey]=remQs;
+      // Show in timed body
+      const el=document.getElementById('sTimedBody');
+      el.innerHTML=el.innerHTML+`<div style="margin-top:20px;padding:14px;background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--rl)">
+        <div style="font-size:11px;font-family:var(--mono);color:var(--amb);margin-bottom:12px">📚 REMEDIATION · 3 targeted review questions</div>
+        ${remQs.map((q,i)=>`<div class="q-block"><div class="q-label">Review ${i+1}</div><div class="q-text">${q.q}</div>
+          <div class="opts">${['A','B','C','D'].map(l=>`<div class="opt" onclick="this.closest('.opts').querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));this.classList.add('sel')">
+            <div class="opt-ltr">${l}</div><div class="opt-txt">${q.opts[l]}</div></div>`).join('')}</div>
+          <div class="rationale show">Answer: ${q.answer} — ${q.rationale}</div></div>`).join('')}
+      </div>`;
+    }catch(e){}
+  }
+}
+
+// ── STUDY GUIDE ──
+async function genStudyGuide(){
+  const btn=document.getElementById('btnGuide');btn.disabled=true;btn.textContent='Generating…';
+  document.getElementById('guideBody').innerHTML='<div class="loading-bar">Generating study guide for today\'s chapter…</div>';
+  const day=DAYS[ST.day-1];
+  const topics=day.videos.map(v=>v.title).join(', ');
+  const section=day.videos[0]?.section;
+  try{
+    const j=await ai(`Generate a comprehensive study guide for CompTIA A+ 220-1202 Day ${ST.day}.
+Section: ${section}
+Topics: ${topics}
+Return JSON: {
+  "chapter": "${section}",
+  "terms": [{"word":"...","def":"..."}],
+  "concepts": ["key concept explanation"],
+  "tips": ["exam trap or common mistake to avoid"],
+  "summary": "2-3 sentence overview"
+}`);
+    const guide=JSON.parse(j);
+    ST.gc[ST.day]=ST.gc[ST.day]||{};ST.gc[ST.day].guide=guide;
+    renderGuide(guide);
+    toast('Study guide generated','ok');
+  }catch(e){document.getElementById('guideBody').innerHTML='<div style="color:var(--red);font-size:12px">Failed.</div>';}
+  btn.disabled=false;btn.textContent='Regenerate';
+}
+
+function renderGuide(g,isS=false){
+  const el=document.getElementById(isS?'sGuideBody':'guideBody');
+  el.innerHTML=`
+    <div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--acc2);line-height:1.7">${g.summary}</div>
+    <div class="sg-section"><h3>Key Terms</h3>
+      ${g.terms?.map(t=>`<div class="sg-term"><div class="sg-term-word">${t.word}</div><div class="sg-term-def">${t.def}</div></div>`).join('')||''}
+    </div>
+    <div class="sg-section"><h3>Core Concepts</h3>
+      ${g.concepts?.map(c=>`<div class="sg-concept">${c}</div>`).join('')||''}
+    </div>
+    <div class="sg-section"><h3>Exam Tips & Traps</h3>
+      ${g.tips?.map(t=>`<div class="sg-tip">⚠️ ${t}</div>`).join('')||''}
+    </div>`;
+}
+
+function printGuide(){window.print();}
+
+// ── STUDENT Q SUBMISSION ──
+function renderSQList(){
+  const todayQs=ST.bank.filter(q=>q.day===ST.day);
+  document.getElementById('sqCountTag').textContent=`${todayQs.length} today`;
+  document.getElementById('sqList').innerHTML=todayQs.length?todayQs.map(q=>`
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px;margin-bottom:7px;display:flex;align-items:flex-start;gap:10px">
+      <div style="flex:1"><div style="font-size:12px;color:var(--tx);line-height:1.5">${q.cleaned||q.raw}</div>
+        <div style="margin-top:5px;display:flex;gap:5px">
+          <span class="tag">${q.code}</span>${q.cleaned?'<span class="tag green">✓ CompTIA formatted</span>':'<span class="tag amber">Pending</span>'}
+        </div></div></div>`).join(''):
+    '<div style="font-size:12px;color:var(--tx3)">No submissions yet today.</div>';
+}
+
+async function submitSQ(){
+  const q=document.getElementById('sqQ').value.trim();
+  const a=document.getElementById('sqA').value.trim();
+  const b=document.getElementById('sqB').value.trim();
+  const c=document.getElementById('sqC').value.trim();
+  const d=document.getElementById('sqD').value.trim();
+  const correct=document.getElementById('sqCorrect').value;
+  if(!q||!a||!b||!c||!d){toast('Fill in all fields','err');return;}
+  toast('Cleaning to CompTIA format…');
+  try{
+    const j=await ai(`Reformat this student question to CompTIA A+ 220-1202 exam style.
+Q: ${q} A:${a} B:${b} C:${c} D:${d} Correct:${correct}
+Return JSON: {"cleaned":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"${correct}","topic":"..."}`);
+    const cl=JSON.parse(j);
+    ST.bank.push({raw:q,cleaned:cl.cleaned,opts:cl.opts,answer:cl.answer,topic:cl.topic,code:ST.code,day:ST.day,ts:Date.now()});
+  }catch{ST.bank.push({raw:q,code:ST.code,day:ST.day,ts:Date.now()});}
+  saveAll();
+  ['sqQ','sqA','sqB','sqC','sqD'].forEach(id=>document.getElementById(id).value='');
+  renderSQList();toast('Question added to bank!','ok');
+}
+
+// ── SAVE NOTES ──
+function saveNotes(){
+  const key=`n_${ST.day}_${ST.code}`;
+  ST.notes[key]={terms:document.getElementById('nTerms').value,how:document.getElementById('nHow').value,real:document.getElementById('nReal').value,traps:document.getElementById('nTraps').value,q:document.getElementById('nQuestion').value};
+  saveAll();toast('Notes saved ✓','ok');
+}
+
+// ── FLASHCARDS ──
+function initFlash(){
+  const filter=document.getElementById('flashFilter')?.value||'all';
+  let deck=ST.bank.filter(q=>q.cleaned||q.raw);
+  if(filter==='missed')deck=deck.filter(q=>ST.fcMissed.has(q.ts));
+  if(deck.length===0){document.getElementById('flashBody').innerHTML='<div class="empty-state"><div class="ei">🃏</div><h3>No questions yet</h3><p>Questions appear as the class submits them.</p></div>';return;}
+  ST.fcDeck=[...deck].sort(()=>Math.random()-.5).slice(0,Math.min(deck.length,20));
+  ST.fcIdx=0;renderFlash();
+}
+
+function renderFlash(){
+  const deck=ST.fcDeck;if(!deck.length)return;
+  const el=document.getElementById('flashBody');
+  const q=deck[ST.fcIdx];
+  el.innerHTML=`
+    <div class="fc-nav">
+      <button class="btn btn-ghost btn-sm" onclick="ST.fcIdx=Math.max(0,ST.fcIdx-1);renderFlash()">← Prev</button>
+      <span class="fc-counter">${ST.fcIdx+1} / ${deck.length}</span>
+      <button class="btn btn-ghost btn-sm" onclick="ST.fcIdx=Math.min(ST.fcDeck.length-1,ST.fcIdx+1);renderFlash()">Next →</button>
+    </div>
+    <div class="flashcard-scene" onclick="this.querySelector('.flashcard').classList.toggle('flipped')">
+      <div class="flashcard">
+        <div class="fc-face">
+          <div class="fc-label">Question — tap to flip</div>
+          <div class="fc-text">${q.cleaned||q.raw}</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-label">Answer</div>
+          <div class="fc-answer">${q.answer ? q.opts?.[q.answer]||q.answer : 'See notes'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-result-btns">
+      <button class="btn btn-red btn-sm" onclick="markFC('miss')">✗ Missed it</button>
+      <button class="btn btn-ghost btn-sm" onclick="markFC('skip')">— Skip</button>
+      <button class="btn btn-grn btn-sm" onclick="markFC('got')">✓ Got it</button>
+    </div>
+    ${q.topic?`<div style="text-align:center;margin-top:8px"><span class="tag cyan">${q.topic}</span></div>`:''}`;
+}
+
+function markFC(result){
+  const q=ST.fcDeck[ST.fcIdx];
+  if(result==='miss')ST.fcMissed.add(q.ts);
+  else if(result==='got')ST.fcMissed.delete(q.ts);
+  ST.fcIdx=Math.min(ST.fcDeck.length-1,ST.fcIdx+1);
+  if(ST.fcIdx===ST.fcDeck.length-1&&result!=='skip'){
+    const missed=ST.fcDeck.filter(q=>ST.fcMissed.has(q.ts)).length;
+    document.getElementById('flashBody').innerHTML+=`<div style="text-align:center;margin-top:12px;padding:14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r)">
+      <div style="font-family:var(--mono);font-size:20px;color:var(--grn);margin-bottom:6px">${ST.fcDeck.length-missed}/${ST.fcDeck.length}</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">Deck complete · ${missed} to review</div>
+      <button class="btn btn-acc btn-sm" onclick="initFlash()">Shuffle & Restart</button>
+      ${missed?`<button class="btn btn-amb btn-sm" onclick="document.getElementById('flashFilter').value='missed';initFlash()">Review Missed</button>`:''}
+    </div>`;
+  } else renderFlash();
+}
+
+// ── EXAM SIMULATOR ──
+function startExam(){
+  if(ST.bank.length<5){toast('Not enough questions in the bank yet — keep submitting!','err');return;}
+  const deck=[...ST.bank].sort(()=>Math.random()-.5).slice(0,10);
+  ST.examState={deck,ans:{},started:Date.now(),idx:0,done:false};
+  startExamTimer();renderExamQ();
+}
+
+function startExamTimer(){
+  let secs=20*60;
+  const el=document.getElementById('examBody');
+  if(ST.examTimer)clearInterval(ST.examTimer);
+  ST.examTimer=setInterval(()=>{
+    secs--;
+    const mins=Math.floor(secs/60);const s=secs%60;
+    const timerEl=document.getElementById('examTimerDisplay');
+    if(timerEl){timerEl.textContent=`${String(mins).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      if(secs<=120)timerEl.className='exam-timer warning';
+      if(secs<=60)timerEl.className='exam-timer danger';}
+    if(secs<=0){clearInterval(ST.examTimer);submitExam();}
+  },1000);
+}
+
+function renderExamQ(){
+  const es=ST.examState;if(!es||es.done)return;
+  const q=es.deck[es.idx];
+  document.getElementById('examBody').innerHTML=`
+    <div class="exam-timer" id="examTimerDisplay">20:00</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span class="tag blue">Question ${es.idx+1} of ${es.deck.length}</span>
+      <button class="btn btn-grn btn-sm" onclick="submitExam()">Submit Exam</button>
+    </div>
+    <div class="q-block">
+      <div class="q-text">${q.cleaned||q.raw}</div>
+      <div class="opts">${['A','B','C','D'].map(l=>`
+        <div class="opt ${es.ans[es.idx]===l?'sel':''}" onclick="es.ans[${es.idx}]='${l}';renderExamQ()">
+          <div class="opt-ltr">${l}</div>
+          <div class="opt-txt">${q.opts?.[l]||'—'}</div>
+        </div>`).join('')}</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      ${es.idx>0?`<button class="btn btn-ghost btn-sm" onclick="es.idx--;renderExamQ()">← Back</button>`:''}
+      ${es.idx<es.deck.length-1?`<button class="btn btn-acc btn-sm" onclick="es.idx++;renderExamQ()">Next →</button>`:''}
+    </div>
+    <div style="display:flex;gap:4px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+      ${es.deck.map((_,i)=>`<div style="width:20px;height:20px;border-radius:4px;cursor:pointer;background:${i===es.idx?'var(--acc)':es.ans[i]?'var(--grn-d)':'var(--s3)'};border:1px solid ${i===es.idx?'var(--acc)':es.ans[i]?'var(--grn)':'var(--b1)'};display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);color:var(--tx3)" onclick="es.idx=${i};renderExamQ()">${i+1}</div>`).join('')}
+    </div>`;
+}
+
+function submitExam(){
+  clearInterval(ST.examTimer);
+  const es=ST.examState;if(!es)return;
+  es.done=true;
+  const sc=es.deck.filter((q,i)=>es.ans[i]===q.answer).length;
+  const pct=Math.round(sc/es.deck.length*100);
+  const timeTaken=Math.round((Date.now()-es.started)/1000);
+  const mins=Math.floor(timeTaken/60);const secs=timeTaken%60;
+  document.getElementById('examBody').innerHTML=`
+    ${scoreCard(sc,es.deck.length,true,'Practice Exam Complete')}
+    <div style="display:flex;gap:10px;margin-bottom:16px;justify-content:center;flex-wrap:wrap">
+      <span class="tag cyan">Time: ${mins}m ${secs}s</span>
+      <span class="${pct>=80?'tag green':pct>=60?'tag amber':'tag red'}">${pct>=80?'PASS':'FAIL'} threshold</span>
+    </div>
+    <div style="margin-bottom:16px">
+      ${es.deck.map((q,i)=>`<div class="q-block">
+        <div class="q-label">Q${i+1} · ${es.ans[i]===q.answer?'<span style="color:var(--grn)">CORRECT</span>':'<span style="color:var(--red)">WRONG</span>'}</div>
+        <div class="q-text">${q.cleaned||q.raw}</div>
+        <div style="font-size:11px;color:var(--tx2);margin-top:6px">Your answer: <strong>${es.ans[i]||'—'}</strong> · Correct: <strong style="color:var(--grn)">${q.answer}</strong></div>
+      </div>`).join('')}
+    </div>
+    <button class="btn btn-acc" onclick="startExam()">Take Another Exam</button>`;
+}
+
+// ── READINESS DASHBOARD ──
+function renderReadiness(){
+  const el=document.getElementById('readinessBody');
+  if(!ST.students.length){el.innerHTML='<div class="empty-state"><div class="ei">👥</div><h3>No students</h3></div>';return;}
+  let classTotal=0,classCount=0;
+  let html=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="readSummary"></div><div class="readiness-grid">`;
+  ST.students.forEach(code=>{
+    const scores=[];
+    for(let d=1;d<=ST.day;d++){
+      const key=`timed_${d}_${code}`;
+      const ans=ST.ans[key]||{};
+      if(Object.keys(ans).length===5){
+        const qs=ST.gc[d]?.timed||[];
+        const sc=Object.entries(ans).filter(([i,a])=>a===qs[+i]?.answer).length;
+        scores.push(sc/5*100);
+      }
+    }
+    const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null;
+    if(avg!==null){classTotal+=avg;classCount++;}
+    const cls=avg===null?'':avg>=80?'pass':avg>=60?'warn':'fail';
+    const col=avg===null?'var(--acc)':avg>=80?'var(--grn)':avg>=60?'var(--amb)':'var(--red)';
+    const missed=[];
+    for(let d=1;d<=ST.day;d++){
+      const key=`timed_${d}_${code}`;const ans=ST.ans[key]||{};
+      const qs=ST.gc[d]?.timed||[];
+      if(Object.keys(ans).length===5){
+        qs.forEach((q,i)=>{if(ans[i]!==q.answer&&q.q)missed.push(q.q.substring(0,40));});
+      }
+    }
+    html+=`<div class="readiness-card ${cls}">
+      <div class="rc-code"><span>${code}</span><span class="tag ${avg===null?'':avg>=80?'green':avg>=60?'amber':'red'}">${avg===null?'No data':avg+'%'}</span></div>
+      <div class="rc-score" style="color:${col}">${avg===null?'—':avg+'%'}</div>
+      <div class="rc-bar"><div class="rc-bar-fill" style="width:${avg||0}%;background:${col}"></div></div>
+      <div class="rc-stats">${scores.length} day${scores.length!==1?'s':''} completed · ${scores.length?'Avg: '+avg+'%':'—'}</div>
+      ${avg!==null&&avg<70&&missed.length?`<div class="rc-topics">Weak areas:<br>${[...new Set(missed)].slice(0,3).map(m=>'• '+m+'…').join('<br>')}</div>`:''}
+      ${avg!==null&&avg<60?'<div class="rc-remediation">⚠️ Below 60% — remediation questions auto-generated after each session.</div>':''}
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+  if(classCount){
+    const avg=Math.round(classTotal/classCount);
+    document.getElementById('readSummary').innerHTML=`
+      <span class="tag cyan">Class avg: ${avg}%</span>
+      <span class="tag">${classCount}/${ST.students.length} have data</span>
+      <span class="${avg>=80?'tag green':avg>=60?'tag amber':'tag red'}">${avg>=80?'On track for exam':'Review recommended'}</span>`;
+  }
+}
+
+// ── EXPORT ──
+function exportCSV(){
+  let csv='Student Code,Days Completed,Average %,Pass/Fail Prediction\n';
+  ST.students.forEach(code=>{
+    const scores=[];
+    for(let d=1;d<=68;d++){const key=`timed_${d}_${code}`;const ans=ST.ans[key]||{};if(Object.keys(ans).length===5){const qs=ST.gc[d]?.timed||[];scores.push(Object.entries(ans).filter(([i,a])=>a===qs[+i]?.answer).length/5*100);}}
+    const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;
+    csv+=`${code},${scores.length},${avg||'N/A'},${avg>=70?'PASS':'NEEDS WORK'}\n`;
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='Readiness_Report.csv';a.click();toast('Exported!','ok');
+}
+
+// ── MODE / LOGIN ──
+function setMode(m){
+  ST.mode=m;
+  document.getElementById('mTeacher').classList.toggle('active',m==='teacher');
+  document.getElementById('mStudent').classList.toggle('active',m==='student');
+  document.getElementById('tvTeacher').style.display=m==='teacher'?'':'none';
+  document.getElementById('tvStudent').style.display=m==='student'?'':'none';
+}
+
+function studentLogin(){
+  const code=document.getElementById('sCodeInput').value.trim().toUpperCase();
+  if(!code){toast('Enter your student code','err');return;}
+  ST.code=code;
+  document.getElementById('sLogin').style.display='none';
+  document.getElementById('sDash').style.display='block';
+  // Load content
+  const gc=ST.gc[ST.day];
+  if(gc?.cold)renderCold(gc.cold,true,code);
+  if(gc?.scenarios)renderScenarios(gc.scenarios,true);
+  if(gc?.disc)renderStudentDisc(gc.disc);
+  if(gc?.timed)renderTimed(gc.timed,true,code);
+  if(gc?.guide)renderGuide(gc.guide,true);
+  // Load saved notes
+  const saved=ST.notes[`n_${ST.day}_${code}`]||{};
+  ['nTerms','nHow','nReal','nTraps','nQuestion'].forEach((id,i)=>{
+    const keys=['terms','how','real','traps','q'];
+    document.getElementById(id).value=saved[keys[i]]||'';
+  });
+  toast(`Welcome, ${code}!`,'ok');
+}
+
+// ── TOAST ──
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+init();
+</script>
+<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('classroom');}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · PBIS & Quiz Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050810;--s1:#0a0d17;--s2:#0f1220;--s3:#141828;--s4:#1a2035;
+  --b1:#1e2540;--b2:#283054;--b3:#334068;
+  --tx:#c8d0e8;--tx2:#7a85a8;--tx3:#424d6a;--tx4:#2a3350;
+  --acc:#00c8ff;--acc2:#0099cc;--acc-d:rgba(0,212,255,0.1);
+  --grn:#00ff88;--grn2:#00cc6a;--grn-d:rgba(0,255,136,0.1);
+  --amb:#ffaa00;--amb-d:rgba(255,170,0,0.1);
+  --red:#ff4466;--red-d:rgba(255,68,102,0.1);
+  --pur:#aa55ff;--pur-d:rgba(170,85,255,0.1);
+  --gold:#ffd700;--gold-d:rgba(255,215,0,0.12);
+  --mono:'JetBrains Mono',monospace;
+  --display:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+  --r:6px;--rl:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 70% 40% at 15% 10%,rgba(0,212,255,0.05),transparent 60%),
+  radial-gradient(ellipse 50% 30% at 85% 90%,rgba(255,215,0,0.04),transparent 50%),
+  repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,0.015) 39px,rgba(0,212,255,0.015) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,0.015) 39px,rgba(0,212,255,0.015) 40px);
+  pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--b1);padding:0 28px;display:flex;align-items:center;gap:16px;background:rgba(6,8,16,0.96);backdrop-filter:blur(20px);position:sticky;top:0;z-index:300;height:54px;flex-shrink:0}
+.logo{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--acc);border:1px solid var(--acc);padding:4px 8px;border-radius:4px;letter-spacing:.5px;background:var(--acc-d)}
+.htitle{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:.8px;color:var(--tx);text-transform:uppercase}
+.hsub{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px}
+.hright{margin-left:auto;display:flex;gap:8px;align-items:center}
+.hpill{font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:20px;letter-spacing:.3px}
+
+/* ── TABS ── */
+nav{display:flex;gap:0;background:var(--s1);border-bottom:1px solid var(--b1);padding:0 24px;overflow-x:auto}
+.tab{padding:13px 20px;font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--tx2)}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* ── PANELS ── */
+.content{flex:1;overflow-y:auto}
+.panel{display:none;padding:28px;max-width:1100px;margin:0 auto;flex-direction:column;gap:20px}
+.panel.active{display:flex}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.25),transparent)}
+.card-hdr{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b1);background:rgba(255,255,255,0.015);flex-wrap:wrap}
+.card-hdr h2{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tx);flex:1}
+.card-body{padding:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── PBIS ── */
+.pbis-hero{background:linear-gradient(135deg,var(--gold-d),var(--acc-d));border:1px solid var(--gold);border-radius:var(--rl);padding:24px;display:flex;gap:24px;align-items:center}
+.pbis-total{text-align:center;flex-shrink:0}
+.pbis-num{font-family:var(--display);font-size:72px;font-weight:800;color:var(--gold);line-height:1;letter-spacing:-3px;text-shadow:0 0 40px rgba(255,215,0,0.4)}
+.pbis-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--amb);text-transform:uppercase;margin-top:4px}
+.pbis-info{flex:1}
+.pbis-info h2{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--tx);margin-bottom:6px}
+.pbis-info p{font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px}
+.pbis-export-note{font-family:var(--mono);font-size:10px;color:var(--amb);background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:8px 12px;line-height:1.6}
+
+.award-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.award-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;transition:border-color .2s;cursor:pointer}
+.award-card:hover{border-color:var(--gold)}
+.award-icon{font-size:28px;flex-shrink:0}
+.award-info{flex:1}
+.award-name{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:3px}
+.award-pts{font-family:var(--mono);font-size:11px;color:var(--gold)}
+.award-trigger{font-size:10px;color:var(--tx3);margin-top:2px}
+.award-btn{padding:6px 12px;background:var(--gold-d);border:1px solid var(--gold);color:var(--gold);border-radius:var(--r);font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.award-btn:hover{background:rgba(255,215,0,0.2)}
+
+.pbis-log{display:flex;flex-direction:column;gap:5px;max-height:300px;overflow-y:auto}
+.log-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r)}
+.log-icon{font-size:14px;flex-shrink:0}
+.log-info{flex:1}
+.log-reason{font-size:11px;color:var(--tx2)}
+.log-code{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.log-pts{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold)}
+.log-time{font-family:var(--mono);font-size:9px;color:var(--tx4)}
+
+.student-pts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.stu-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px;text-align:center;transition:all .2s}
+.stu-card.top{border-color:var(--gold)}
+.stu-code{font-family:var(--mono);font-size:10px;color:var(--tx2);margin-bottom:4px}
+.stu-pts{font-family:var(--display);font-size:28px;font-weight:800;color:var(--gold);line-height:1}
+.stu-rank{font-size:9px;color:var(--tx3);font-family:var(--mono)}
+
+/* ── QUIZ INTEGRITY (LOCKDOWN) ── */
+.lockdown-inactive{text-align:center;padding:48px 20px;background:var(--s2);border:1.5px dashed var(--b2);border-radius:var(--rl)}
+.ld-icon{font-size:48px;margin-bottom:14px;opacity:.5}
+.lockdown-config{display:flex;flex-direction:column;gap:12px}
+.lc-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r)}
+.lc-label{font-size:12px;color:var(--tx2)}
+.lc-sub{font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:2px}
+.lc-toggle{width:36px;height:20px;background:var(--b2);border-radius:10px;cursor:pointer;transition:background .2s;position:relative;flex-shrink:0}
+.lc-toggle.on{background:var(--grn)}
+.lc-toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s}
+.lc-toggle.on::after{transform:translateX(16px)}
+
+.integrity-log{display:flex;flex-direction:column;gap:5px}
+.il-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s2);border-radius:var(--r);border-left:2px solid}
+.il-item.violation{border-left-color:var(--red)}
+.il-item.ok{border-left-color:var(--grn)}
+.il-item.warn{border-left-color:var(--amb)}
+.il-icon{font-size:12px;flex-shrink:0}
+.il-msg{flex:1;font-size:11px;color:var(--tx2)}
+.il-time{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+
+/* Lockdown active overlay */
+.lockdown-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;overflow:hidden}
+.lo-header{background:var(--red-d);border-bottom:2px solid var(--red);padding:10px 20px;display:flex;align-items:center;gap:12px}
+.lo-secure{font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.lo-timer{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--amb);margin-left:auto}
+.lo-timer.warn{color:var(--red);animation:blink .8s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.lo-body{flex:1;overflow-y:auto;padding:28px;max-width:800px;margin:0 auto;width:100%}
+.lo-footer{background:var(--s1);border-top:1px solid var(--b1);padding:14px 24px;display:flex;align-items:center;gap:12px}
+.lo-progress-bar{flex:1;height:4px;background:var(--b1);border-radius:2px;overflow:hidden}
+.lo-progress-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .3s}
+.lo-qcount{font-family:var(--mono);font-size:11px;color:var(--tx3)}
+
+/* Warning flash */
+.integrity-warning{position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;padding:12px 20px;text-align:center;font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;z-index:10000;transform:translateY(-100%);transition:transform .3s}
+.integrity-warning.show{transform:translateY(0)}
+
+/* ── PDF GENERATOR ── */
+.pdf-config{display:flex;flex-direction:column;gap:14px}
+.pf-section{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px}
+.pf-label{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px}
+.pf-row{display:flex;gap:10px;flex-wrap:wrap}
+.pf-inp{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;transition:border-color .2s;flex:1;min-width:140px}
+.pf-inp:focus{border-color:var(--acc)}
+.pf-inp::placeholder{color:var(--tx3)}
+.pf-select{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none;flex:1;min-width:140px}
+.chapter-chips{display:flex;flex-wrap:wrap;gap:5px}
+.ch-chip{padding:5px 11px;border-radius:20px;font-family:var(--mono);font-size:9px;border:1px solid var(--b2);color:var(--tx3);cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.ch-chip:hover{border-color:var(--b3)}
+.ch-chip.on{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+.qtype-row{display:flex;gap:8px;flex-wrap:wrap}
+.qt-btn{padding:7px 14px;border-radius:var(--r);font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--b2);color:var(--tx3);cursor:pointer;transition:all .15s}
+.qt-btn.on{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+
+.pdf-preview{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:20px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--tx2);white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-top:0}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-acc:hover{background:var(--acc2)}
+.btn-grn{background:var(--grn);color:var(--bg);font-weight:800}
+.btn-grn:hover{background:var(--grn2)}
+.btn-gold{background:var(--gold);color:var(--bg)}
+.btn-red{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{border-color:var(--b3);color:var(--tx)}
+.btn-sm{padding:5px 12px;font-size:10px;border-radius:5px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.3px}
+.tag.acc{background:var(--acc-d);color:var(--acc);border:1px solid var(--acc)}
+.tag.grn{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn)}
+.tag.red{background:var(--red-d);color:var(--red);border:1px solid var(--red)}
+.tag.amb{background:var(--amb-d);color:var(--amb);border:1px solid var(--amb)}
+.tag.gold{background:var(--gold-d);color:var(--gold);border:1px solid var(--gold)}
+.divider{height:1px;background:var(--b1);margin:6px 0}
+.loading{display:flex;align-items:center;gap:10px;color:var(--tx3);font-family:var(--mono);font-size:11px;padding:16px;justify-content:center}
+.loading::before{content:'';width:14px;height:14px;border:1.5px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--tx);z-index:10001;opacity:0;transform:translateY(8px);transition:all .25s}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.toast.gold{border-color:var(--gold);color:var(--gold)}
+
+/* Quiz question styles (lockdown) */
+.lo-q-block{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.lo-q-num{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:6px;text-transform:uppercase}
+.lo-q-text{font-size:13px;font-weight:500;color:var(--tx);line-height:1.65;margin-bottom:12px}
+.lo-opts{display:flex;flex-direction:column;gap:6px}
+.lo-opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:6px;border:1px solid var(--b1);cursor:pointer;transition:all .15s;background:var(--s3)}
+.lo-opt:hover{border-color:var(--b2)}
+.lo-opt.sel{border-color:var(--acc);background:var(--acc-d)}
+.lo-opt.correct{border-color:var(--grn);background:var(--grn-d)}
+.lo-opt.wrong{border-color:var(--red);background:var(--red-d)}
+.lo-opt-ltr{width:22px;height:22px;border-radius:4px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono);font-weight:700;color:var(--tx3);flex-shrink:0}
+.lo-opt.sel .lo-opt-ltr{background:var(--acc);color:var(--bg)}
+.lo-opt.correct .lo-opt-ltr{background:var(--grn);color:var(--bg)}
+.lo-opt.wrong .lo-opt-ltr{background:var(--red);color:#fff}
+.lo-opt-txt{font-size:12px;color:var(--tx2);line-height:1.5}
+.lo-rationale{margin-top:10px;padding:8px 12px;background:var(--s4);border-left:2px solid var(--grn);border-radius:4px;font-size:11px;color:var(--tx2);line-height:1.6;display:none}
+.lo-rationale.show{display:block}
+
+/* Violation overlay */
+.violation-flash{position:fixed;inset:0;background:rgba(255,68,102,0.15);z-index:9998;pointer-events:none;opacity:0;transition:opacity .1s}
+.violation-flash.show{opacity:1}
+
+<link rel="stylesheet" href="platform.css">
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">A+ 220</div>
+  <div>
+    <div class="htitle">PBIS & Quiz Tools</div>
+    <div class="hsub">CompTIA A+ 220-1202 · Rewards · Integrity · PDF Export</div>
+  </div>
+  <div class="hright">
+    <span class="hpill" style="background:var(--gold-d);border:1px solid var(--gold);color:var(--gold)" id="hTotalPts">0 pts total</span>
+    <span class="hpill" style="background:var(--red-d);border:1px solid var(--red);color:var(--red)" id="hViolations" style="display:none">0 violations</span>
+  </div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="switchTab('pbis')">🏆 PBIS Points</div>
+  <div class="tab" onclick="switchTab('lockdown')">🔒 Quiz Integrity</div>
+  <div class="tab" onclick="switchTab('pdf')">📄 PDF Quiz Generator</div>
+</nav>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════════
+     TAB 1: PBIS POINTS
+══════════════════════════════════════════ -->
+<div class="panel active" id="tab-pbis">
+
+  <!-- Hero -->
+  <div class="pbis-hero">
+    <div class="pbis-total">
+      <div class="pbis-num" id="pbisTotal">0</div>
+      <div class="pbis-label">Total Points Earned</div>
+    </div>
+    <div class="pbis-info">
+      <h2>PBIS Rewards Tracker</h2>
+      <p>Points auto-award when students hit key milestones. Manually award additional points below. Export anytime for upload to PBIS Rewards.</p>
+      <div class="pbis-export-note">
+        ⚡ PBIS Rewards Integration: This tracker auto-awards points and logs every event. Use "Export for PBIS Rewards" to download a CSV formatted for bulk upload to your school's PBIS Rewards account.
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-gold" onclick="exportPBIS()">↓ Export for PBIS Rewards</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetPBIS()">Reset All Points</button>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Auto-award triggers -->
+    <div class="card">
+      <div class="card-hdr">
+        <h2>⚡ Auto-Award Triggers</h2>
+        <span class="tag grn">3 active</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-bottom:14px;line-height:1.7">These award automatically when students hit milestones. Connect to classroom platform to enable live auto-awards.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--s2);border:1px solid var(--grn);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">⏱</span>
+            <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--tx)">Score 80%+ on Timed Practice</div><div style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Awards 5 points per qualifying attempt</div></div>
+            <span class="tag grn">5 pts</span>
+          </div>
+          <div style="background:var(--s2);border:1px solid var(--grn);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">🔥</span>
+            <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--tx)">7-Day Study Streak</div><div style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Awards 10 points at milestone</div></div>
+            <span class="tag grn">10 pts</span>
+          </div>
+          <div style="background:var(--s2);border:1px solid var(--grn);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">🃏</span>
+            <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--tx)">Complete Spaced Repetition Session</div><div style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Awards 3 points per session</div></div>
+            <span class="tag grn">3 pts</span>
+          </div>
+        </div>
+
+        <div class="divider" style="margin:16px 0"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:10px">SIMULATE AUTO-AWARD (for testing)</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="autoAward('timed_80','Scored 80%+ on Timed Practice',5)">Simulate 80% Score</button>
+          <button class="btn btn-ghost btn-sm" onclick="autoAward('streak_7','7-Day Streak Milestone',10)">Simulate 7-Day Streak</button>
+          <button class="btn btn-ghost btn-sm" onclick="autoAward('sr_complete','Spaced Repetition Session',3)">Simulate SR Session</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual award -->
+    <div class="card">
+      <div class="card-hdr"><h2>✋ Manual Award</h2></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:5px">STUDENT CODE</div>
+            <input type="text" id="manCode" placeholder="STU-001" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--mono);font-size:13px;letter-spacing:1px;outline:none;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:5px">REASON</div>
+            <input type="text" id="manReason" placeholder="e.g. Excellent participation" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none">
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:5px">POINTS</div>
+            <input type="number" id="manPts" value="5" min="1" max="50" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--mono);font-size:16px;outline:none;text-align:center">
+          </div>
+          <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="manualAward()">🏆 Award Points</button>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin:10px 0 8px">QUICK AWARD PRESETS</div>
+        <div class="award-grid">
+          <div class="award-card" onclick="quickAward('Great question!',2)"><div class="award-icon">💬</div><div class="award-info"><div class="award-name">Great Question</div><div class="award-pts">+2 pts</div></div><button class="award-btn">+2</button></div>
+          <div class="award-card" onclick="quickAward('Helped a classmate',3)"><div class="award-icon">🤝</div><div class="award-info"><div class="award-name">Helped Classmate</div><div class="award-pts">+3 pts</div></div><button class="award-btn">+3</button></div>
+          <div class="award-card" onclick="quickAward('Perfect score on cold retrieval',5)"><div class="award-icon">❄️</div><div class="award-info"><div class="award-name">Perfect Retrieval</div><div class="award-pts">+5 pts</div></div><button class="award-btn">+5</button></div>
+          <div class="award-card" onclick="quickAward('Chapter notes completed',4)"><div class="award-icon">📝</div><div class="award-info"><div class="award-name">Notes Complete</div><div class="award-pts">+4 pts</div></div><button class="award-btn">+4</button></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Leaderboard + Log -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hdr"><h2>🏅 Class Leaderboard</h2><span class="tag gold" id="leaderCount">0 students</span></div>
+      <div class="card-body"><div class="student-pts-grid" id="leaderboard"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><h2>📋 Award Log</h2><button class="btn btn-ghost btn-sm" onclick="clearLog()">Clear</button></div>
+      <div class="card-body"><div class="pbis-log" id="pbisLog"><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No awards yet.</div></div></div>
+    </div>
+  </div>
+
+</div><!-- /tab-pbis -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 2: QUIZ INTEGRITY (LOCKDOWN)
+══════════════════════════════════════════ -->
+<div class="panel" id="tab-lockdown">
+
+  <div class="two-col">
+
+    <!-- Config -->
+    <div class="card">
+      <div class="card-hdr">
+        <h2>🔒 Integrity Settings</h2>
+        <span class="tag red" id="integrityMode">All enforced</span>
+      </div>
+      <div class="card-body">
+        <div class="lockdown-config">
+          <div class="lc-row"><div><div class="lc-label">Fullscreen enforcement</div><div class="lc-sub">Forces fullscreen · warns on exit attempt</div></div><div class="lc-toggle on" id="tog-fs" onclick="toggleSetting('fs',this)"></div></div>
+          <div class="lc-row"><div><div class="lc-label">Tab-switch detection</div><div class="lc-sub">Logs and flags every tab switch</div></div><div class="lc-toggle on" id="tog-tab" onclick="toggleSetting('tab',this)"></div></div>
+          <div class="lc-row"><div><div class="lc-label">Right-click disabled</div><div class="lc-sub">Blocks context menu during quiz</div></div><div class="lc-toggle on" id="tog-rc" onclick="toggleSetting('rc',this)"></div></div>
+          <div class="lc-row"><div><div class="lc-label">Copy/paste disabled</div><div class="lc-sub">Blocks Ctrl+C, Ctrl+V, Ctrl+A</div></div><div class="lc-toggle on" id="tog-cp" onclick="toggleSetting('cp',this)"></div></div>
+          <div class="lc-row"><div><div class="lc-label">Dev tools detection</div><div class="lc-sub">Flags if dev tools opened</div></div><div class="lc-toggle on" id="tog-dt" onclick="toggleSetting('dt',this)"></div></div>
+          <div class="lc-row"><div><div class="lc-label">Auto-submit on time expiry</div><div class="lc-sub">Submits quiz when timer hits zero</div></div><div class="lc-toggle on" id="tog-at" onclick="toggleSetting('at',this)"></div></div>
+          <div class="lc-row"><div><div class="lc-label">Flag violation to teacher</div><div class="lc-sub">Logs all violations with timestamp</div></div><div class="lc-toggle on" id="tog-fl" onclick="toggleSetting('fl',this)"></div></div>
+        </div>
+
+        <div class="divider" style="margin:16px 0"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:10px">QUIZ SETUP</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:11px;color:var(--tx2);width:80px;flex-shrink:0">Student Code</span>
+            <input type="text" id="ldCode" placeholder="STU-001" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-family:var(--mono);font-size:12px;letter-spacing:1px;outline:none;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:11px;color:var(--tx2);width:80px;flex-shrink:0">Time Limit</span>
+            <select id="ldTime" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-size:12px;outline:none">
+              <option value="600">10 minutes</option>
+              <option value="900">15 minutes</option>
+              <option value="1200" selected>20 minutes</option>
+              <option value="1800">30 minutes</option>
+              <option value="2700">45 minutes</option>
+              <option value="3600">60 minutes</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:11px;color:var(--tx2);width:80px;flex-shrink:0">Quiz Title</span>
+            <input type="text" id="ldTitle" placeholder="Day 15 Timed Practice" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none">
+          </div>
+        </div>
+        <button class="btn btn-grn" style="width:100%;justify-content:center;font-size:14px;padding:12px" onclick="startLockdown()">🔒 Launch Lockdown Quiz</button>
+        <div style="font-size:10px;color:var(--tx3);text-align:center;font-family:var(--mono);margin-top:8px">Uses AI to generate 10 fresh CompTIA A+ questions</div>
+      </div>
+    </div>
+
+    <!-- Violation log -->
+    <div class="card">
+      <div class="card-hdr">
+        <h2>⚠️ Integrity Log</h2>
+        <span class="tag red" id="violationCount">0 violations</span>
+        <button class="btn btn-ghost btn-sm" onclick="clearIntegrityLog()">Clear</button>
+      </div>
+      <div class="card-body">
+        <div style="font-size:11px;color:var(--tx2);line-height:1.7;margin-bottom:14px">All integrity events are logged here. Violations are flagged to the teacher with student code and timestamp.</div>
+        <div class="integrity-log" id="integrityLog">
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No sessions yet. Launch a lockdown quiz to begin logging.</div>
+        </div>
+
+        <div class="divider" style="margin:14px 0"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:10px">VIOLATION SUMMARY BY STUDENT</div>
+        <div id="violationSummary" style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No violations recorded.</div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /tab-lockdown -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 3: PDF QUIZ GENERATOR
+══════════════════════════════════════════ -->
+<div class="panel" id="tab-pdf">
+
+  <div class="two-col">
+
+    <!-- Config -->
+    <div class="card">
+      <div class="card-hdr"><h2>📄 PDF Quiz Builder</h2></div>
+      <div class="card-body">
+        <div class="pdf-config">
+
+          <div class="pf-section">
+            <div class="pf-label">Quiz Details</div>
+            <div class="pf-row">
+              <input class="pf-inp" type="text" id="pdfTitle" placeholder="Quiz title (e.g. Chapter 9 Review)">
+              <input class="pf-inp" type="text" id="pdfCourse" placeholder="Course / Period" value="CompTIA A+ 220-1202">
+            </div>
+            <div class="pf-row" style="margin-top:8px">
+              <input class="pf-inp" type="date" id="pdfDate">
+              <select class="pf-select" id="pdfDiff">
+                <option value="mixed">Mixed difficulty</option>
+                <option value="easy">Easy (foundational)</option>
+                <option value="medium">Medium (application)</option>
+                <option value="hard">Hard (exam-level)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pf-section">
+            <div class="pf-label">Chapters (select one or more)</div>
+            <div class="chapter-chips" id="pdfChips"></div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <button class="btn btn-ghost btn-sm" onclick="pdfSelectAll()">Select All</button>
+              <button class="btn btn-ghost btn-sm" onclick="pdfClearAll()">Clear</button>
+            </div>
+          </div>
+
+          <div class="pf-section">
+            <div class="pf-label">Question Types</div>
+            <div class="qtype-row">
+              <div class="qt-btn on" onclick="togglePdfType(this,'mc')" data-type="mc">Multiple Choice</div>
+              <div class="qt-btn" onclick="togglePdfType(this,'tf')" data-type="tf">True / False</div>
+              <div class="qt-btn" onclick="togglePdfType(this,'open')" data-type="open">Open Response</div>
+            </div>
+          </div>
+
+          <div class="pf-section">
+            <div class="pf-label">Options</div>
+            <div class="pf-row">
+              <select class="pf-select" id="pdfCount">
+                <option value="5">5 questions</option>
+                <option value="10" selected>10 questions</option>
+                <option value="15">15 questions</option>
+                <option value="20">20 questions</option>
+                <option value="25">25 questions</option>
+              </select>
+              <select class="pf-select" id="pdfFormat">
+                <option value="both">Questions + Answer Key (separate pages)</option>
+                <option value="questions">Questions only</option>
+                <option value="key">Answer key only</option>
+              </select>
+            </div>
+            <div class="pf-row" style="margin-top:8px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx2);cursor:pointer">
+                <input type="checkbox" id="pdfAnsLines" checked style="accent-color:var(--acc)"> Include answer lines for open response
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx2);cursor:pointer">
+                <input type="checkbox" id="pdfRationale" style="accent-color:var(--acc)"> Include rationale in answer key
+              </label>
+            </div>
+          </div>
+
+          <button class="btn btn-acc" style="width:100%;justify-content:center;padding:13px;font-size:14px" onclick="generatePDF()" id="pdfGenBtn">
+            ⚡ Generate PDF Quiz
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview + Download -->
+    <div class="card">
+      <div class="card-hdr"><h2>Preview & Download</h2><span class="tag acc" id="pdfStatus">Ready</span></div>
+      <div class="card-body" id="pdfPreviewArea">
+        <div style="text-align:center;padding:40px 20px;color:var(--tx3)">
+          <div style="font-size:40px;margin-bottom:12px;opacity:.4">📄</div>
+          <div style="font-family:var(--display);font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--tx2);margin-bottom:8px">Ready to Generate</div>
+          <div style="font-size:11px;font-family:var(--mono);line-height:1.8">Select chapters and question types,<br>then click Generate PDF Quiz.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /tab-pdf -->
+
+</div><!-- /content -->
+</div><!-- /app -->
+
+<!-- LOCKDOWN OVERLAY -->
+<div id="lockdownOverlay" style="display:none" class="lockdown-overlay">
+  <div class="lo-header">
+    <div class="lo-secure">
+      <span>🔒</span>
+      <span id="loSecureLabel">SECURE QUIZ MODE · <span id="loStudentCode">—</span></span>
+    </div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--tx3)" id="loTitle">—</div>
+    <div class="lo-timer" id="loTimer">20:00</div>
+  </div>
+  <div class="lo-body" id="loBody">
+    <div class="loading">Loading quiz questions…</div>
+  </div>
+  <div class="lo-footer">
+    <div class="lo-progress-bar"><div class="lo-progress-fill" id="loProgressFill" style="width:0%"></div></div>
+    <div class="lo-qcount" id="loQCount">0 / 0 answered</div>
+    <button class="btn btn-grn btn-sm" id="loSubmitBtn" onclick="submitLockdownQuiz()" disabled>Submit Quiz</button>
+  </div>
+</div>
+
+<!-- Violation flash -->
+<div class="violation-flash" id="violationFlash"></div>
+
+<!-- Warning banner -->
+<div class="integrity-warning" id="integrityWarning"></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="platform.js"></script>
+<script>
+// Fallback storage helpers (in case platform.js loads async)
+if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+const CHAPTERS = [
+  {id:0,ch:'Ch.1',title:'Safety & Professionalism'},
+  {id:1,ch:'Ch.2',title:'Intro to Computers & OS'},
+  {id:2,ch:'Ch.7',title:'Power Supplies'},
+  {id:3,ch:'Ch.8',title:'Mass Storage Technologies'},
+  {id:4,ch:'Ch.9',title:'Implementing Mass Storage'},
+  {id:5,ch:'Ch.10',title:'Essential Peripherals'},
+  {id:6,ch:'Ch.11',title:'Installing & Upgrading OS'},
+  {id:7,ch:'Ch.12',title:'Working with OS'},
+  {id:8,ch:'Ch.13',title:'Users, Groups & Permissions'},
+  {id:9,ch:'Ch.14',title:'Maintaining OS'},
+  {id:10,ch:'Ch.15',title:'Command-Line Interface'},
+  {id:11,ch:'Ch.16',title:'Troubleshooting Systems'},
+  {id:12,ch:'Ch.17',title:'Display Technologies'},
+  {id:13,ch:'Ch.18',title:'Essentials of Networking'},
+  {id:14,ch:'Ch.19',title:'TCP/IP Basics'},
+  {id:15,ch:'Ch.20',title:'OS Networking & Troubleshooting'},
+  {id:16,ch:'Ch.21',title:'Wireless Networking'},
+  {id:17,ch:'Ch.22',title:'Internet & SOHO Networking'},
+  {id:18,ch:'Ch.23',title:'Virtualization & Cloud'},
+  {id:19,ch:'Ch.24',title:'Portable Computing'},
+  {id:20,ch:'Ch.25',title:'Mobile Devices'},
+  {id:21,ch:'Ch.26',title:'Securing Mobile Devices'},
+  {id:22,ch:'Ch.27',title:'Printers & Multifunction'},
+  {id:23,ch:'Ch.28',title:'Essential Security'},
+  {id:24,ch:'Ch.29',title:'Securing Endpoints'},
+  {id:25,ch:'Ch.30',title:'Operational Procedures'},
+];
+
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function sl(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+const ST = {
+  pbisLog: ls('pbis_log',[]),
+  pbisStudents: ls('pbis_students',{}),
+  integrityLog: ls('integrity_log',[]),
+  settings: {fs:true,tab:true,rc:true,cp:true,dt:true,at:true,fl:true},
+  ldQuestions: null,
+  ldAnswers: {},
+  ldTimer: null,
+  ldSecs: 1200,
+  ldCode: '',
+  ldTitle: '',
+  ldSubmitted: false,
+  pdfChaps: new Set(),
+  pdfTypes: new Set(['mc']),
+  pdfQuestions: null,
+};
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+function init(){
+  buildPdfChips();
+  renderPBIS();
+  renderIntegrityLog();
+  document.getElementById('pdfDate').value = new Date().toISOString().split('T')[0];
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+// ══════════════════════════════════════════════════
+// PBIS
+// ══════════════════════════════════════════════════
+function awardPBIS(code, reason, pts, auto=false){
+  const entry = {code, reason, pts, auto, time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString(), ts: Date.now()};
+  ST.pbisLog.unshift(entry);
+  ST.pbisStudents[code] = (ST.pbisStudents[code]||0) + pts;
+  sl('pbis_log', ST.pbisLog);
+  sl('pbis_students', ST.pbisStudents);
+  renderPBIS();
+  toast(`🏆 ${code} +${pts} pts — ${reason}`, 'gold');
+}
+
+function autoAward(trigger, reason, pts){
+  const code = prompt('Student code for auto-award:') || 'STU-001';
+  awardPBIS(code.toUpperCase(), reason, pts, true);
+}
+
+function manualAward(){
+  const code = document.getElementById('manCode').value.trim().toUpperCase();
+  const reason = document.getElementById('manReason').value.trim();
+  const pts = parseInt(document.getElementById('manPts').value)||5;
+  if(!code){toast('Enter a student code','err');return;}
+  if(!reason){toast('Enter a reason','err');return;}
+  awardPBIS(code, reason, pts, false);
+  document.getElementById('manCode').value='';
+  document.getElementById('manReason').value='';
+}
+
+function quickAward(reason, pts){
+  const code = document.getElementById('manCode').value.trim().toUpperCase() || prompt('Student code:');
+  if(!code)return;
+  awardPBIS(code.toUpperCase(), reason, pts, false);
+}
+
+function renderPBIS(){
+  const total = Object.values(ST.pbisStudents).reduce((s,v)=>s+v,0);
+  document.getElementById('pbisTotal').textContent = total;
+  document.getElementById('hTotalPts').textContent = `${total} pts total`;
+
+  // Log
+  const log = document.getElementById('pbisLog');
+  log.innerHTML = ST.pbisLog.length ? ST.pbisLog.slice(0,30).map(e=>`
+    <div class="log-item">
+      <div class="log-icon">${e.auto?'⚡':'✋'}</div>
+      <div class="log-info">
+        <div class="log-reason">${e.reason}</div>
+        <div class="log-code">${e.code} · ${e.date} ${e.time}</div>
+      </div>
+      <div class="log-pts">+${e.pts}</div>
+    </div>`).join('') : '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No awards yet.</div>';
+
+  // Leaderboard
+  const sorted = Object.entries(ST.pbisStudents).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('leaderCount').textContent = `${sorted.length} students`;
+  document.getElementById('leaderboard').innerHTML = sorted.length ? sorted.map(([code,pts],i)=>`
+    <div class="stu-card ${i===0?'top':''}">
+      ${i===0?'<div style="font-size:14px;margin-bottom:3px">👑</div>':''}
+      <div class="stu-code">${code}</div>
+      <div class="stu-pts">${pts}</div>
+      <div class="stu-rank">#${i+1} · ${pts} pts</div>
+    </div>`).join('') : '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No students yet.</div>';
+}
+
+function exportPBIS(){
+  const lines = ['Student Code,Points Earned,Awards Count,Last Award Date'];
+  const byCode = {};
+  ST.pbisLog.forEach(e=>{
+    if(!byCode[e.code]) byCode[e.code]={pts:0,count:0,date:e.date};
+    byCode[e.code].pts += e.pts;
+    byCode[e.code].count++;
+    byCode[e.code].date = e.date;
+  });
+  Object.entries(byCode).sort((a,b)=>b[1].pts-a[1].pts).forEach(([code,data])=>{
+    lines.push(`${code},${data.pts},${data.count},${data.date}`);
+  });
+  // PBIS Rewards format note
+  lines.push('');
+  lines.push('# Upload instructions for PBIS Rewards:');
+  lines.push('# 1. Log into PBIS Rewards admin portal');
+  lines.push('# 2. Go to Points > Bulk Award');
+  lines.push('# 3. Upload this CSV file');
+  lines.push('# 4. Map columns: Student ID = Student Code, Points = Points Earned');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download = `PBIS_Rewards_Export_${new Date().toLocaleDateString().replace(/\//g,'-')}.csv`;
+  a.click();
+  toast('Exported for PBIS Rewards upload!','ok');
+}
+
+function resetPBIS(){
+  if(!confirm('Reset all PBIS points and log?'))return;
+  ST.pbisLog=[]; ST.pbisStudents={};
+  sl('pbis_log',[]); sl('pbis_students',{});
+  renderPBIS(); toast('PBIS data reset');
+}
+
+function clearLog(){ST.pbisLog=[];sl('pbis_log',[]);renderPBIS();}
+
+// ══════════════════════════════════════════════════
+// INTEGRITY / LOCKDOWN
+// ══════════════════════════════════════════════════
+function toggleSetting(key, el){
+  ST.settings[key] = !ST.settings[key];
+  el.classList.toggle('on', ST.settings[key]);
+}
+
+function logIntegrity(type, msg, code=''){
+  const entry = {type, msg, code, time: new Date().toLocaleTimeString(), ts: Date.now()};
+  ST.integrityLog.unshift(entry);
+  sl('integrity_log', ST.integrityLog);
+  renderIntegrityLog();
+}
+
+function renderIntegrityLog(){
+  const log = document.getElementById('integrityLog');
+  const violations = ST.integrityLog.filter(e=>e.type==='violation');
+  document.getElementById('violationCount').textContent = `${violations.length} violations`;
+  document.getElementById('hViolations').textContent = `${violations.length} violations`;
+  document.getElementById('hViolations').style.display = violations.length>0?'':'none';
+
+  log.innerHTML = ST.integrityLog.length ? ST.integrityLog.slice(0,30).map(e=>`
+    <div class="il-item ${e.type}">
+      <div class="il-icon">${e.type==='violation'?'⚠️':e.type==='warn'?'⚡':'✓'}</div>
+      <div class="il-msg">${e.code?`[${e.code}] `:''} ${e.msg}</div>
+      <div class="il-time">${e.time}</div>
+    </div>`).join('') : '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No sessions yet.</div>';
+
+  // Violation summary
+  const byStudent = {};
+  violations.forEach(v=>{if(v.code){byStudent[v.code]=(byStudent[v.code]||0)+1;}});
+  const summary = document.getElementById('violationSummary');
+  summary.innerHTML = Object.keys(byStudent).length ? Object.entries(byStudent).sort((a,b)=>b[1]-a[1]).map(([code,count])=>`
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--b1)">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--tx2)">${code}</span>
+      <span class="tag red">${count} violation${count>1?'s':''}</span>
+    </div>`).join('') : '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No violations recorded.</div>';
+}
+
+function clearIntegrityLog(){
+  ST.integrityLog=[]; sl('integrity_log',[]);
+  renderIntegrityLog(); toast('Integrity log cleared');
+}
+
+async function startLockdown(){
+  const code = document.getElementById('ldCode').value.trim().toUpperCase() || 'STUDENT';
+  const title = document.getElementById('ldTitle').value.trim() || 'CompTIA A+ Quiz';
+  const secs = parseInt(document.getElementById('ldTime').value)||1200;
+  ST.ldCode = code; ST.ldTitle = title; ST.ldSecs = secs;
+  ST.ldAnswers = {}; ST.ldSubmitted = false;
+
+  // Show overlay
+  document.getElementById('lockdownOverlay').style.display='flex';
+  document.getElementById('loStudentCode').textContent = code;
+  document.getElementById('loTitle').textContent = title;
+  document.getElementById('loBody').innerHTML = '<div class="loading">Generating quiz questions…</div>';
+
+  // Enforce fullscreen
+  if(ST.settings.fs){
+    try{await document.documentElement.requestFullscreen();}catch(e){}
+  }
+
+  // Set up integrity listeners
+  setupIntegrityListeners();
+  logIntegrity('ok', `Quiz session started: ${title}`, code);
+
+  // Generate questions via AI
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:2500,
+        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown.',
+        messages:[{role:'user',content:`Generate 10 CompTIA A+ 220-1202 multiple choice questions at exam difficulty. Mix of topics from all chapters. Use qualifier words (BEST, FIRST, MOST, NEXT). Plausible distractors.
+Return JSON: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."}]`}]
+      })
+    });
+    const d = await r.json();
+    const text = d.content?.map(c=>c.text||'').join('')||'';
+    ST.ldQuestions = JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+    renderLockdownQuiz();
+    startLockdownTimer();
+  }catch(e){
+    document.getElementById('loBody').innerHTML='<div style="color:var(--red);padding:20px;font-family:var(--mono)">Failed to load questions. Check your connection and try again.</div>';
+  }
+}
+
+function renderLockdownQuiz(){
+  const qs = ST.ldQuestions;
+  if(!qs) return;
+  const answered = Object.keys(ST.ldAnswers).length;
+  document.getElementById('loProgressFill').style.width = `${answered/qs.length*100}%`;
+  document.getElementById('loQCount').textContent = `${answered} / ${qs.length} answered`;
+  document.getElementById('loSubmitBtn').disabled = answered < qs.length && !ST.ldSubmitted;
+
+  if(ST.ldSubmitted){
+    let score = 0;
+    const html = qs.map((q,i)=>{
+      const sel = ST.ldAnswers[i];
+      const correct = sel===q.answer;
+      if(correct) score++;
+      return `<div class="lo-q-block">
+        <div class="lo-q-num">Question ${i+1} of ${qs.length} · ${correct?'<span style="color:var(--grn)">CORRECT</span>':'<span style="color:var(--red)">WRONG</span>'}</div>
+        <div class="lo-q-text">${q.q}</div>
+        <div class="lo-opts">
+          ${['A','B','C','D'].map(l=>`
+            <div class="lo-opt ${l===q.answer?'correct':l===sel&&l!==q.answer?'wrong':''}">
+              <div class="lo-opt-ltr">${l}</div>
+              <div class="lo-opt-txt">${q.opts[l]}</div>
+            </div>`).join('')}
+        </div>
+        <div class="lo-rationale show">${q.rationale}</div>
+      </div>`;
+    }).join('');
+    const pct = Math.round(score/qs.length*100);
+    const col = pct>=80?'var(--grn)':pct>=60?'var(--amb)':'var(--red)';
+    document.getElementById('loBody').innerHTML = `
+      <div style="text-align:center;padding:24px;background:var(--s2);border-radius:var(--rl);margin-bottom:20px;border:1px solid var(--b1)">
+        <div style="font-family:var(--display);font-size:64px;font-weight:800;color:${col};line-height:1;letter-spacing:-3px">${pct}%</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--tx2);margin-top:8px">${score} of ${qs.length} correct · ${pct>=80?'PASS':'NEEDS REVIEW'}</div>
+        <button class="btn btn-ghost btn-sm" onclick="exitLockdown()" style="margin-top:14px">Exit Quiz Mode</button>
+      </div>${html}`;
+    // Auto-award PBIS if 80%+
+    if(pct>=80 && ST.ldCode && ST.ldCode!=='STUDENT'){
+      awardPBIS(ST.ldCode, `Scored ${pct}% on Timed Practice (Lockdown Quiz)`, 5, true);
+    }
+    return;
+  }
+
+  document.getElementById('loBody').innerHTML = qs.map((q,i)=>{
+    const sel = ST.ldAnswers[i];
+    return `<div class="lo-q-block">
+      <div class="lo-q-num">Question ${i+1} of ${qs.length}</div>
+      <div class="lo-q-text">${q.q}</div>
+      <div class="lo-opts">
+        ${['A','B','C','D'].map(l=>`
+          <div class="lo-opt ${sel===l?'sel':''}" onclick="ldPick(${i},'${l}')">
+            <div class="lo-opt-ltr">${l}</div>
+            <div class="lo-opt-txt">${q.opts[l]}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  updateLdProgress();
+}
+
+function ldPick(i, letter){
+  if(ST.ldSubmitted) return;
+  ST.ldAnswers[i] = letter;
+  updateLdProgress();
+  // Re-render just that question's options
+  const block = document.getElementById('loBody').querySelectorAll('.lo-q-block')[i];
+  if(block){
+    block.querySelectorAll('.lo-opt').forEach((opt,j)=>{
+      const l=['A','B','C','D'][j];
+      opt.className = `lo-opt ${l===letter?'sel':''}`;
+    });
+  }
+}
+
+function updateLdProgress(){
+  const qs = ST.ldQuestions||[];
+  const answered = Object.keys(ST.ldAnswers).length;
+  document.getElementById('loProgressFill').style.width = `${qs.length?answered/qs.length*100:0}%`;
+  document.getElementById('loQCount').textContent = `${answered} / ${qs.length} answered`;
+  document.getElementById('loSubmitBtn').disabled = answered < qs.length;
+}
+
+function submitLockdownQuiz(){
+  if(!ST.ldQuestions) return;
+  if(Object.keys(ST.ldAnswers).length < ST.ldQuestions.length){
+    showWarning('Answer all questions before submitting!'); return;
+  }
+  ST.ldSubmitted = true;
+  clearInterval(ST.ldTimer);
+  logIntegrity('ok', `Quiz submitted by ${ST.ldCode}`, ST.ldCode);
+  document.getElementById('loSubmitBtn').disabled = true;
+  renderLockdownQuiz();
+}
+
+function startLockdownTimer(){
+  let secs = ST.ldSecs;
+  updateTimerDisplay(secs);
+  ST.ldTimer = setInterval(()=>{
+    secs--;
+    updateTimerDisplay(secs);
+    if(secs<=120) document.getElementById('loTimer').className='lo-timer warn';
+    if(secs<=0){
+      clearInterval(ST.ldTimer);
+      if(ST.settings.at && !ST.ldSubmitted){ submitLockdownQuiz(); }
+    }
+  },1000);
+}
+
+function updateTimerDisplay(secs){
+  const m=Math.floor(secs/60), s=secs%60;
+  document.getElementById('loTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function exitLockdown(){
+  clearInterval(ST.ldTimer);
+  document.getElementById('lockdownOverlay').style.display='none';
+  removeIntegrityListeners();
+  if(document.fullscreenElement) document.exitFullscreen();
+}
+
+// ── INTEGRITY LISTENERS ──
+let _intListeners = {};
+
+function setupIntegrityListeners(){
+  // Tab visibility
+  if(ST.settings.tab){
+    _intListeners.vis = ()=>{
+      if(document.hidden){
+        flagViolation('Tab switch detected — student left the quiz tab');
+      }
+    };
+    document.addEventListener('visibilitychange',_intListeners.vis);
+  }
+
+  // Right-click
+  if(ST.settings.rc){
+    _intListeners.rc = e=>{e.preventDefault(); flagViolation('Right-click attempt blocked');};
+    document.getElementById('lockdownOverlay').addEventListener('contextmenu',_intListeners.rc);
+  }
+
+  // Copy/paste/select
+  if(ST.settings.cp){
+    _intListeners.cp = e=>{
+      if((e.ctrlKey||e.metaKey)&&['c','v','a','x'].includes(e.key.toLowerCase())){
+        e.preventDefault(); flagViolation(`Keyboard shortcut blocked: Ctrl+${e.key.toUpperCase()}`);
+      }
+      if(e.key==='F12'){e.preventDefault(); flagViolation('F12 (Dev Tools) blocked');}
+      if(e.key==='Escape'){e.preventDefault(); showWarning('You cannot exit during a quiz!');}
+    };
+    document.addEventListener('keydown',_intListeners.cp);
+  }
+
+  // Fullscreen exit detection
+  if(ST.settings.fs){
+    _intListeners.fs = ()=>{
+      if(!document.fullscreenElement && !ST.ldSubmitted){
+        flagViolation('Fullscreen exited — attempting to restore');
+        document.documentElement.requestFullscreen().catch(()=>{});
+      }
+    };
+    document.addEventListener('fullscreenchange',_intListeners.fs);
+  }
+
+  // Dev tools size detection
+  if(ST.settings.dt){
+    _intListeners.dt = setInterval(()=>{
+      if(window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160){
+        flagViolation('Developer tools may be open — window size anomaly detected');
+      }
+    }, 2000);
+  }
+
+  // Mouse leave
+  _intListeners.ml = ()=>{ if(!ST.ldSubmitted) flagViolation('Mouse left quiz window'); };
+  document.addEventListener('mouseleave',_intListeners.ml);
+}
+
+function removeIntegrityListeners(){
+  if(_intListeners.vis) document.removeEventListener('visibilitychange',_intListeners.vis);
+  if(_intListeners.rc) document.getElementById('lockdownOverlay')?.removeEventListener('contextmenu',_intListeners.rc);
+  if(_intListeners.cp) document.removeEventListener('keydown',_intListeners.cp);
+  if(_intListeners.fs) document.removeEventListener('fullscreenchange',_intListeners.fs);
+  if(_intListeners.dt) clearInterval(_intListeners.dt);
+  if(_intListeners.ml) document.removeEventListener('mouseleave',_intListeners.ml);
+  _intListeners = {};
+}
+
+function flagViolation(msg){
+  if(ST.ldSubmitted) return;
+  showWarning(`⚠️ INTEGRITY ALERT: ${msg}`);
+  flashViolation();
+  if(ST.settings.fl) logIntegrity('violation', msg, ST.ldCode);
+}
+
+function showWarning(msg){
+  const el = document.getElementById('integrityWarning');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+function flashViolation(){
+  const el = document.getElementById('violationFlash');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),300);
+}
+
+// ══════════════════════════════════════════════════
+// PDF QUIZ GENERATOR
+// ══════════════════════════════════════════════════
+function buildPdfChips(){
+  document.getElementById('pdfChips').innerHTML = CHAPTERS.map(ch=>`
+    <div class="ch-chip" onclick="togglePdfChap(${ch.id},this)" id="pchip-${ch.id}">${ch.ch}</div>`).join('');
+}
+
+function togglePdfChap(id,el){
+  if(ST.pdfChaps.has(id)){ST.pdfChaps.delete(id);el.classList.remove('on');}
+  else{ST.pdfChaps.add(id);el.classList.add('on');}
+}
+
+function togglePdfType(el,type){
+  if(ST.pdfTypes.has(type)){if(ST.pdfTypes.size===1)return;ST.pdfTypes.delete(type);el.classList.remove('on');}
+  else{ST.pdfTypes.add(type);el.classList.add('on');}
+}
+
+function pdfSelectAll(){CHAPTERS.forEach(ch=>{ST.pdfChaps.add(ch.id);document.getElementById(`pchip-${ch.id}`)?.classList.add('on');});}
+function pdfClearAll(){ST.pdfChaps.clear();document.querySelectorAll('.ch-chip').forEach(el=>el.classList.remove('on'));}
+
+async function generatePDF(){
+  if(ST.pdfChaps.size===0){toast('Select at least one chapter','err');return;}
+  const btn = document.getElementById('pdfGenBtn');
+  btn.disabled=true; btn.textContent='⚡ Generating…';
+  document.getElementById('pdfStatus').textContent='Generating…';
+  document.getElementById('pdfPreviewArea').innerHTML='<div class="loading">Generating quiz questions via AI…</div>';
+
+  const chaps = CHAPTERS.filter(c=>ST.pdfChaps.has(c.id));
+  const types = [...ST.pdfTypes];
+  const count = parseInt(document.getElementById('pdfCount').value)||10;
+  const diff = document.getElementById('pdfDiff').value;
+  const title = document.getElementById('pdfTitle').value || `CompTIA A+ Quiz`;
+  const course = document.getElementById('pdfCourse').value || 'CompTIA A+ 220-1202';
+  const format = document.getElementById('pdfFormat').value;
+  const ansLines = document.getElementById('pdfAnsLines').checked;
+  const rationale = document.getElementById('pdfRationale').checked;
+
+  const typeMap = {
+    mc:'Multiple choice (4 options A-D, CompTIA qualifier words)',
+    tf:'True/False (clear factual statement)',
+    open:'Open response CompTIA scenario (2-3 sentence IT scenario with constraint and qualifier word)',
+  };
+  const typeDescs = types.map(t=>typeMap[t]).join('; ');
+
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:3500,
+        system:'You are a CompTIA A+ 220-1202 exam writer for high school students. Return only valid JSON array.',
+        messages:[{role:'user',content:`Generate ${count} CompTIA A+ 220-1202 quiz questions.
+Chapters: ${chaps.map(c=>`${c.ch} ${c.title}`).join(', ')}
+Difficulty: ${diff}
+Types: ${typeDescs}
+
+Return JSON array:
+[
+  {"type":"mc","num":1,"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"...","chapter":"Ch.X"},
+  {"type":"tf","num":2,"q":"True or false statement","answer":true,"rationale":"...","chapter":"Ch.X"},
+  {"type":"open","num":3,"scenario":"2-3 sentence IT scenario","prompt":"What should the technician do FIRST?","modelAnswer":"Model answer with key points","chapter":"Ch.X"}
+]`}]
+      })
+    });
+    const d = await r.json();
+    const text = d.content?.map(c=>c.text||'').join('')||'';
+    ST.pdfQuestions = JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+    renderPDFPreview(ST.pdfQuestions, title, course, format, ansLines, rationale);
+    document.getElementById('pdfStatus').textContent=`${ST.pdfQuestions.length} questions ready`;
+    toast(`${ST.pdfQuestions.length} questions generated!`,'ok');
+  }catch(e){
+    document.getElementById('pdfPreviewArea').innerHTML=`<div style="color:var(--red);font-family:var(--mono);font-size:11px;padding:16px">Generation failed: ${e.message}</div>`;
+    document.getElementById('pdfStatus').textContent='Failed';
+    toast('Generation failed','err');
+  }
+  btn.disabled=false; btn.textContent='⚡ Generate PDF Quiz';
+}
+
+function renderPDFPreview(qs, title, course, format, ansLines, rationale){
+  const preview = document.getElementById('pdfPreviewArea');
+  preview.innerHTML = `
+    <div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-acc" onclick="downloadPDF()">⬇️ Download PDF</button>
+      <button class="btn btn-ghost btn-sm" onclick="printPDF()">🖨️ Print</button>
+      <span class="tag acc">${qs.length} questions</span>
+    </div>
+    <div class="pdf-preview" id="pdfPreviewText">${buildPDFText(qs, title, course, format, ansLines, rationale)}</div>`;
+}
+
+function buildPDFText(qs, title, course, format, ansLines, inclRationale){
+  const date = document.getElementById('pdfDate').value || new Date().toLocaleDateString();
+  const lines = [];
+  const hr = '─'.repeat(60);
+
+  if(format!=='key'){
+    lines.push(`${course}`);
+    lines.push(`${title}`);
+    lines.push(`Date: ${date}   Name/Code: _____________________`);
+    lines.push(hr);
+    lines.push('');
+    lines.push('INSTRUCTIONS: Choose the BEST answer for each question.');
+    lines.push('For scenario questions, read carefully and identify the qualifier word.');
+    lines.push('');
+    lines.push(hr);
+    lines.push('');
+
+    qs.forEach((q,i)=>{
+      if(q.type==='mc'){
+        lines.push(`${i+1}. ${q.q}`);
+        ['A','B','C','D'].forEach(l=>lines.push(`   ${l}. ${q.opts[l]}`));
+        lines.push('');
+      } else if(q.type==='tf'){
+        lines.push(`${i+1}. TRUE / FALSE: ${q.q}`);
+        lines.push('   Circle one:   TRUE     FALSE');
+        lines.push('');
+      } else if(q.type==='open'){
+        lines.push(`${i+1}. SCENARIO:`);
+        lines.push(`   ${q.scenario}`);
+        lines.push(`   ${q.prompt||'What should the technician do FIRST?'}`);
+        if(ansLines){
+          lines.push('');
+          lines.push('   ___________________________________________');
+          lines.push('   ___________________________________________');
+          lines.push('   ___________________________________________');
+        }
+        lines.push('');
+      }
+    });
+  }
+
+  if(format!=='questions'){
+    if(format==='both'){lines.push('');lines.push('═'.repeat(60));lines.push('ANSWER KEY — DO NOT DISTRIBUTE TO STUDENTS');lines.push('═'.repeat(60));lines.push('');}
+    else{lines.push(`${course}`);lines.push(`ANSWER KEY — ${title}`);lines.push(hr);lines.push('');}
+
+    qs.forEach((q,i)=>{
+      if(q.type==='mc'){
+        lines.push(`${i+1}. ${q.answer}`);
+        if(inclRationale) lines.push(`   → ${q.rationale}`);
+      } else if(q.type==='tf'){
+        lines.push(`${i+1}. ${q.answer ? 'TRUE' : 'FALSE'}`);
+        if(inclRationale) lines.push(`   → ${q.rationale}`);
+      } else if(q.type==='open'){
+        lines.push(`${i+1}. [Open Response]`);
+        lines.push(`   Model Answer: ${q.modelAnswer}`);
+      }
+      lines.push('');
+    });
+  }
+
+  return lines.join('\n');
+}
+
+function downloadPDF(){
+  if(!ST.pdfQuestions){toast('Generate questions first','err');return;}
+  const title = document.getElementById('pdfTitle').value || 'CompTIA_A+_Quiz';
+  const course = document.getElementById('pdfCourse').value || 'CompTIA A+ 220-1202';
+  const format = document.getElementById('pdfFormat').value;
+  const ansLines = document.getElementById('pdfAnsLines').checked;
+  const rationale = document.getElementById('pdfRationale').checked;
+  const text = buildPDFText(ST.pdfQuestions, title, course, format, ansLines, rationale);
+
+  // Generate styled HTML for PDF printing
+  const html = buildPrintHTML(ST.pdfQuestions, title, course, format, ansLines, rationale);
+  const blob = new Blob([html],{type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url,'_blank');
+  if(win){
+    setTimeout(()=>{win.print();},800);
+  } else {
+    // Fallback: download as text
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+    a.download = `${title.replace(/\s+/g,'_')}.txt`;
+    a.click();
+  }
+  toast('PDF ready — print dialog opened','ok');
+}
+
+function buildPrintHTML(qs, title, course, format, ansLines, inclRationale){
+  const date = document.getElementById('pdfDate').value || new Date().toLocaleDateString();
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${title}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Calibri:wght@400;700&display=swap');
+  body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4;color:#000;margin:0;padding:0}
+  .page{width:8.5in;min-height:11in;padding:1in;margin:0 auto;box-sizing:border-box}
+  .header{border-bottom:2pt solid #000;padding-bottom:8pt;margin-bottom:16pt}
+  .h-title{font-size:16pt;font-weight:bold;margin-bottom:4pt}
+  .h-meta{display:flex;justify-content:space-between;font-size:10pt;color:#444}
+  .meta-line{margin-bottom:6pt;font-size:10pt}
+  .instructions{background:#f5f5f5;border:1pt solid #ccc;padding:8pt 12pt;margin-bottom:16pt;font-size:10pt}
+  .q-block{margin-bottom:16pt;page-break-inside:avoid}
+  .q-num{font-weight:bold;font-size:11pt;margin-bottom:4pt}
+  .q-text{margin-bottom:6pt;font-size:11pt}
+  .scenario-box{background:#f9f9f9;border-left:3pt solid #2563eb;padding:8pt 12pt;margin-bottom:8pt;font-size:10.5pt;font-style:italic}
+  .opts{margin-left:16pt}
+  .opt{margin-bottom:3pt;font-size:11pt}
+  .ans-line{border-bottom:1pt solid #000;height:18pt;margin:6pt 0}
+  .tf-opts{font-weight:bold;font-size:12pt;letter-spacing:20pt;margin-left:16pt}
+  .answer-key{page-break-before:always}
+  .ak-header{background:#1a1a1a;color:#fff;padding:10pt 14pt;font-size:13pt;font-weight:bold;margin-bottom:14pt}
+  .ak-item{margin-bottom:10pt;padding:6pt 10pt;background:#f9f9f9;border-left:3pt solid #16a34a}
+  .ak-num{font-weight:bold}
+  .ak-rationale{font-size:10pt;color:#555;margin-top:4pt;font-style:italic}
+  @media print{body{margin:0}.page{margin:0;padding:.75in}}
+</style></head><body>`;
+
+  if(format!=='key'){
+    html += `<div class="page">
+      <div class="header">
+        <div class="h-title">${title}</div>
+        <div class="h-meta"><span>${course}</span><span>Date: ${date}</span></div>
+        <div class="meta-line" style="margin-top:8pt">Student Code: _______________________ &nbsp;&nbsp;&nbsp; Period: _____________</div>
+      </div>
+      <div class="instructions"><strong>Instructions:</strong> Choose the BEST answer for each question. For scenario questions, identify the qualifier word (BEST, FIRST, MOST, NEXT) and use evidence from the scenario to support your answer.</div>`;
+
+    qs.forEach((q,i)=>{
+      html += `<div class="q-block">`;
+      if(q.type==='mc'){
+        html += `<div class="q-num">Question ${i+1}. <span style="font-family:monospace;font-size:9pt;background:#e0e7ff;padding:1pt 5pt;border-radius:3pt">Multiple Choice</span></div>
+          <div class="q-text">${q.q}</div>
+          <div class="opts">
+            ${['A','B','C','D'].map(l=>`<div class="opt">&#9675; &nbsp; <strong>${l}.</strong> &nbsp; ${q.opts[l]}</div>`).join('')}
+          </div>`;
+      } else if(q.type==='tf'){
+        html += `<div class="q-num">Question ${i+1}. <span style="font-family:monospace;font-size:9pt;background:#dcfce7;padding:1pt 5pt;border-radius:3pt">True / False</span></div>
+          <div class="q-text">${q.q}</div>
+          <div class="tf-opts">TRUE &nbsp;&nbsp;&nbsp;&nbsp; FALSE</div>`;
+      } else if(q.type==='open'){
+        html += `<div class="q-num">Question ${i+1}. <span style="font-family:monospace;font-size:9pt;background:#ede9fe;padding:1pt 5pt;border-radius:3pt">Open Response</span></div>
+          <div class="scenario-box">${q.scenario}</div>
+          <div class="q-text"><strong>${q.prompt||'What should the technician do FIRST? Explain your reasoning.'}</strong></div>
+          ${ansLines?'<div class="ans-line"></div><div class="ans-line"></div><div class="ans-line"></div>':''}`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
+  if(format!=='questions'){
+    html += `<div class="${format==='both'?'answer-key':'page'}">
+      <div class="ak-header">📋 ANSWER KEY — DO NOT DISTRIBUTE TO STUDENTS<br><span style="font-size:10pt;font-weight:normal">${title} · ${course} · ${date}</span></div>`;
+    qs.forEach((q,i)=>{
+      html += `<div class="ak-item">
+        <div class="ak-num">Q${i+1}. `;
+      if(q.type==='mc') html += `Answer: <strong>${q.answer}. ${q.opts[q.answer]}</strong>`;
+      else if(q.type==='tf') html += `Answer: <strong>${q.answer?'TRUE':'FALSE'}</strong>`;
+      else if(q.type==='open') html += `<em>Open Response</em> — Model Answer: <strong>${q.modelAnswer}</strong>`;
+      html += `</div>`;
+      if(inclRationale && q.rationale) html += `<div class="ak-rationale">Rationale: ${q.rationale}</div>`;
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('pbis');}
+}
+</script>
+</body></html>`;
+  return html;
+}
+
+function printPDF(){
+  if(!ST.pdfQuestions){toast('Generate questions first','err');return;}
+  downloadPDF();
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function toast(msg, type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',3500);
+}
+
+init();
+</script>
+<script>
+// Platform shared init
+if(typeof Platform !== 'undefined') {
+  if(typeof Platform!=='undefined'){Platform.init('pbis');}
+}
+</script>
+</body>
+</html>
