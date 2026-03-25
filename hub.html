@@ -323,8 +323,15 @@ footer {
     <div class="ph-sub">CompTIA A+ 220-1202 · Classroom Hub</div>
   </div>
   <div class="ph-right" id="headerRight">
-    <span id="teacherBadge" style="display:none;font-family:var(--mono);font-size:9px;background:var(--gold-d);border:1px solid var(--gold);color:var(--gold);padding:4px 10px;border-radius:20px;cursor:pointer" onclick="switchToStudent()">👨‍🏫 Teacher · Switch to Student</span>
-    <span class="ph-back" onclick="openAnnModal()">📢 Announce</span>
+    <!-- Teacher mode active -->
+    <span id="teacherBadge" style="display:none;font-family:var(--mono);font-size:9px;background:var(--gold-d);border:1px solid var(--gold);color:var(--gold);padding:5px 12px;border-radius:20px;cursor:pointer;letter-spacing:.3px" onclick="switchToStudent()">👨‍🏫 Teacher Mode · Exit</span>
+    <span id="teacherAnnounce" style="display:none" class="ph-back" onclick="openAnnModal()">📢 Announce</span>
+    <!-- Always visible teacher login button -->
+    <button id="teacherLoginBtn"
+      onclick="openTeacherLogin()"
+      style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;padding:6px 14px;border-radius:6px;border:1.5px solid var(--gold);background:var(--gold-d);color:var(--gold);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:5px">
+      🔑 Teacher Login
+    </button>
   </div>
 </header>
 
@@ -659,6 +666,15 @@ function teacherEntry() {
   setTimeout(() => document.getElementById('pinInput').focus(), 200);
 }
 
+function openTeacherLogin() {
+  // Close any open modals first
+  document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('open'));
+  document.getElementById('teacherModal').classList.add('open');
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinError').textContent = '';
+  setTimeout(() => document.getElementById('pinInput').focus(), 200);
+}
+
 function checkTeacherPin() {
   const pin = document.getElementById('pinInput').value.trim();
   const savedPin = localStorage.getItem('teacher_pin') || '1202'; // default PIN is 1202
@@ -684,14 +700,17 @@ function closeTeacherModal() {
 }
 
 function applyMode(isTeacher) {
-  // Teacher-only tools: setup wizard banner, PBIS, exam suite teacher tabs, setup extras, arena setup
-  const teacherTools = document.querySelectorAll('.teacher-only');
-  teacherTools.forEach(el => {
+  // Teacher-only elements
+  document.querySelectorAll('.teacher-only').forEach(el => {
     el.style.display = isTeacher ? '' : 'none';
   });
-  // Show teacher badge in header if teacher mode
-  const badge = document.getElementById('teacherBadge');
-  if (badge) badge.style.display = isTeacher ? '' : 'none';
+  // Header controls
+  const badge        = document.getElementById('teacherBadge');
+  const announce     = document.getElementById('teacherAnnounce');
+  const loginBtn     = document.getElementById('teacherLoginBtn');
+  if (badge)    badge.style.display    = isTeacher ? '' : 'none';
+  if (announce) announce.style.display = isTeacher ? '' : 'none';
+  if (loginBtn) loginBtn.style.display = isTeacher ? 'none' : 'flex';
 }
 
 function switchToStudent() {
