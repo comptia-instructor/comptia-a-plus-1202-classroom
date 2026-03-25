@@ -963,7 +963,7 @@ Return JSON array of exactly ${count} questions:
 Rules: vary chapters, no repeated questions, realistic IT scenarios, CompTIA exam style wording.`;
 
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown.',messages:[{role:'user',content:prompt}]})});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON, no markdown. Each call must produce DIFFERENT questions — vary topics, difficulty, scenario types, and wording every time. Return only valid JSON array.',messages:[{role:'user',content:prompt}]})});
     const d=await resp.json();
     const text=d.content?.map(c=>c.text||'').join('')||'';
     const clean=text.replace(/```json\n?|\n?```/g,'').trim();
@@ -1088,7 +1088,7 @@ async function checkOpen(i){
   const btn=ta.nextElementSibling;
   btn.disabled=true;btn.textContent='Checking…';
   try{
-    const j=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:'You are a CompTIA A+ instructor. Give brief, encouraging feedback on a student\'s open response. Keep it under 80 words. Note what they got right, what was missing, and the key points from the model answer.',messages:[{role:'user',content:`Question/Scenario: ${q.scenario}\nPrompt: ${q.prompt}\nModel answer: ${q.modelAnswer}\nStudent response: ${resp}\n\nGive feedback in this format: "✓ What you got right: ... | ✗ What was missing: ... | Key point: ..."`}]})});
+    const j=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:'You are a CompTIA A+ instructor. Give brief, encouraging feedback on a student\'s open response. Keep it under 80 words. Note what they got right, what was missing, and the key points from the model answer.',messages:[{role:'user',content:`[Seed: ${Date.now()}] Question/Scenario: ${q.scenario}\nPrompt: ${q.prompt}\nModel answer: ${q.modelAnswer}\nStudent response: ${resp}\n\nGive feedback in this format: "✓ What you got right: ... | ✗ What was missing: ... | Key point: ..."`}]})});
     const data=await j.json();
     const feedback=data.content?.map(c=>c.text||'').join('')||'';
     const fb=document.getElementById(`of-${i}`);
@@ -1219,6 +1219,28 @@ init();
 if(typeof Platform !== 'undefined') {
   if(typeof Platform!=='undefined'){Platform.init('notes');}
 }
+
+// PDF export for quiz results
+function exportQuizPDF(questions, meta) {
+  if (typeof Platform !== 'undefined' && Platform.quizToPDF) {
+    Platform.quizToPDF(questions, meta);
+  }
+}
+
+function exportCurrentQuizPDF() {
+  // Try to find the last generated quiz questions in state
+  const qs = window._lastQuizQuestions || [];
+  if (!qs.length) {
+    if(typeof Platform!=='undefined') Platform.toast('Generate a quiz first', 'err');
+    return;
+  }
+  Platform.quizToPDF(qs, {
+    title: 'CompTIA A+ Chapter Quiz',
+    course: 'CompTIA A+ 220-1202',
+    showKey: true,
+  });
+}
+
 </script>
 </body>
 </html>

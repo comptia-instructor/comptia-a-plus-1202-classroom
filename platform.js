@@ -88,6 +88,155 @@
       return existing;
     },
 
+    // ── PDF EXPORT ──
+    // Call with an array of question objects and optional metadata
+    // questions: [{q, opts:{A,B,C,D}, answer, rationale, type, domain, studentAnswer}]
+    // meta: {title, course, code, date, score, total}
+    quizToPDF: function(questions, meta) {
+      meta = meta || {};
+      const title    = meta.title  || 'CompTIA A+ Quiz';
+      const course   = meta.course || 'CompTIA A+ 220-1202';
+      const code     = meta.code   || this.getCode() || '';
+      const date     = meta.date   || new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+      const showKey  = meta.showKey !== false; // default true
+      const scored   = meta.score !== undefined;
+
+      const scoreColor = scored
+        ? (meta.score/meta.total >= .8 ? '#16a34a' : meta.score/meta.total >= .6 ? '#d97706' : '#dc2626')
+        : '#2563eb';
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${title}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Barlow',Arial,sans-serif;font-size:11pt;color:#111;background:#fff;padding:0}
+  .page{width:8.5in;min-height:11in;padding:.75in;margin:0 auto}
+  .hdr{border-bottom:2pt solid #111;padding-bottom:10pt;margin-bottom:16pt;display:flex;justify-content:space-between;align-items:flex-end}
+  .hdr-left h1{font-family:'Barlow Condensed',sans-serif;font-size:22pt;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:2pt}
+  .hdr-left p{font-size:9pt;color:#555;letter-spacing:.5px}
+  .hdr-right{text-align:right;font-size:9pt;color:#555;line-height:1.8}
+  .meta-bar{display:flex;gap:20pt;margin-bottom:14pt;padding:8pt 12pt;background:#f8f8f8;border:1pt solid #ddd;border-radius:4pt;font-size:10pt}
+  .meta-item{display:flex;flex-direction:column;gap:2pt}
+  .meta-label{font-size:7pt;letter-spacing:1px;text-transform:uppercase;color:#888;font-weight:600}
+  .meta-val{font-weight:600;color:#111}
+  .score-badge{font-family:'Barlow Condensed',sans-serif;font-size:28pt;font-weight:800;color:${scoreColor};line-height:1}
+  .instructions{background:#f0f7ff;border:1pt solid #bcd;border-radius:4pt;padding:8pt 12pt;margin-bottom:14pt;font-size:9.5pt;color:#333;line-height:1.6}
+  .q-block{margin-bottom:14pt;page-break-inside:avoid;border-left:2pt solid #e5e7eb;padding-left:10pt}
+  .q-block.correct{border-left-color:#16a34a}
+  .q-block.wrong{border-left-color:#dc2626}
+  .q-meta{font-size:8pt;color:#888;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4pt;display:flex;gap:8pt}
+  .q-text{font-size:11pt;font-weight:500;line-height:1.6;margin-bottom:7pt}
+  .scenario{background:#f9f9f9;border-left:3pt solid #2563eb;padding:6pt 10pt;margin-bottom:7pt;font-style:italic;font-size:10.5pt}
+  .opts{margin-left:4pt}
+  .opt{display:flex;gap:8pt;margin-bottom:4pt;font-size:10.5pt;align-items:flex-start;padding:4pt 6pt;border-radius:3pt}
+  .opt.correct-ans{background:#dcfce7;border:1pt solid #16a34a}
+  .opt.student-wrong{background:#fee2e2;border:1pt solid #dc2626}
+  .opt-ltr{font-weight:700;min-width:16pt;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:12pt}
+  .rationale{margin-top:6pt;padding:6pt 10pt;background:#f0fdf4;border-left:2pt solid #16a34a;font-size:9.5pt;color:#166534;line-height:1.6;border-radius:0 4pt 4pt 0}
+  .rationale-wrong{background:#fff7ed;border-left-color:#d97706;color:#92400e}
+  .ans-line{border-bottom:1pt solid #999;height:18pt;margin:5pt 0}
+  .answer-key{page-break-before:always}
+  .ak-hdr{background:#111;color:#fff;padding:10pt 14pt;font-family:'Barlow Condensed',sans-serif;font-size:16pt;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:14pt}
+  .ak-item{display:flex;gap:10pt;padding:7pt 10pt;margin-bottom:6pt;border-radius:4pt;background:#f8f8f8;border:1pt solid #e5e7eb;align-items:flex-start;page-break-inside:avoid}
+  .ak-num{font-family:'Barlow Condensed',sans-serif;font-size:13pt;font-weight:800;min-width:24pt;color:#2563eb}
+  .ak-ans{flex:1}
+  .ak-ans strong{font-size:11pt}
+  .ak-rat{font-size:9pt;color:#555;margin-top:3pt;line-height:1.6}
+  @media print{.page{padding:.5in}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<div class="page">
+  <div class="hdr">
+    <div class="hdr-left">
+      <h1>${title}</h1>
+      <p>${course}</p>
+    </div>
+    <div class="hdr-right">
+      ${date}<br>
+      ${code ? `Student: <strong>${code}</strong><br>` : ''}
+      ${scored ? `Score: <span class="score-badge">${meta.score}/${meta.total}</span>` : ''}
+    </div>
+  </div>
+
+  ${!scored ? `<div class="instructions"><strong>Instructions:</strong> Choose the BEST answer for each question. Look for qualifier words: BEST · FIRST · MOST · NEXT · LEAST. Read each scenario carefully before answering.</div>` : ''}
+
+  ${questions.map((q, i) => {
+    const isScored   = q.studentAnswer !== undefined;
+    const isCorrect  = isScored && q.studentAnswer === q.answer;
+    const blockClass = isScored ? (isCorrect ? 'correct' : 'wrong') : '';
+    const isTF       = q.type === 'tf';
+    const isOpen     = q.type === 'open';
+
+    return `<div class="q-block ${blockClass}">
+      <div class="q-meta">
+        <span>Question ${i+1}</span>
+        ${q.domain ? `<span>${q.domain}</span>` : ''}
+        ${isScored ? `<span style="color:${isCorrect?'#16a34a':'#dc2626'};font-weight:700">${isCorrect?'✓ CORRECT':'✗ WRONG'}</span>` : ''}
+      </div>
+      ${q.scenario ? `<div class="scenario">${q.scenario}</div>` : ''}
+      <div class="q-text">${q.q}</div>
+      ${isTF ? `
+        <div class="opts">
+          <div class="opt ${isScored&&q.answer===true?'correct-ans':''} ${isScored&&q.studentAnswer===true&&q.answer!==true?'student-wrong':''}">
+            <span class="opt-ltr">T</span> True
+          </div>
+          <div class="opt ${isScored&&q.answer===false?'correct-ans':''} ${isScored&&q.studentAnswer===false&&q.answer!==false?'student-wrong':''}">
+            <span class="opt-ltr">F</span> False
+          </div>
+        </div>` :
+      isOpen ? `
+        <div class="ans-line"></div>
+        <div class="ans-line"></div>
+        <div class="ans-line"></div>` :
+      `<div class="opts">
+        ${['A','B','C','D'].map(l => {
+          const isAns = l === q.answer;
+          const isStu = isScored && l === q.studentAnswer;
+          let cls = '';
+          if (isScored && isAns) cls = 'correct-ans';
+          else if (isScored && isStu && !isAns) cls = 'student-wrong';
+          return `<div class="opt ${cls}">
+            <span class="opt-ltr">${l}</span>${q.opts ? q.opts[l] : ''}
+          </div>`;
+        }).join('')}
+      </div>`}
+      ${isScored && q.rationale ? `
+        <div class="rationale ${isCorrect?'':'rationale-wrong'}">
+          <strong>${isCorrect ? '✓' : '✗'}</strong> ${q.rationale}
+        </div>` : ''}
+    </div>`;
+  }).join('')}
+
+  ${showKey && !scored ? `
+  <div class="answer-key">
+    <div class="ak-hdr">📋 Answer Key — Do Not Distribute</div>
+    ${questions.map((q, i) => `
+      <div class="ak-item">
+        <div class="ak-num">Q${i+1}</div>
+        <div class="ak-ans">
+          ${q.type === 'open'
+            ? `<strong>Open Response</strong> — ${q.modelAnswer || q.answer || 'See rubric'}`
+            : q.type === 'tf'
+            ? `<strong>${q.answer ? 'TRUE' : 'FALSE'}</strong>`
+            : `<strong>${q.answer}. ${q.opts ? q.opts[q.answer] : ''}</strong>`}
+          ${q.rationale ? `<div class="ak-rat">${q.rationale}</div>` : ''}
+        </div>
+      </div>`).join('')}
+  </div>` : ''}
+
+</div>
+<script>window.print();<\/script>
+</body></html>`;
+
+      const w = window.open('', '_blank');
+      if (w) {
+        w.document.write(html);
+        w.document.close();
+      } else {
+        this.toast('Allow pop-ups to download PDF', 'err');
+      }
+    },
+
     // Returns code or prompts if missing
     requireCode: function() {
       const code = this.getCode();

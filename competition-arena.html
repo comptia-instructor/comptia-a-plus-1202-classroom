@@ -906,8 +906,8 @@ async function startBossBattle(){
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:2500,
-        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown.',
-        messages:[{role:'user',content:`Generate 10 challenging CompTIA A+ 220-1202 questions for the chapter: "${chapter}". 
+        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON, no markdown. Each call must produce DIFFERENT questions — vary topics, difficulty, scenario types, and wording every time. Return only valid JSON array.',
+        messages:[{role:'user',content:`[Seed: ${Date.now()}] Generate 10 challenging CompTIA A+ 220-1202 questions for the chapter: "${chapter}". 
 These are for a class competition — make them challenging but fair. Use qualifier words. Plausible distractors.
 Return JSON: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."}]`}]
       })
@@ -1008,6 +1008,7 @@ function renderBossResult(correct,total){
       </div>
       <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
         <button class="btn btn-ghost btn-sm" onclick="showBossReview()">Review Answers</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportBossPDF()">📄 PDF</button>
         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bossInterface').style.display='none'">Close</button>
       </div>
     </div>`;
@@ -1320,6 +1321,19 @@ init();
 if(typeof Platform !== 'undefined') {
   if(typeof Platform!=='undefined'){Platform.init('arena');}
 }
+
+// PDF export for boss battle results
+function exportBossPDF() {
+  if (!bossState.qs) { if(typeof Platform!=='undefined') Platform.toast('No battle to export','err'); return; }
+  const qs = bossState.qs.map((q,i)=>({...q, studentAnswer: bossState.answers[i]}));
+  const chapter = document.getElementById('bossChapterSel')?.value || 'Chapter Boss';
+  Platform.quizToPDF(qs, {
+    title: 'Boss Battle: ' + chapter,
+    course: 'CompTIA A+ 220-1202',
+    showKey: true,
+  });
+}
+
 </script>
 </body>
 </html>

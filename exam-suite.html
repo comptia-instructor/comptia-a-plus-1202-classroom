@@ -792,7 +792,7 @@ async function startExam(){
         body:JSON.stringify({
           model:'claude-sonnet-4-20250514',max_tokens:3000,
           system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown or preamble.',
-          messages:[{role:'user',content:`Generate exactly ${domain.qs} CompTIA A+ 220-1202 exam questions for the domain: "${domain.name}". 
+          messages:[{role:'user',content:`[Seed: ${Date.now()}] Generate exactly ${domain.qs} CompTIA A+ 220-1202 exam questions for the domain: "${domain.name}". 
 Use qualifier words (BEST, FIRST, MOST, NEXT, LEAST). Mix of difficulty. Plausible distractors. Realistic IT scenarios.
 Return JSON array: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"...","domain":"${domain.name}"}]`}]
         })
@@ -963,6 +963,7 @@ function submitExam(){
       </div>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:20px">
         <button class="btn btn-ghost" onclick="reviewExam()">Review Answers</button>
+        <button class="btn btn-ghost" onclick="exportExamPDF()">📄 Download PDF</button>
         <button class="btn btn-acc" onclick="resetExam()">Take Another Exam</button>
       </div>
     </div>`;
@@ -1056,7 +1057,7 @@ async function loadMicroLesson(topic, missCount){
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:1500,
         system:'You are a CompTIA A+ 220-1202 tutor. Return only valid JSON, no markdown.',
-        messages:[{role:'user',content:`Create a 5-minute micro-lesson for a student who has missed questions about "${topic}" ${missCount} times.
+        messages:[{role:'user',content:`[Seed: ${Date.now()}] Create a 5-minute micro-lesson for a student who has missed questions about "${topic}" ${missCount} times.
 
 Return JSON:
 {
@@ -1164,7 +1165,7 @@ async function generateComm(){
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:600,
         system:'You are a professional high school IT teacher writing a parent communication. Write naturally and professionally. Return only the email text, no subject line unless asked, no JSON.',
-        messages:[{role:'user',content:`Write ${typeMap[type]} to the parent/guardian of a student in my CompTIA A+ 220-1202 certification class.
+        messages:[{role:'user',content:`[Seed: ${Date.now()}] Write ${typeMap[type]} to the parent/guardian of a student in my CompTIA A+ 220-1202 certification class.
 
 Student first name: ${name}
 Parent name: ${parent||'Parent/Guardian'}
@@ -1496,6 +1497,39 @@ init();
 if(typeof Platform !== 'undefined') {
   if(typeof Platform!=='undefined'){Platform.init('exam');}
 }
+
+// PDF export helper
+function exportQuizPDF(questions, meta) {
+  if (typeof Platform !== 'undefined' && Platform.quizToPDF) {
+    Platform.quizToPDF(questions, meta);
+  }
+}
+
+// Export exam results to PDF
+function exportExamPDF() {
+  if (!ST.examQs) { if(typeof Platform!=='undefined') Platform.toast('No exam to export', 'err'); return; }
+  const qs = ST.examQs.map((q, i) => ({...q, studentAnswer: ST.examAnswers[i]}));
+  const correct = qs.filter(q => q.studentAnswer === q.answer).length;
+  Platform.quizToPDF(qs, {
+    title: 'CompTIA A+ Practice Exam',
+    course: 'CompTIA A+ 220-1202',
+    code: ST.examCode,
+    score: Math.round(correct/qs.length*900),
+    total: 900,
+    showKey: true,
+  });
+}
+
+// Export micro-lesson quiz to PDF
+function exportMicroPDF(questions, topic) {
+  if (!questions || !questions.length) return;
+  Platform.quizToPDF(questions, {
+    title: 'Micro-Lesson: ' + topic,
+    course: 'CompTIA A+ 220-1202',
+    showKey: true,
+  });
+}
+
 </script>
 </body>
 </html>

@@ -1389,6 +1389,16 @@ init();
 if(typeof Platform !== 'undefined') {
   if(typeof Platform!=='undefined'){Platform.init('classroom');}
 }
+
+// PDF export for any quiz result
+function exportQuizPDF(questions, meta) {
+  if (typeof Platform !== 'undefined' && Platform.quizToPDF) {
+    Platform.quizToPDF(questions, meta);
+  } else {
+    alert('PDF export requires platform.js to be loaded.');
+  }
+}
+
 </script>
 </body>
 </html>

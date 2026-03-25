@@ -789,8 +789,8 @@ async function startLockdown(){
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:2500,
-        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON array, no markdown.',
-        messages:[{role:'user',content:`Generate 10 CompTIA A+ 220-1202 multiple choice questions at exam difficulty. Mix of topics from all chapters. Use qualifier words (BEST, FIRST, MOST, NEXT). Plausible distractors.
+        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON, no markdown. Each call must produce DIFFERENT questions — vary topics, difficulty, scenario types, and wording every time. Return only valid JSON array.',
+        messages:[{role:'user',content:`[Seed: ${Date.now()}] Generate 10 CompTIA A+ 220-1202 multiple choice questions at exam difficulty. Mix of topics from all chapters. Use qualifier words (BEST, FIRST, MOST, NEXT). Plausible distractors.
 Return JSON: [{"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."}]`}]
       })
     });
@@ -1060,7 +1060,7 @@ async function generatePDF(){
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:3500,
         system:'You are a CompTIA A+ 220-1202 exam writer for high school students. Return only valid JSON array.',
-        messages:[{role:'user',content:`Generate ${count} CompTIA A+ 220-1202 quiz questions.
+        messages:[{role:'user',content:`[Seed: ${Date.now()}] Generate ${count} UNIQUE CompTIA A+ 220-1202 quiz questions. Use a different mix of topics, scenarios, and difficulty each time this is called. Avoid repeating questions from previous sessions.
 Chapters: ${chaps.map(c=>`${c.ch} ${c.title}`).join(', ')}
 Difficulty: ${diff}
 Types: ${typeDescs}
@@ -1075,7 +1075,7 @@ Return JSON array:
     });
     const d = await r.json();
     const text = d.content?.map(c=>c.text||'').join('')||'';
-    ST.pdfQuestions = JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+    ST.pdfQuestions = window._lastPbisQuestions = JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
     renderPDFPreview(ST.pdfQuestions, title, course, format, ansLines, rationale);
     document.getElementById('pdfStatus').textContent=`${ST.pdfQuestions.length} questions ready`;
     toast(`${ST.pdfQuestions.length} questions generated!`,'ok');

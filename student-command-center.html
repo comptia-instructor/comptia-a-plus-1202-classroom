@@ -268,6 +268,7 @@ nav::-webkit-scrollbar{height:2px}
   <div class="nav-btn" onclick="goPanel('spaced')">Study Queue</div>
   <div class="nav-btn" onclick="goPanel('glossary')">Glossary</div>
   <div class="nav-btn" onclick="goPanel('confusion')">Confusion Flag</div>
+  <div class="nav-btn" onclick="goPanel('tonight')">🎯 Study Tonight</div>
   <div class="nav-btn" onclick="goPanel('report')">My Report</div>
   <div class="nav-btn" onclick="goPanel('prep')">Teacher Prep</div>
 </nav>
@@ -324,6 +325,7 @@ nav::-webkit-scrollbar{height:2px}
             <div class="sb-label" style="margin-bottom:8px">This week's activity</div>
             <div class="streak-display" id="weekStreak"></div>
           </div>
+          <button class="btn btn-acc" style="width:100%;justify-content:center;margin-top:14px" onclick="goPanel('tonight')">🎯 See Full Study Plan →</button>
         </div>
       </div>
     </div>
@@ -580,6 +582,69 @@ nav::-webkit-scrollbar{height:2px}
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       STUDY TONIGHT PANEL
+  ══════════════════════════════════ -->
+  <div class="panel" id="panelTonight">
+
+    <!-- Hero -->
+    <div class="card fade-up" style="background:linear-gradient(135deg,rgba(0,212,255,0.07),rgba(170,85,255,0.05));border-color:var(--acc)">
+      <div class="card-body" style="padding:20px 22px">
+        <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--acc);margin-bottom:4px">What to Study Tonight</div>
+            <div style="font-size:12px;color:var(--tx2);line-height:1.7" id="tonightSummary">
+              Analyzing your quiz history to build a personalized study plan…
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-self:center">
+            <button class="btn btn-acc btn-sm" onclick="buildStudyPlan()">↺ Refresh Plan</button>
+            <button class="btn btn-ghost btn-sm" onclick="printStudyPlan()">🖨️ Print Plan</button>
+          </div>
+        </div>
+        <!-- Time estimate bar -->
+        <div style="margin-top:14px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:5px">TONIGHT'S ESTIMATED STUDY TIME</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="flex:1;height:6px;background:var(--s3);border-radius:3px;overflow:hidden">
+              <div id="timeBar" style="height:100%;background:linear-gradient(90deg,var(--acc),var(--pur));border-radius:3px;width:0%;transition:width 1s ease"></div>
+            </div>
+            <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--acc);min-width:60px;text-align:right" id="timeEst">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority list -->
+    <div id="priorityList"></div>
+
+    <!-- Study tools quick-launch -->
+    <div class="card fade-up">
+      <div class="card-header"><h2>🚀 Study Tools</h2></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">
+          <a href="pacing-review.html" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--b1)'">
+            <span style="font-size:18px">📖</span>
+            <div><div style="font-family:var(--display);font-size:12px;font-weight:700;color:var(--tx);letter-spacing:.3px;text-transform:uppercase">Chapter Guide</div><div style="font-size:9px;color:var(--tx3);font-family:var(--mono)">Concepts + practice Qs</div></div>
+          </a>
+          <a href="comptia-notes-quiz.html" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--grn)'" onmouseout="this.style.borderColor='var(--b1)'">
+            <span style="font-size:18px">📝</span>
+            <div><div style="font-family:var(--display);font-size:12px;font-weight:700;color:var(--tx);letter-spacing:.3px;text-transform:uppercase">Notes + Quiz</div><div style="font-size:9px;color:var(--tx3);font-family:var(--mono)">Cornell notes by chapter</div></div>
+          </a>
+          <div onclick="goPanel('spaced')" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--amb)'" onmouseout="this.style.borderColor='var(--b1)'">
+            <span style="font-size:18px">🃏</span>
+            <div><div style="font-family:var(--display);font-size:12px;font-weight:700;color:var(--tx);letter-spacing:.3px;text-transform:uppercase">Flashcards</div><div style="font-size:9px;color:var(--tx3);font-family:var(--mono)">Spaced repetition queue</div></div>
+          </div>
+          <a href="exam-suite.html" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--b1)'">
+            <span style="font-size:18px">🎓</span>
+            <div><div style="font-family:var(--display);font-size:12px;font-weight:700;color:var(--tx);letter-spacing:.3px;text-transform:uppercase">Practice Exam</div><div style="font-size:9px;color:var(--tx3);font-family:var(--mono)">Full 90-question exam</div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </div><!-- /content -->
@@ -852,7 +917,189 @@ function calcDomainScores(){
   });
 }
 
-function calcTotalQs(){return Object.values(ST.scores).reduce((s,v)=>s+(v.count||0),0)||Object.keys(ST.scores).length*5}
+// ── STUDY TONIGHT ──────────────────────────────────────────
+function buildStudyPlan() {
+  const domainScores = calcDomainScores();
+  const readiness    = calcReadiness();
+  const srDue        = getSRDue();
+  const code         = ST.code;
+
+  // ── Score every chapter by weakness ──
+  // Pull quiz scores per chapter from ST.scores
+  const chapterScores = CHAPTERS.map(ch => {
+    const keys = Object.keys(ST.scores).filter(k => k.toLowerCase().includes(ch.ch.toLowerCase().replace('.','').replace(' ','')));
+    const scores = keys.map(k => {
+      const v = ST.scores[k];
+      return typeof v === 'number' ? v : (v && v.pct != null ? v.pct : null);
+    }).filter(s => s !== null);
+    const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : null;
+
+    // Find this chapter's domain and weight
+    const domain = DOMAINS.find(d => d.chapters.includes(ch.id));
+    const domScore = domain ? domainScores.find(ds => ds.name === domain.name)?.score || 0 : 0;
+    const domWeight = domain ? domain.weight : 0;
+
+    // Priority score: lower is worse, higher domain weight = more important
+    // If no data, assume 50% (unknown, needs study)
+    const effectiveScore = avg !== null ? avg : 50;
+    const priority = (100 - effectiveScore) * (1 + domWeight * 2);
+
+    return { ...ch, avg, effectiveScore, priority, domainName: domain?.name || 'General', domWeight, hasData: avg !== null };
+  });
+
+  // Sort by priority (highest priority = most urgent to study)
+  const ranked = [...chapterScores].sort((a,b) => b.priority - a.priority);
+
+  // ── Categorize ──
+  const critical  = ranked.filter(c => c.hasData && c.avg < 60).slice(0,3);
+  const improving = ranked.filter(c => c.hasData && c.avg >= 60 && c.avg < 80).slice(0,3);
+  const noData    = ranked.filter(c => !c.hasData).slice(0,3);
+  const strong    = ranked.filter(c => c.hasData && c.avg >= 80);
+
+  // ── Time estimate ──
+  const mins = (critical.length * 20) + (improving.length * 15) + (srDue.length > 0 ? 10 : 0) + (noData.length > 0 ? 10 : 0);
+  const timeStr = mins >= 60 ? `${Math.floor(mins/60)}h ${mins%60}m` : `${mins} min`;
+  document.getElementById('timeEst').textContent = timeStr;
+  document.getElementById('timeBar').style.width = Math.min(100, mins/90*100) + '%';
+
+  // ── Summary line ──
+  let summary = '';
+  if (!readiness) {
+    summary = 'Complete some quizzes first — then come back and your personalized study plan will appear here.';
+  } else if (critical.length) {
+    summary = `You have ${critical.length} chapter${critical.length>1?'s':''} scoring below 60% that need immediate attention. Focus on these before anything else — they account for exam questions you're currently likely to miss.`;
+  } else if (improving.length) {
+    summary = `Your weakest areas are scoring between 60–80%. Push these above 80% and you'll be on track to pass. Tonight: focused review, not new material.`;
+  } else {
+    summary = `All studied chapters are above 80%. Solid! Tonight: run through your flashcard queue and take a practice exam to confirm your readiness.`;
+  }
+  document.getElementById('tonightSummary').textContent = summary;
+
+  // ── Build priority cards ──
+  const list = document.getElementById('priorityList');
+  list.innerHTML = '';
+
+  // Section builder
+  function makeSection(title, items, color, timePerItem, icon, instruction) {
+    if (!items.length) return '';
+    const total = items.length * timePerItem;
+    return `
+      <div class="card fade-up" style="margin-bottom:12px">
+        <div class="card-header" style="border-left:3px solid ${color}">
+          <h2>${icon} ${title}</h2>
+          <span class="tag" style="background:rgba(0,0,0,.2);color:${color};border-color:${color}">${items.length} chapter${items.length>1?'s':''} · ~${total} min</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--tx2);line-height:1.7;margin-bottom:12px;padding:8px 12px;background:var(--s2);border-radius:var(--r);border-left:2px solid ${color}">${instruction}</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            ${items.map((ch,i) => `
+              <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);transition:all .15s">
+                <div style="font-family:var(--display);font-size:22px;font-weight:900;color:${color};min-width:28px;text-align:center">${i+1}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--tx)">${ch.ch} — ${ch.title}</div>
+                  <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:2px">
+                    ${ch.hasData ? `Quiz avg: <span style="color:${ch.avg<60?'var(--red)':ch.avg<80?'var(--amb)':'var(--grn)'};font-weight:700">${ch.avg}%</span>` : 'No quiz data yet'}
+                    · ${ch.domainName} (${Math.round(ch.domWeight*100)}% of exam)
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+                  <a href="pacing-review.html" onclick="localStorage.setItem('review_open_chapter','${ch.ch}')" class="btn btn-ghost btn-sm" style="font-size:9px">📖 Study Guide</a>
+                  <a href="comptia-notes-quiz.html" class="btn btn-ghost btn-sm" style="font-size:9px">📝 Notes</a>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  let html = '';
+
+  // Critical
+  html += makeSection(
+    'Study First — Below 60%',
+    critical,
+    'var(--red)',
+    20,
+    '🚨',
+    'These chapters are scoring below 60% — you\'re currently likely to miss exam questions on these topics. Open the Study Guide for each one: read the key concepts, do the 5 practice questions, and note the exam traps.'
+  );
+
+  // Improving
+  html += makeSection(
+    'Push Higher — 60–80%',
+    improving,
+    'var(--amb)',
+    15,
+    '📈',
+    'These chapters are on the way up but not locked in yet. One focused review session each should push them above 80%. Focus on the vocab terms and exam traps specifically — that\'s where the gap usually is.'
+  );
+
+  // No data
+  if (noData.length) {
+    html += makeSection(
+      'Not Studied Yet',
+      noData,
+      'var(--acc)',
+      10,
+      '❓',
+      'No quiz data for these chapters yet. Take a quick 5-question quiz on each to find out where you stand — you might be stronger than you think.'
+    );
+  }
+
+  // Flashcards
+  if (srDue.length > 0) {
+    html += `
+      <div class="card fade-up" style="margin-bottom:12px">
+        <div class="card-header" style="border-left:3px solid var(--pur)">
+          <h2>🃏 Flashcard Queue</h2>
+          <span class="tag" style="background:rgba(0,0,0,.2);color:var(--pur);border-color:var(--pur)">${srDue.length} term${srDue.length>1?'s':''} due · ~10 min</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--tx2);line-height:1.7;margin-bottom:12px;padding:8px 12px;background:var(--s2);border-radius:var(--r);border-left:2px solid var(--pur)">
+            Your spaced repetition queue has ${srDue.length} term${srDue.length>1?'s':''} scheduled for review today. These are terms you've seen before — reviewing them now locks them into long-term memory before the exam.
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            ${srDue.slice(0,6).map(t=>`<span style="background:var(--s2);border:1px solid var(--b2);border-radius:3px;padding:3px 9px;font-family:var(--mono);font-size:10px;color:var(--tx2)">${t.word}</span>`).join('')}
+            ${srDue.length>6?`<span style="font-family:var(--mono);font-size:10px;color:var(--tx3)">+${srDue.length-6} more</span>`:''}
+          </div>
+          <button class="btn btn-pur btn-sm" onclick="goPanel('spaced')">Start Flashcard Review →</button>
+        </div>
+      </div>`;
+  }
+
+  // Strong chapters — just acknowledge
+  if (strong.length) {
+    html += `
+      <div class="card fade-up" style="margin-bottom:12px;opacity:.7">
+        <div class="card-header" style="border-left:3px solid var(--grn)">
+          <h2>✅ Strong Chapters — ${strong.length} at 80%+</h2>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${strong.map(ch=>`<span style="background:var(--grn-d);border:1px solid var(--grn);border-radius:3px;padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--grn)">${ch.ch} · ${ch.avg}%</span>`).join('')}
+          </div>
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:8px">These are solid. Don't spend tonight's time here — maintain with occasional flashcard review.</div>
+        </div>
+      </div>`;
+  }
+
+  if (!html) {
+    html = `<div style="text-align:center;padding:40px;color:var(--tx3);font-family:var(--mono)">
+      <div style="font-size:32px;margin-bottom:12px">📊</div>
+      <div style="font-size:13px;margin-bottom:8px;color:var(--tx2)">Complete some quizzes first</div>
+      <div style="font-size:11px;line-height:1.8">Take a few quizzes in the Classroom Platform or Notes tool,<br>then come back and your personalized plan will appear here.</div>
+      <a href="comptia-notes-quiz.html" class="btn btn-acc" style="margin-top:16px;text-decoration:none;display:inline-flex">Take a Quiz Now →</a>
+    </div>`;
+  }
+
+  list.innerHTML = html;
+}
+
+function printStudyPlan() {
+  window.print();
+}
+
+
 function calcAccuracy(){
   const vals=Object.values(ST.scores);
   if(!vals.length)return 0;
@@ -1335,10 +1582,12 @@ function goPanel(id){
     (id==='glossary'&&b.textContent==='Glossary')||
     (id==='confusion'&&b.textContent==='Confusion Flag')||
     (id==='report'&&b.textContent==='My Report')||
+    (id==='tonight'&&b.textContent==='🎯 Study Tonight')||
     (id==='prep'&&b.textContent==='Teacher Prep'))b.classList.add('active');});
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel'+id.charAt(0).toUpperCase()+id.slice(1))?.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='tonight') buildStudyPlan();
 }
 
 // ── TOAST ──

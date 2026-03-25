@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Pacing & Review</title>
+<link rel="stylesheet" href="platform.css">
+<style>
+.wrap { max-width: 1000px; margin: 0 auto; padding: 24px; }
+
+/* ── PACING STATUS BAR ── */
+.pace-bar {
+  border-radius: var(--rl);
+  border: 1px solid var(--b1);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.pace-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.pace-bar.on-track  { background: linear-gradient(135deg,var(--grn-d),var(--s1)); border-color: var(--grn); }
+.pace-bar.on-track::before  { background: linear-gradient(90deg,transparent,var(--grn),transparent); }
+.pace-bar.behind    { background: linear-gradient(135deg,var(--amb-d),var(--s1)); border-color: var(--amb); }
+.pace-bar.behind::before    { background: linear-gradient(90deg,transparent,var(--amb),transparent); }
+.pace-bar.critical  { background: linear-gradient(135deg,var(--red-d),var(--s1)); border-color: var(--red); }
+.pace-bar.critical::before  { background: linear-gradient(90deg,transparent,var(--red),transparent); }
+.pace-bar.unconfigured { background: var(--s1); border-color: var(--b1); }
+
+.pace-icon { font-size: 36px; flex-shrink: 0; }
+.pace-info { flex: 1; min-width: 200px; }
+.pace-status {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.pace-bar.on-track .pace-status { color: var(--grn); }
+.pace-bar.behind   .pace-status { color: var(--amb); }
+.pace-bar.critical .pace-status { color: var(--red); }
+.pace-bar.unconfigured .pace-status { color: var(--tx2); }
+.pace-detail { font-size: 12px; color: var(--tx2); line-height: 1.7; }
+.pace-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ps {
+  text-align: center;
+  background: rgba(255,255,255,0.04);
+  padding: 10px 16px;
+  border-radius: var(--r);
+  border: 1px solid var(--b1);
+  min-width: 80px;
+}
+.ps-num {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.ps-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--tx3);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--rl);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,transparent,rgba(0,200,255,.18),transparent);
+}
+.card-hdr {
+  padding: 13px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--b1);
+  background: rgba(255,255,255,.015);
+  flex-wrap: wrap;
+}
+.card-hdr h2 {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--tx);
+  flex: 1;
+}
+.card-body { padding: 18px; }
+
+/* ── VIDEO SEARCH ── */
+.video-search-wrap {
+  position: relative;
+  margin-bottom: 14px;
+}
+.video-search {
+  width: 100%;
+  background: var(--s2);
+  border: 1.5px solid var(--b2);
+  border-radius: var(--r);
+  padding: 12px 16px 12px 44px;
+  color: var(--tx);
+  font-family: var(--sans);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+.video-search:focus { border-color: var(--acc); }
+.video-search::placeholder { color: var(--tx3); }
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  pointer-events: none;
+}
+.video-results {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.video-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: all .15s;
+}
+.video-result:hover { border-color: var(--acc); background: var(--acc-d); }
+.video-result.active { border-color: var(--grn); background: var(--grn-d); }
+.vr-day {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--acc);
+  min-width: 48px;
+  flex-shrink: 0;
+}
+.vr-info { flex: 1; min-width: 0; }
+.vr-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vr-chapter {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  margin-top: 2px;
+}
+.vr-mins {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  flex-shrink: 0;
+}
+.set-day-btn {
+  padding: 4px 12px;
+  background: var(--acc-d);
+  border: 1px solid var(--acc);
+  color: var(--acc);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 9px;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.set-day-btn:hover { background: rgba(0,200,255,.2); }
+
+/* ── PACING CONFIG ── */
+.pace-config {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media(max-width:600px) { .pace-config { grid-template-columns: 1fr; } }
+.pc-group { display: flex; flex-direction: column; gap: 5px; }
+.pc-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.pc-inp {
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  border-radius: var(--r);
+  padding: 9px 13px;
+  color: var(--tx);
+  font-family: var(--mono);
+  font-size: 15px;
+  outline: none;
+  width: 100%;
+  transition: border-color .2s;
+  font-weight: 700;
+  text-align: center;
+}
+.pc-inp:focus { border-color: var(--acc); }
+
+/* ── PACING CALENDAR ── */
+.pace-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-top: 12px;
+}
+.pc-day {
+  border-radius: 5px;
+  padding: 5px 4px;
+  text-align: center;
+  min-height: 52px;
+  border: 1px solid var(--b1);
+  background: var(--s2);
+  cursor: pointer;
+  transition: all .15s;
+  position: relative;
+}
+.pc-day:hover { border-color: var(--b2); }
+.pc-day.done  { background: var(--grn-d); border-color: var(--grn); opacity: .75; }
+.pc-day.today { background: var(--acc-d); border-color: var(--acc); }
+.pc-day.skip  { opacity: .3; pointer-events: none; background: var(--s3); }
+.pc-day.combo { background: var(--amb-d); border-color: var(--amb); }
+.pc-day.no-class { opacity: .15; pointer-events: none; }
+.pc-date { font-family: var(--mono); font-size: 8px; color: var(--tx3); }
+.pc-daynum { font-family: var(--display); font-size: 12px; font-weight: 700; color: var(--acc); line-height: 1; margin: 1px 0; }
+.pc-day.today .pc-daynum { color: var(--acc); }
+.pc-day.done .pc-daynum { color: var(--grn); }
+.pc-day.combo .pc-daynum { color: var(--amb); font-size: 10px; }
+.pc-ch { font-size: 7px; color: var(--tx3); line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.pc-tick { position: absolute; top: 2px; right: 3px; font-size: 7px; color: var(--grn); }
+.pc-skip-mark { position: absolute; top: 2px; right: 3px; font-size: 7px; color: var(--tx3); }
+
+/* ── CHAPTER REVIEW ── */
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.chapter-chip {
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chapter-chip:hover { border-color: var(--b2); }
+.chapter-chip.active { border-color: var(--acc); background: var(--acc-d); }
+.chapter-chip.complete { border-color: var(--grn); }
+.cc-num { font-family: var(--display); font-size: 16px; font-weight: 800; color: var(--acc); min-width: 36px; }
+.chapter-chip.complete .cc-num { color: var(--grn); }
+.cc-title { font-size: 11px; color: var(--tx2); line-height: 1.4; flex: 1; }
+.cc-conf { font-size: 14px; flex-shrink: 0; }
+
+/* Review content */
+.review-section {
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  border-radius: var(--r);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.rs-header {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rs-header::after { content: ''; flex: 1; height: 1px; background: var(--b1); }
+.concept-block {
+  font-size: 13px;
+  color: var(--tx);
+  line-height: 1.8;
+  padding: 12px 14px;
+  background: var(--s3);
+  border-left: 2px solid var(--acc);
+  border-radius: 0 var(--r) var(--r) 0;
+  margin-bottom: 8px;
+}
+.vocab-item {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--b1);
+  align-items: flex-start;
+}
+.vocab-item:last-child { border-bottom: none; }
+.vocab-term {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--acc);
+  min-width: 140px;
+  flex-shrink: 0;
+}
+.vocab-def { font-size: 12px; color: var(--tx2); line-height: 1.6; flex: 1; }
+.trap-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--red-d);
+  border: 1px solid var(--red);
+  border-radius: var(--r);
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--tx);
+  line-height: 1.6;
+}
+.trap-icon { flex-shrink: 0; font-size: 14px; }
+
+/* Confidence self-check */
+.conf-check {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.conf-btn {
+  padding: 10px 18px;
+  border-radius: var(--r);
+  border: 1px solid var(--b2);
+  background: var(--s3);
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+  flex: 1;
+  max-width: 120px;
+}
+.conf-btn:hover { border-color: var(--b3); }
+.conf-btn.sel-1 { border-color: var(--red);  background: var(--red-d);  }
+.conf-btn.sel-2 { border-color: var(--amb);  background: var(--amb-d);  }
+.conf-btn.sel-3 { border-color: var(--acc);  background: var(--acc-d);  }
+.conf-btn.sel-4 { border-color: var(--grn);  background: var(--grn-d);  }
+.conf-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+.conf-label { font-size: 9px; font-family: var(--mono); color: var(--tx3); text-transform: uppercase; letter-spacing: .5px; }
+
+/* tabs */
+nav { display: flex; background: var(--s1); border-bottom: 1px solid var(--b1); padding: 0 20px; overflow-x: auto; }
+.tab { padding: 12px 16px; font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--tx3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .2s; white-space: nowrap; }
+.tab:hover { color: var(--tx2); }
+.tab.active { color: var(--acc); border-bottom-color: var(--acc); }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.btn { padding: 8px 18px; border-radius: var(--r); border: none; cursor: pointer; font-family: var(--display); font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { transform: translateY(-1px); }
+.btn:disabled { opacity: .35; cursor: not-allowed; transform: none !important; }
+.btn-acc { background: var(--acc); color: var(--bg); }
+.btn-grn { background: var(--grn); color: var(--bg); }
+.btn-amb { background: var(--amb-d); border: 1px solid var(--amb); color: var(--amb); }
+.btn-ghost { background: transparent; border: 1px solid var(--b2); color: var(--tx2); }
+.btn-ghost:hover { border-color: var(--b3); color: var(--tx); }
+.btn-sm { padding: 5px 12px; font-size: 10px; border-radius: 5px; }
+.btn-wide { width: 100%; justify-content: center; }
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 3px; font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: .3px; border: 1px solid; }
+.tag-acc { background: var(--acc-d); color: var(--acc); border-color: var(--acc); }
+.tag-grn { background: var(--grn-d); color: var(--grn); border-color: var(--grn); }
+.tag-amb { background: var(--amb-d); color: var(--amb); border-color: var(--amb); }
+.tag-red { background: var(--red-d); color: var(--red); border-color: var(--red); }
+.loading { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--tx3); font-family: var(--mono); font-size: 11px; padding: 32px; }
+.loading::before { content: ''; width: 14px; height: 14px; border: 1.5px solid var(--b2); border-top-color: var(--acc); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--s2); border: 1px solid var(--b2); border-radius: var(--r); padding: 10px 16px; font-family: var(--mono); font-size: 11px; color: var(--tx); z-index: 1000; opacity: 0; transform: translateY(8px); transition: all .25s; max-width: 300px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.ok  { border-color: var(--grn); color: var(--grn); }
+.toast.err { border-color: var(--red); color: var(--red); }
+.divider { height: 1px; background: var(--b1); margin: 10px 0; }
+
+/* q block */
+.q-block { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r); padding: 14px; margin-bottom: 10px; }
+.q-num { font-family: var(--mono); font-size: 9px; color: var(--tx3); letter-spacing: .8px; margin-bottom: 5px; }
+.q-text { font-size: 13px; font-weight: 500; color: var(--tx); line-height: 1.65; margin-bottom: 10px; }
+.opts { display: flex; flex-direction: column; gap: 5px; }
+.opt { display: flex; align-items: flex-start; gap: 8px; padding: 8px 11px; border-radius: 5px; border: 1px solid var(--b1); cursor: pointer; transition: all .15s; background: var(--s3); font-size: 12px; color: var(--tx2); }
+.opt:hover { border-color: var(--b2); }
+.opt.sel     { border-color: var(--acc); background: var(--acc-d); color: var(--tx); }
+.opt.correct { border-color: var(--grn); background: var(--grn-d); color: var(--tx); }
+.opt.wrong   { border-color: var(--red); background: var(--red-d); color: var(--tx); }
+.opt-ltr { font-family: var(--mono); font-size: 10px; font-weight: 700; min-width: 16px; flex-shrink: 0; color: var(--tx3); }
+.opt.sel .opt-ltr { color: var(--acc); }
+.opt.correct .opt-ltr { color: var(--grn); }
+.opt.wrong .opt-ltr { color: var(--red); }
+.rationale { margin-top: 8px; padding: 8px 12px; background: var(--s4); border-left: 2px solid var(--grn); border-radius: 4px; font-size: 11px; color: var(--tx2); line-height: 1.6; display: none; }
+.rationale.show { display: block; }
+</style>
+</head>
+<body class="platform-atmosphere">
+<div class="platform-shell">
+
+<header class="platform-header">
+  <a href="hub.html" class="ph-logo">A+</a>
+  <div>
+    <div class="ph-title">Pacing <span>&amp; Review</span></div>
+    <div class="ph-sub">Smart pacing · Video lookup · Chapter study guides</div>
+  </div>
+  <div class="ph-right" id="headerRight">
+    <span class="tag tag-acc" id="todayLabel">Day —</span>
+    <a href="hub.html" class="ph-back">← Hub</a>
+  </div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="goTab('pacing')">📅 Pacing Guide</div>
+  <div class="tab" onclick="goTab('video')">🎬 Video Lookup</div>
+  <div class="tab" onclick="goTab('review')">📖 Chapter Review</div>
+</nav>
+
+<div class="platform-content">
+<div class="wrap">
+
+<!-- ══════════════════════════
+     TAB 1 — PACING GUIDE
+══════════════════════════ -->
+<div class="panel active" id="panelPacing">
+
+  <!-- Status bar -->
+  <div class="pace-bar unconfigured" id="paceBar">
+    <div class="pace-icon" id="paceIcon">📅</div>
+    <div class="pace-info">
+      <div class="pace-status" id="paceStatus">Configure your semester below</div>
+      <div class="pace-detail" id="paceDetail">Enter your total school days and today's class day to see your pacing status.</div>
+    </div>
+    <div class="pace-stats" id="paceStats"></div>
+  </div>
+
+  <!-- Config -->
+  <div class="card">
+    <div class="card-hdr"><h2>⚙️ Semester Setup</h2></div>
+    <div class="card-body">
+      <div class="pace-config">
+        <div class="pc-group">
+          <div class="pc-label">Total school days in semester</div>
+          <input class="pc-inp" type="number" id="semDays" min="40" max="120" placeholder="90" oninput="recalcPace()">
+          <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:3px">Include all days — not just class days</div>
+        </div>
+        <div class="pc-group">
+          <div class="pc-label">How many days per week is this class?</div>
+          <input class="pc-inp" type="number" id="daysPerWeek" min="1" max="5" value="5" oninput="recalcPace()">
+        </div>
+        <div class="pc-group">
+          <div class="pc-label">Current class day (content day #)</div>
+          <input class="pc-inp" type="number" id="currentDay" min="1" max="68" placeholder="1" oninput="setCurrentDay(this.value); recalcPace()">
+          <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:3px">Which of the 68 content days are you on?</div>
+        </div>
+        <div class="pc-group">
+          <div class="pc-label">First day of class</div>
+          <input type="date" id="semStart" class="pc-inp" style="font-size:13px;text-align:left;font-weight:400" oninput="recalcPace()">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="btn btn-acc" onclick="savePaceConfig()">Save &amp; Recalculate</button>
+        <button class="btn btn-ghost btn-sm" onclick="markDayDone()">✓ Mark Today Complete</button>
+        <button class="btn btn-ghost btn-sm" onclick="skipDay()">⊘ Skip a Day</button>
+        <button class="btn btn-ghost btn-sm" onclick="combineDay()">⚡ Combine 2 Days</button>
+      </div>
+
+      <!-- Pacing recommendation -->
+      <div id="paceRecommendation" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Pacing calendar -->
+  <div class="card">
+    <div class="card-hdr">
+      <h2>📅 Semester Calendar</h2>
+      <span class="tag tag-acc" id="calProgress">—</span>
+      <button class="btn btn-ghost btn-sm" onclick="exportPaceCSV()">↓ Export</button>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--tx3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--acc-d);border:1px solid var(--acc)"></div>Today</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--tx3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--grn-d);border:1px solid var(--grn)"></div>Done</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--tx3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--amb-d);border:1px solid var(--amb)"></div>Combined days</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--tx3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--s3);border:1px solid var(--b1);opacity:.3)"></div>Skipped</div>
+      </div>
+      <div class="pace-cal" id="paceCal">
+        <div style="padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3)">Mon</div>
+        <div style="padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3)">Tue</div>
+        <div style="padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3)">Wed</div>
+        <div style="padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3)">Thu</div>
+        <div style="padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3)">Fri</div>
+        <div style="padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3)">Sat</div>
+        <div style="padding:6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--tx3)">Sun</div>
+      </div>
+      <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:8px">Click any day to toggle complete. Configure semester dates above to see the full calendar.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════
+     TAB 2 — VIDEO LOOKUP
+══════════════════════════ -->
+<div class="panel" id="panelVideo">
+
+  <div class="card">
+    <div class="card-hdr">
+      <h2>🎬 Video Lookup</h2>
+      <span class="tag tag-acc" id="currentDayBadge">Day — not set</span>
+    </div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px">
+        Type any part of a video title to find which day it belongs to. Selecting a video sets the current day across all tools — cold retrieval, timed practice, the hub calendar, and sub mode all update automatically.
+      </div>
+      <div class="video-search-wrap">
+        <div class="search-icon">🔍</div>
+        <input class="video-search" type="text" id="videoSearchInput"
+          placeholder="e.g. partitioning, TCP/IP, users and groups…"
+          oninput="searchVideos(this.value)">
+      </div>
+      <div class="video-results" id="videoResults">
+        <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:16px;text-align:center">Start typing to search all 147 videos across 68 class days.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's assignment -->
+  <div class="card" id="todayCard" style="display:none">
+    <div class="card-hdr">
+      <h2>📌 Today's Assignment</h2>
+      <span class="tag tag-grn" id="todayDayTag">Day —</span>
+    </div>
+    <div class="card-body" id="todayCardBody"></div>
+  </div>
+
+  <!-- Yesterday's videos (for review) -->
+  <div class="card" id="yesterdayCard" style="display:none">
+    <div class="card-hdr"><h2>⏮ Yesterday's Content</h2></div>
+    <div class="card-body" id="yesterdayCardBody"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════
+     TAB 3 — CHAPTER REVIEW
+══════════════════════════ -->
+<div class="panel" id="panelReview">
+
+  <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:4px;flex-wrap:wrap">
+    <div style="flex:1">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:4px">Chapter Study Guides</div>
+      <div style="font-size:12px;color:var(--tx2);line-height:1.7">Select any chapter to get a complete study guide — key concepts, vocabulary, 5 practice questions, exam traps, and a confidence check. Generated fresh by AI each time.</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="clearReviewCache()">↺ Regenerate</button>
+  </div>
+
+  <!-- Chapter selector -->
+  <div class="chapter-grid" id="chapterGrid"></div>
+
+  <!-- Review content area -->
+  <div id="reviewArea" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)" id="reviewChapterTitle">—</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:2px" id="reviewChapterSub">—</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="printReview()">🖨️ Print</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeReview()">✕ Close</button>
+      </div>
+    </div>
+    <div id="reviewContent"><div class="loading">Generating study guide…</div></div>
+  </div>
+
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /content -->
+</div><!-- /shell -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── ALL 147 VIDEOS MAPPED TO 68 DAYS ──────────────────────
+const ALL_DAYS = [
+  {day:1,  ch:'Ch.1',  section:'Safety & Professionalism', videos:['Professional Communication I','Professional Communication II'], mins:14},
+  {day:2,  ch:'Ch.1',  section:'Safety & Professionalism', videos:['Dealing with Difficult Customers','Physical Safety','Common Safety Procedures'], mins:18},
+  {day:3,  ch:'Ch.2',  section:'Intro to OS', videos:["What's an Operating System?",'Users and Super Users'], mins:14},
+  {day:4,  ch:'Ch.2',  section:'Windows', videos:['Why Windows?','Touring Windows 10 Part I','Touring Windows 10 Part II'], mins:20},
+  {day:5,  ch:'Ch.2',  section:'Windows 11 & macOS', videos:['Touring Windows 11','Touring macOS Part I'], mins:16},
+  {day:6,  ch:'Ch.2',  section:'macOS & Linux', videos:['Touring macOS Part II','Touring macOS Part III','Touring Linux'], mins:18},
+  {day:7,  ch:'Ch.7',  section:'Power Supplies', videos:['Power Protection','Cooling Your System','Maintaining Proper Airflow'], mins:18},
+  {day:8,  ch:'Ch.8',  section:'Mass Storage', videos:['Boot Order','Understanding Partitioning'], mins:14},
+  {day:9,  ch:'Ch.9',  section:'Partitioning', videos:['MBR Partitioning','GPT Partitioning'], mins:14},
+  {day:10, ch:'Ch.9',  section:'File Systems', videos:['Understanding File Systems','Popular File Systems'], mins:14},
+  {day:11, ch:'Ch.9',  section:'Implementing Mass Storage', videos:['Formatting in Action','Dynamic Disks'], mins:14},
+  {day:12, ch:'Ch.9',  section:'RAID', videos:['Understanding RAID','Implementing RAID'], mins:14},
+  {day:13, ch:'Ch.9',  section:'Encryption & Backup', videos:['Encrypting Mass Storage','Mass Storage Troubleshooting'], mins:14},
+  {day:14, ch:'Ch.10', section:'Essential Peripherals', videos:['Optical Media','USB Standards','Keyboards and Mice'], mins:18},
+  {day:15, ch:'Ch.10', section:'Peripherals II', videos:['Webcams','Monitors and Projectors','Scanners'], mins:18},
+  {day:16, ch:'Ch.11', section:'Installing & Upgrading OS', videos:['Planning Your OS Installation','Installing Windows'], mins:14},
+  {day:17, ch:'Ch.11', section:'OS Installation II', videos:['Post-Installation Tasks','Upgrading Windows','Linux Installation'], mins:18},
+  {day:18, ch:'Ch.12', section:'Working with OS', videos:['Task Manager','Performance Monitor'], mins:14},
+  {day:19, ch:'Ch.12', section:'OS Tools', videos:['The Windows Registry','Microsoft Management Console','Services'], mins:18},
+  {day:20, ch:'Ch.12', section:'OS Tools II', videos:['Tools for Programmers','Remote Desktop','System Restore'], mins:18},
+  {day:21, ch:'Ch.13', section:'Users Groups Permissions', videos:['Understanding Users and Groups','Managing Users in Windows'], mins:14},
+  {day:22, ch:'Ch.13', section:'NTFS Permissions', videos:['NTFS Permissions','Shares'], mins:14},
+  {day:23, ch:'Ch.13', section:'Sharing & Linux Users', videos:['Permissions in Linux','Scripting Basics'], mins:14},
+  {day:24, ch:'Ch.14', section:'Maintaining OS', videos:['Patch Management','Scheduling Maintenance'], mins:14},
+  {day:25, ch:'Ch.14', section:'Backup & Restore', videos:['Backup and Recovery','Imaging and Deployment'], mins:14},
+  {day:26, ch:'Ch.14', section:'Virtualization Intro', videos:['Introduction to Virtualization','Setting Up Virtual Machines'], mins:14},
+  {day:27, ch:'Ch.15', section:'CLI Navigation', videos:['Introduction to the CLI','Working with Directories'], mins:14},
+  {day:28, ch:'Ch.15', section:'CLI Files', videos:['Working with Files','CLI Wildcards and Redirection'], mins:14},
+  {day:29, ch:'Ch.15', section:'CLI Commands', videos:['CLI Tools for Configuration','CLI Networking Commands'], mins:14},
+  {day:30, ch:'Ch.15', section:'Advanced CLI', videos:['CLI Troubleshooting Tools','SFC and DISM'], mins:14},
+  {day:31, ch:'Ch.15', section:'Scripting', videos:['Introduction to Scripting','PowerShell Scripting'], mins:14},
+  {day:32, ch:'Ch.16', section:'Troubleshooting Systems', videos:['Troubleshooting Methodology','Troubleshooting Hard Drive Problems'], mins:14},
+  {day:33, ch:'Ch.16', section:'Boot Troubleshooting', videos:['Boot Problems','Windows Boot Troubleshooting'], mins:14},
+  {day:34, ch:'Ch.16', section:'GUI Troubleshooting', videos:['Working with Windows Processes','Troubleshooting Applications'], mins:14},
+  {day:35, ch:'Ch.16', section:'Advanced Troubleshooting', videos:['Troubleshooting Networks','Memory Troubleshooting'], mins:14},
+  {day:36, ch:'Ch.17', section:'Display Technologies', videos:['Display Technologies','Installing and Configuring Monitors'], mins:14},
+  {day:37, ch:'Ch.18', section:'Essentials of Networking', videos:['What Is a Network?','Hub vs Switch','MAC Addresses'], mins:18},
+  {day:38, ch:'Ch.18', section:'Networking II', videos:['Ethernet Standards','Installing a SOHO Network'], mins:14},
+  {day:39, ch:'Ch.19', section:'TCP/IP Basics', videos:['Introduction to IP Addressing','Subnet Masks'], mins:14},
+  {day:40, ch:'Ch.19', section:'IP Addressing', videos:['NAT and Private IP Addresses','Working with DHCP'], mins:14},
+  {day:41, ch:'Ch.19', section:'DNS & IPv6', videos:['Understanding DNS','Introduction to IPv6'], mins:14},
+  {day:42, ch:'Ch.20', section:'OS Networking', videos:['Configuring IP Addressing in Windows','Network Troubleshooting Tools'], mins:14},
+  {day:43, ch:'Ch.20', section:'AD & Routers', videos:['Introduction to Active Directory','Configuring SOHO Routers'], mins:14},
+  {day:44, ch:'Ch.20', section:'Firewall & VPN', videos:['Configuring Firewalls','Setting Up VPNs'], mins:14},
+  {day:45, ch:'Ch.20', section:'Advanced Networking', videos:['Proxy Servers','Load Balancers and QoS'], mins:14},
+  {day:46, ch:'Ch.21', section:'Wireless Networking', videos:['802.11 Standards','Antenna Types'], mins:14},
+  {day:47, ch:'Ch.21', section:'Wireless Config', videos:['Wi-Fi Encryption','Configuring 802.11 Networks'], mins:14},
+  {day:48, ch:'Ch.21', section:'Enterprise Wireless', videos:['Enterprise Wireless','Cellular Standards','Bluetooth'], mins:18},
+  {day:49, ch:'Ch.22', section:'Internet Connections', videos:['Connecting to the Internet','ISP Technologies'], mins:14},
+  {day:50, ch:'Ch.22', section:'Remote Access', videos:['Remote Access','FTP and File Sharing'], mins:14},
+  {day:51, ch:'Ch.22', section:'VPN & Proxy', videos:['VPN Technologies','Proxy Servers'], mins:14},
+  {day:52, ch:'Ch.22', section:'IoT & Troubleshooting', videos:['IoT Devices','Network Troubleshooting'], mins:14},
+  {day:53, ch:'Ch.23', section:'Virtualization & Cloud', videos:['Cloud Computing','Types of Cloud Services','Virtual Desktops'], mins:18},
+  {day:54, ch:'Ch.23', section:'Cloud II', videos:['Cloud Storage','Cloud Migration Considerations'], mins:14},
+  {day:55, ch:'Ch.24', section:'Portable Computing', videos:['Laptop Components','Laptop Disassembly'], mins:14},
+  {day:56, ch:'Ch.24', section:'Laptop Config', videos:['Configuring Laptops','Laptop Troubleshooting'], mins:14},
+  {day:57, ch:'Ch.25', section:'Mobile Devices', videos:['Mobile Device Types','Configuring Mobile Devices'], mins:14},
+  {day:58, ch:'Ch.25', section:'Mobile II', videos:['Mobile Device Connectivity','Troubleshooting Mobile Devices'], mins:14},
+  {day:59, ch:'Ch.26', section:'Securing Mobile Devices', videos:['Mobile Device Security','MDM Solutions'], mins:14},
+  {day:60, ch:'Ch.27', section:'Printers', videos:['Laser Printers','Inkjet Printers','Thermal Printers'], mins:18},
+  {day:61, ch:'Ch.27', section:'Printer Config', videos:['Installing Printers','Printer Troubleshooting'], mins:14},
+  {day:62, ch:'Ch.28', section:'Essential Security', videos:['Malware Types','Social Engineering'], mins:14},
+  {day:63, ch:'Ch.28', section:'Security II', videos:['Authentication Methods','Password Best Practices'], mins:14},
+  {day:64, ch:'Ch.29', section:'Securing Endpoints', videos:['Anti-Malware Tools','Patch Management'], mins:14},
+  {day:65, ch:'Ch.29', section:'Social Engineering Defense', videos:['Dealing with Social Engineering','Windows Defender'], mins:14},
+  {day:66, ch:'Ch.29', section:'Incident Response', videos:['Incident Response Procedures','Digital Forensics'], mins:14},
+  {day:67, ch:'Ch.30', section:'Operational Procedures', videos:['Documentation and Ticketing','Change Management'], mins:14},
+  {day:68, ch:'Ch.30', section:'Ops II', videos:['Backup Best Practices','Data Destruction','Environmental Controls'], mins:18},
+];
+
+const CHAPTERS = [
+  {id:'Ch.1', title:'Safety & Professionalism'},
+  {id:'Ch.2', title:'Intro to Computers & OS'},
+  {id:'Ch.7', title:'Power Supplies'},
+  {id:'Ch.8', title:'Mass Storage Technologies'},
+  {id:'Ch.9', title:'Implementing Mass Storage'},
+  {id:'Ch.10',title:'Essential Peripherals'},
+  {id:'Ch.11',title:'Installing & Upgrading OS'},
+  {id:'Ch.12',title:'Working with OS'},
+  {id:'Ch.13',title:'Users, Groups & Permissions'},
+  {id:'Ch.14',title:'Maintaining OS'},
+  {id:'Ch.15',title:'Command-Line Interface'},
+  {id:'Ch.16',title:'Troubleshooting Systems'},
+  {id:'Ch.17',title:'Display Technologies'},
+  {id:'Ch.18',title:'Essentials of Networking'},
+  {id:'Ch.19',title:'TCP/IP Basics'},
+  {id:'Ch.20',title:'OS Networking & Troubleshooting'},
+  {id:'Ch.21',title:'Wireless Networking'},
+  {id:'Ch.22',title:'Internet & SOHO Networking'},
+  {id:'Ch.23',title:'Virtualization & Cloud'},
+  {id:'Ch.24',title:'Portable Computing'},
+  {id:'Ch.25',title:'Mobile Devices'},
+  {id:'Ch.26',title:'Securing Mobile Devices'},
+  {id:'Ch.27',title:'Printers & Multifunction'},
+  {id:'Ch.28',title:'Essential Security'},
+  {id:'Ch.29',title:'Securing Endpoints'},
+  {id:'Ch.30',title:'Operational Procedures'},
+];
+
+// ── STORAGE ──────────────────────────────────────────────
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function sl(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+// ── STATE ─────────────────────────────────────────────────
+let ST = {
+  semDays:     ls('pace_sem_days', 0),
+  daysPerWeek: ls('pace_dpw', 5),
+  currentDay:  ls('current_day', 1),
+  semStart:    ls('cal_start', null),
+  doneDays:    ls('hub_done', []),
+  skipDays:    ls('pace_skip', []),
+  comboDays:   ls('pace_combo', []),
+  reviewCache: ls('review_cache', {}),
+  confRatings: ls('review_conf', {}),
+};
+
+// ── INIT ─────────────────────────────────────────────────
+function init() {
+  // Restore saved values
+  if(ST.semDays) document.getElementById('semDays').value = ST.semDays;
+  if(ST.daysPerWeek) document.getElementById('daysPerWeek').value = ST.daysPerWeek;
+  if(ST.currentDay) document.getElementById('currentDay').value = ST.currentDay;
+  if(ST.semStart) document.getElementById('semStart').value = ST.semStart;
+
+  updateTodayLabel();
+  recalcPace();
+  buildChapterGrid();
+
+  // Show today's card in video tab if day is set
+  if(ST.currentDay) renderTodayCard(ST.currentDay);
+}
+
+function goTab(id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabs = ['pacing','video','review'];
+  document.querySelectorAll('.tab')[tabs.indexOf(id)]?.classList.add('active');
+  document.getElementById('panel' + id.charAt(0).toUpperCase() + id.slice(1)).classList.add('active');
+}
+
+function updateTodayLabel() {
+  const d = ST.currentDay;
+  document.getElementById('todayLabel').textContent = d ? `Day ${d}` : 'Day — not set';
+  document.getElementById('currentDayBadge').textContent = d ? `Currently on Day ${d}` : 'Day not set';
+}
+
+function setCurrentDay(val) {
+  const d = parseInt(val);
+  if(d >= 1 && d <= 68) {
+    ST.currentDay = d;
+    sl('current_day', d);
+    updateTodayLabel();
+    renderTodayCard(d);
+  }
+}
+
+// ── PACING ENGINE ─────────────────────────────────────────
+function savePaceConfig() {
+  ST.semDays     = parseInt(document.getElementById('semDays').value) || 0;
+  ST.daysPerWeek = parseInt(document.getElementById('daysPerWeek').value) || 5;
+  ST.currentDay  = parseInt(document.getElementById('currentDay').value) || 1;
+  ST.semStart    = document.getElementById('semStart').value || null;
+
+  sl('pace_sem_days', ST.semDays);
+  sl('pace_dpw', ST.daysPerWeek);
+  sl('current_day', ST.currentDay);
+  if(ST.semStart) sl('cal_start', ST.semStart);
+
+  recalcPace();
+  renderPaceCal();
+  toast('Pacing guide updated!','ok');
+}
+
+function recalcPace() {
+  const semDays     = parseInt(document.getElementById('semDays').value) || ST.semDays;
+  const daysPerWeek = parseInt(document.getElementById('daysPerWeek').value) || 5;
+  const currentDay  = parseInt(document.getElementById('currentDay').value) || ST.currentDay;
+  const doneDays    = ST.doneDays.length;
+
+  if(!semDays) return;
+
+  // Calculate total class periods in semester
+  const totalClassDays = Math.floor(semDays * daysPerWeek / 5);
+
+  // Content days remaining
+  const contentRemaining = 68 - currentDay;
+  const classesRemaining = totalClassDays - doneDays;
+
+  // Buffer days (days with no new content — for review, testing, etc.)
+  const buffer = classesRemaining - contentRemaining;
+
+  // Pacing rate: content days / class days
+  const paceRate = contentRemaining / Math.max(classesRemaining, 1);
+
+  // Expected day based on elapsed class days
+  const elapsedClasses = doneDays;
+  const expectedDay = Math.round(elapsedClasses * 68 / totalClassDays);
+  const daysDiff = currentDay - expectedDay;
+
+  // Status
+  let status, detail, barClass, icon;
+  if(buffer >= 10) {
+    status = 'On Track 🟢';
+    detail = `You have ${buffer} buffer days — plenty of room if you need to slow down, add review days, or cover topics more deeply.`;
+    barClass = 'on-track'; icon = '🟢';
+  } else if(buffer >= 3) {
+    status = 'Slightly Behind 🟡';
+    detail = `Only ${buffer} buffer days remaining. Stay consistent and you'll finish on time — but avoid spending extra days on any single chapter.`;
+    barClass = 'behind'; icon = '🟡';
+  } else if(buffer >= 0) {
+    status = 'At Risk 🔴';
+    detail = `Just ${buffer} buffer days left. Consider combining short video days and trimming review time to stay on track.`;
+    barClass = 'critical'; icon = '🔴';
+  } else {
+    status = 'Behind Schedule 🔴';
+    detail = `You're ${Math.abs(buffer)} days behind. See the recommendations below to get back on track before the semester ends.`;
+    barClass = 'critical'; icon = '🔴';
+  }
+
+  // Update status bar
+  const bar = document.getElementById('paceBar');
+  bar.className = `pace-bar ${barClass}`;
+  document.getElementById('paceIcon').textContent = icon;
+  document.getElementById('paceStatus').textContent = status;
+  document.getElementById('paceDetail').textContent = detail;
+  document.getElementById('paceStats').innerHTML = `
+    <div class="ps"><div class="ps-num" style="color:var(--acc)">${totalClassDays}</div><div class="ps-label">Total class periods</div></div>
+    <div class="ps"><div class="ps-num" style="color:var(--grn)">${doneDays}</div><div class="ps-label">Days completed</div></div>
+    <div class="ps"><div class="ps-num" style="color:var(--amb)">${contentRemaining}</div><div class="ps-label">Content days left</div></div>
+    <div class="ps"><div class="ps-num" style="color:${buffer>=5?'var(--grn)':buffer>=0?'var(--amb)':'var(--red)'}">${Math.max(0,buffer)}</div><div class="ps-label">Buffer days</div></div>
+  `;
+
+  document.getElementById('calProgress').textContent = `${doneDays} / 68 days done`;
+
+  // Recommendations
+  const rec = document.getElementById('paceRecommendation');
+  rec.style.display = 'block';
+  let recHTML = '';
+  if(buffer < 5) {
+    recHTML += `<div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:14px 16px;margin-bottom:10px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--amb);letter-spacing:1px;margin-bottom:6px">⚡ PACING RECOMMENDATIONS</div>`;
+    if(buffer < 0) recHTML += `<div style="font-size:12px;color:var(--tx2);line-height:1.8;margin-bottom:4px">• You need to cover <strong>${Math.abs(buffer)} extra content days</strong> across your remaining classes. That means combining some lighter days.</div>`;
+    recHTML += `<div style="font-size:12px;color:var(--tx2);line-height:1.8;margin-bottom:4px">• Chapters 1 and 2 can be condensed — students likely have some prior knowledge.</div>`;
+    recHTML += `<div style="font-size:12px;color:var(--tx2);line-height:1.8;margin-bottom:4px">• Days with only 14 minutes of video can be doubled up if needed.</div>`;
+    recHTML += `<div style="font-size:12px;color:var(--tx2);line-height:1.8">• Focus remaining review time on the 5 CompTIA exam domains rather than chapter-by-chapter review.</div>`;
+    recHTML += `</div>`;
+  } else {
+    recHTML = `<div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:12px 16px;font-size:12px;color:var(--grn)">✓ You're in good shape. ${buffer} buffer days gives you flexibility for review, testing days, and slower chapters.</div>`;
+  }
+  rec.innerHTML = recHTML;
+
+  renderPaceCal();
+}
+
+function renderPaceCal() {
+  const startStr = document.getElementById('semStart').value || ST.semStart;
+  if(!startStr) return;
+
+  const cal = document.getElementById('paceCal');
+  // Keep headers
+  const headers = Array.from(cal.children).slice(0,7);
+  cal.innerHTML = '';
+  headers.forEach(h => cal.appendChild(h));
+
+  const start = new Date(startStr + 'T12:00:00');
+  const today = new Date();
+  const daysPerWeek = parseInt(document.getElementById('daysPerWeek').value) || 5;
+
+  // Calculate start of first week (Monday)
+  const dow = (start.getDay() + 6) % 7;
+  const weekStart = new Date(start);
+  weekStart.setDate(start.getDate() - dow);
+
+  // Fill blank days before start
+  for(let i = 0; i < dow; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'pc-day no-class';
+    cal.appendChild(blank);
+  }
+
+  let classDay = 0;
+  const totalClassDays = Math.floor((parseInt(document.getElementById('semDays').value)||90) * daysPerWeek / 5);
+
+  for(let d = 0; d < totalClassDays + dow + 14; d++) {
+    const date = new Date(weekStart);
+    date.setDate(weekStart.getDate() + d);
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    const isAfterStart = date >= start;
+    const isToday = date.toDateString() === today.toDateString();
+
+    if(isWeekend || !isAfterStart) {
+      const blank = document.createElement('div');
+      blank.className = 'pc-day no-class';
+      cal.appendChild(blank);
+      continue;
+    }
+
+    classDay++;
+    if(classDay > totalClassDays + 5) break;
+
+    // Map class day to content day
+    const contentDay = classDay <= 68 ? classDay : null;
+    const dayData = contentDay ? ALL_DAYS[contentDay-1] : null;
+    const isDone = contentDay && ST.doneDays.includes(contentDay);
+    const isSkipped = ST.skipDays.includes(classDay);
+    const isCombo = ST.comboDays.includes(classDay);
+    const isCurrent = contentDay === ST.currentDay;
+
+    const cell = document.createElement('div');
+    cell.className = `pc-day${isToday?' today':''}${isDone?' done':''}${isSkipped?' skip':''}${isCombo?' combo':''}`;
+    cell.innerHTML = `
+      ${isDone?'<div class="pc-tick">✓</div>':''}
+      ${isSkipped?'<div class="pc-skip-mark">—</div>':''}
+      <div class="pc-date">${['M','T','W','T','F'][date.getDay()-1]||''} ${date.getDate()}</div>
+      ${contentDay?`<div class="pc-daynum">${isCombo?`D${contentDay-1}+${contentDay}`:`D${contentDay}`}</div>
+      <div class="pc-ch">${dayData?.section||''}</div>`:'<div class="pc-ch" style="color:var(--tx4);margin-top:4px">buffer</div>'}
+    `;
+    if(contentDay) cell.onclick = () => toggleDayDone(contentDay);
+    cal.appendChild(cell);
+  }
+}
+
+function toggleDayDone(day) {
+  const idx = ST.doneDays.indexOf(day);
+  if(idx >= 0) ST.doneDays.splice(idx,1);
+  else ST.doneDays.push(day);
+  sl('hub_done', ST.doneDays);
+  recalcPace();
+}
+
+function markDayDone() {
+  if(!ST.currentDay) { toast('Set current day first','err'); return; }
+  if(!ST.doneDays.includes(ST.currentDay)) {
+    ST.doneDays.push(ST.currentDay);
+    sl('hub_done', ST.doneDays);
+  }
+  const next = ST.currentDay + 1;
+  if(next <= 68) {
+    ST.currentDay = next;
+    sl('current_day', next);
+    document.getElementById('currentDay').value = next;
+    updateTodayLabel();
+    renderTodayCard(next);
+  }
+  recalcPace();
+  toast(`Day ${ST.currentDay-1} complete → now on Day ${ST.currentDay}`,'ok');
+}
+
+function skipDay() {
+  const day = parseInt(prompt('Which class day number to skip? (e.g. a testing day or assembly)')) || 0;
+  if(!day) return;
+  if(!ST.skipDays.includes(day)) { ST.skipDays.push(day); sl('pace_skip', ST.skipDays); }
+  recalcPace();
+  toast(`Day ${day} marked as skipped`,'ok');
+}
+
+function combineDay() {
+  const day = parseInt(prompt('Which content day do you want to combine with the next? (e.g. 15 combines days 15+16)')) || 0;
+  if(!day) return;
+  if(!ST.comboDays.includes(day)) { ST.comboDays.push(day); sl('pace_combo', ST.comboDays); }
+  recalcPace();
+  toast(`Days ${day} and ${day+1} combined into one class period`,'ok');
+}
+
+function exportPaceCSV() {
+  const lines = ['Content Day,Section,Chapter,Videos,Status'];
+  ALL_DAYS.forEach(d => {
+    const status = ST.doneDays.includes(d.day) ? 'Complete' : ST.skipDays.includes(d.day) ? 'Skipped' : d.day < ST.currentDay ? 'Past' : d.day === ST.currentDay ? 'Today' : 'Upcoming';
+    lines.push(`${d.day},"${d.section}","${d.ch}","${d.videos.join('; ')}","${status}"`);
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download = 'CompTIA_A+_Pacing_Guide.csv';
+  a.click();
+  toast('Pacing guide exported!','ok');
+}
+
+// ── VIDEO SEARCH ──────────────────────────────────────────
+function searchVideos(query) {
+  const q = query.trim().toLowerCase();
+  const results = document.getElementById('videoResults');
+
+  if(!q) {
+    results.innerHTML = '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:16px;text-align:center">Start typing to search all 147 videos.</div>';
+    return;
+  }
+
+  // Search all videos across all days
+  const matches = [];
+  ALL_DAYS.forEach(day => {
+    day.videos.forEach(video => {
+      if(video.toLowerCase().includes(q) || day.section.toLowerCase().includes(q) || day.ch.toLowerCase().includes(q)) {
+        matches.push({day, video});
+      }
+    });
+  });
+
+  if(!matches.length) {
+    results.innerHTML = '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:16px;text-align:center">No videos match that search. Try a different keyword.</div>';
+    return;
+  }
+
+  results.innerHTML = matches.slice(0,20).map(m => `
+    <div class="video-result ${ST.currentDay === m.day.day ? 'active' : ''}" onclick="selectVideo(${m.day.day})">
+      <div class="vr-day">D${m.day.day}</div>
+      <div class="vr-info">
+        <div class="vr-title">${m.video}</div>
+        <div class="vr-chapter">${m.day.ch} · ${m.day.section}</div>
+      </div>
+      <div class="vr-mins">${m.day.mins}min</div>
+      <button class="set-day-btn" onclick="event.stopPropagation();selectVideo(${m.day.day})">
+        ${ST.currentDay === m.day.day ? '✓ Current' : 'Set as today'}
+      </button>
+    </div>`).join('');
+}
+
+function selectVideo(dayNum) {
+  setCurrentDay(dayNum);
+  document.getElementById('videoSearchInput').value = '';
+  document.getElementById('videoResults').innerHTML = `<div style="font-size:11px;color:var(--grn);font-family:var(--mono);padding:12px 16px">✓ Set to Day ${dayNum}. All tools updated.</div>`;
+  // Update the pacing tab too
+  document.getElementById('currentDay').value = dayNum;
+  recalcPace();
+  toast(`Day set to ${dayNum} — all tools updated`,'ok');
+}
+
+function renderTodayCard(dayNum) {
+  const d = ALL_DAYS[dayNum-1];
+  if(!d) return;
+
+  const card = document.getElementById('todayCard');
+  card.style.display = 'block';
+  document.getElementById('todayDayTag').textContent = `Day ${dayNum}`;
+  document.getElementById('todayCardBody').innerHTML = `
+    <div style="margin-bottom:12px">
+      <div style="font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:4px">${d.section}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--tx3)">${d.ch} · ${d.mins} minutes of video</div>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">Videos to watch</div>
+    ${d.videos.map(v => `
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:5px">
+        <span style="font-size:14px">▶️</span>
+        <span style="font-size:12px;color:var(--tx)">${v}</span>
+      </div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-acc btn-sm" onclick="window.open('https://www.udemy.com/course/total-comptia-a-certification/learn/','_blank')">Open Udemy →</button>
+      <button class="btn btn-ghost btn-sm" onclick="goTab('review');openChapterReview('${d.ch}')">📖 Study Guide for ${d.ch}</button>
+    </div>`;
+
+  // Yesterday's card
+  if(dayNum > 1) {
+    const yesterday = ALL_DAYS[dayNum-2];
+    const yCard = document.getElementById('yesterdayCard');
+    yCard.style.display = 'block';
+    document.getElementById('yesterdayCardBody').innerHTML = `
+      <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx2);margin-bottom:8px">Day ${dayNum-1} · ${yesterday.section}</div>
+      ${yesterday.videos.map(v=>`<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:4px 0">• ${v}</div>`).join('')}
+      <div style="margin-top:10px">
+        <button class="btn btn-ghost btn-sm" onclick="goTab('review');openChapterReview('${yesterday.ch}')">Review ${yesterday.ch} →</button>
+      </div>`;
+  }
+}
+
+// ── CHAPTER REVIEW ────────────────────────────────────────
+function buildChapterGrid() {
+  const grid = document.getElementById('chapterGrid');
+  grid.innerHTML = CHAPTERS.map(ch => {
+    const conf = ST.confRatings[ch.id] || 0;
+    const confEmoji = conf === 4 ? '💪' : conf === 3 ? '👍' : conf === 2 ? '😐' : conf === 1 ? '😬' : '';
+    return `<div class="chapter-chip ${conf===4?'complete':''}" onclick="openChapterReview('${ch.id}')" id="chip-${ch.id.replace('.','_')}">
+      <div class="cc-num">${ch.id}</div>
+      <div class="cc-title">${ch.title}</div>
+      <div class="cc-conf">${confEmoji}</div>
+    </div>`;
+  }).join('');
+}
+
+async function openChapterReview(chId) {
+  const ch = CHAPTERS.find(c => c.id === chId);
+  if(!ch) return;
+
+  const area = document.getElementById('reviewArea');
+  area.style.display = 'block';
+  document.getElementById('reviewChapterTitle').textContent = ch.id + ' — ' + ch.title;
+  document.getElementById('reviewChapterSub').textContent = 'CompTIA A+ 220-1202 · Complete Study Guide';
+  document.getElementById('reviewContent').innerHTML = '<div class="loading">Generating study guide for ' + ch.title + '…</div>';
+  area.scrollIntoView({behavior:'smooth'});
+
+  // Check cache first
+  if(ST.reviewCache[chId]) {
+    renderReviewContent(ST.reviewCache[chId], chId);
+    return;
+  }
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2500,
+        system: 'You are a CompTIA A+ 220-1202 instructor creating study materials for high school students. Return only valid JSON, no markdown, no preamble.',
+        messages: [{role:'user', content: `Create a complete study guide for CompTIA A+ 220-1202 ${ch.id}: "${ch.title}".
+
+Return JSON:
+{
+  "concepts": ["3-4 plain-language sentences explaining the core concept of this chapter for a high school student"],
+  "vocab": [{"term":"...","definition":"one clear sentence definition"}],
+  "questions": [
+    {"q":"MC question with qualifier word","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."},
+    {"q":"MC question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"B","rationale":"..."},
+    {"q":"MC question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"C","rationale":"..."},
+    {"q":"MC question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"D","rationale":"..."},
+    {"q":"MC question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"..."}
+  ],
+  "traps": ["Most common mistake #1 students make on CompTIA A+ exam for this chapter","Trap #2","Trap #3"]
+}`}]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.map(c=>c.text||'').join('')||'';
+    const guide = JSON.parse(text.replace(/```json\n?|\n?```/g,'').trim());
+    ST.reviewCache[chId] = guide;
+    sl('review_cache', ST.reviewCache);
+    renderReviewContent(guide, chId);
+  } catch(e) {
+    document.getElementById('reviewContent').innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:11px;padding:16px">Generation failed. Check your connection and try again.<br><br><button class="btn btn-ghost btn-sm" onclick="openChapterReview('${chId}')">Retry</button></div>`;
+  }
+}
+
+function renderReviewContent(guide, chId) {
+  const answers = {};
+
+  const html = `
+    <!-- Key Concepts -->
+    <div class="review-section">
+      <div class="rs-header">📖 Key Concepts</div>
+      ${(guide.concepts||[]).map(c=>`<div class="concept-block">${c}</div>`).join('')}
+    </div>
+
+    <!-- Vocabulary -->
+    <div class="review-section">
+      <div class="rs-header">📚 Vocabulary (${(guide.vocab||[]).length} terms)</div>
+      ${(guide.vocab||[]).map(v=>`
+        <div class="vocab-item">
+          <div class="vocab-term">${v.term}</div>
+          <div class="vocab-def">${v.definition}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Practice Questions -->
+    <div class="review-section">
+      <div class="rs-header">🎯 Practice Questions</div>
+      ${(guide.questions||[]).map((q,i)=>`
+        <div class="q-block" id="rq-${chId}-${i}">
+          <div class="q-num">Question ${i+1} of ${guide.questions.length}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="opts">
+            ${['A','B','C','D'].map(l=>`
+              <div class="opt" onclick="answerReview('${chId}',${i},'${l}','${q.answer}',this)">
+                <span class="opt-ltr">${l}</span>${q.opts[l]}
+              </div>`).join('')}
+          </div>
+          <div class="rationale" id="rr-${chId}-${i}">${q.rationale}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Exam Traps -->
+    <div class="review-section">
+      <div class="rs-header">⚠️ Exam Traps</div>
+      ${(guide.traps||[]).map(t=>`
+        <div class="trap-item">
+          <span class="trap-icon">⚠️</span>${t}
+        </div>`).join('')}
+    </div>
+
+    <!-- Confidence Check -->
+    <div class="review-section">
+      <div class="rs-header">💭 How confident do you feel about ${chId}?</div>
+      <div class="conf-check">
+        <div class="conf-btn ${ST.confRatings[chId]===1?'sel-1':''}" onclick="setConf('${chId}',1,this)"><span class="conf-emoji">😬</span><span class="conf-label">Not ready</span></div>
+        <div class="conf-btn ${ST.confRatings[chId]===2?'sel-2':''}" onclick="setConf('${chId}',2,this)"><span class="conf-emoji">😐</span><span class="conf-label">Getting there</span></div>
+        <div class="conf-btn ${ST.confRatings[chId]===3?'sel-3':''}" onclick="setConf('${chId}',3,this)"><span class="conf-emoji">👍</span><span class="conf-label">Pretty good</span></div>
+        <div class="conf-btn ${ST.confRatings[chId]===4?'sel-4':''}" onclick="setConf('${chId}',4,this)"><span class="conf-emoji">💪</span><span class="conf-label">Solid</span></div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('reviewContent').innerHTML = html;
+}
+
+function answerReview(chId, qIdx, letter, answer, el) {
+  const block = document.getElementById(`rq-${chId}-${qIdx}`);
+  block.querySelectorAll('.opt').forEach((o,j) => {
+    const l = ['A','B','C','D'][j];
+    o.className = 'opt' + (l===answer?' correct':l===letter&&l!==answer?' wrong':'');
+  });
+  document.getElementById(`rr-${chId}-${qIdx}`)?.classList.add('show');
+}
+
+function setConf(chId, rating, el) {
+  ST.confRatings[chId] = rating;
+  sl('review_conf', ST.confRatings);
+  el.closest('.conf-check').querySelectorAll('.conf-btn').forEach(b=>b.className='conf-btn');
+  const cls = ['','sel-1','sel-2','sel-3','sel-4'][rating];
+  el.classList.add(cls);
+  buildChapterGrid();
+  toast(`Confidence saved for ${chId}`,'ok');
+}
+
+function closeReview() {
+  document.getElementById('reviewArea').style.display = 'none';
+}
+
+function clearReviewCache() {
+  ST.reviewCache = {};
+  sl('review_cache', {});
+  toast('Cache cleared — next open will regenerate','ok');
+}
+
+function printReview() { window.print(); }
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (type?' '+type:'');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.className='toast', 3500);
+}
+
+init();
+</script>
+</body>
+</html>

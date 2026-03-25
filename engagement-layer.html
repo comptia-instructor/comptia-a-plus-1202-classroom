@@ -697,8 +697,8 @@ async function generateQOTD(){
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:400,
-        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON, no markdown.',
-        messages:[{role:'user',content:`Generate 1 CompTIA A+ 220-1202 question on the topic: "${topic}". Use a qualifier word (BEST/FIRST/MOST). Challenging but fair for high school students.
+        system:'You are a CompTIA A+ 220-1202 exam writer. Return only valid JSON, no markdown. Each call must produce DIFFERENT questions — vary topics, difficulty, scenario types, and wording every time.',
+        messages:[{role:'user',content:`[Seed: ${Date.now()}] Generate 1 CompTIA A+ 220-1202 question on the topic: "${topic}". Use a qualifier word (BEST/FIRST/MOST). Challenging but fair for high school students.
 Return JSON: {"q":"...","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"...","topic":"${topic}"}`}]
       })
     });
