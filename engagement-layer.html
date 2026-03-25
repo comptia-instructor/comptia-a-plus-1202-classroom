@@ -292,12 +292,12 @@ nav::-webkit-scrollbar{height:2px}
     <div class="card-hdr"><h2>🎛️ Teacher Controls</h2></div>
     <div class="card-body">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-        <button class="btn btn-acc" onclick="generateQOTD()" id="genQotdBtn">⚡ Generate New Question</button>
-        <button class="btn btn-ghost btn-sm" onclick="startQotdTimer(60)">60s Timer</button>
-        <button class="btn btn-ghost btn-sm" onclick="startQotdTimer(90)">90s Timer</button>
-        <button class="btn btn-ghost btn-sm" onclick="startQotdTimer(120)">2min Timer</button>
-        <button class="btn btn-ghost btn-sm" onclick="revealQotd()">Reveal Answer</button>
-        <button class="btn btn-ghost btn-sm" onclick="resetQotd()">Reset</button>
+        <button class="btn btn-acc teacher-only" onclick="generateQOTD()" id="genQotdBtn">⚡ Generate New Question</button>
+        <button class="btn btn-ghost btn-sm teacher-only" onclick="startQotdTimer(60)">60s Timer</button>
+        <button class="btn btn-ghost btn-sm teacher-only" onclick="startQotdTimer(90)">90s Timer</button>
+        <button class="btn btn-ghost btn-sm teacher-only" onclick="startQotdTimer(120)">2min Timer</button>
+        <button class="btn btn-ghost btn-sm teacher-only" onclick="revealQotd()">Reveal Answer</button>
+        <button class="btn btn-ghost btn-sm teacher-only" onclick="resetQotd()">Reset</button>
       </div>
       <div style="font-size:11px;color:var(--tx2);line-height:1.7;font-family:var(--mono)">
         Start class with QOTD every day. Generate the question, start the timer, first 3 correct answers get +1 PBIS point automatically. Resets daily.
@@ -330,7 +330,7 @@ nav::-webkit-scrollbar{height:2px}
     <div class="xp-milestone" id="xpMilestones"></div>
   </div>
 
-  <div class="card">
+  <div class="card teacher-only">
     <div class="card-hdr"><h2>⚡ Award Class XP</h2><span class="tag pur" id="totalXpTag">0 XP total</span></div>
     <div class="card-body">
       <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px">The whole class earns XP together. When the class levels up, everyone celebrates. Award XP for collective achievements.</div>
@@ -484,7 +484,7 @@ nav::-webkit-scrollbar{height:2px}
     </div>
   </div>
 
-  <button class="spotlight-btn" onclick="launchSpotlight()">
+  <button class="spotlight-btn teacher-only" onclick="launchSpotlight()">
     <span id="slEmojiPreview">🌟</span>
     SPOTLIGHT THIS STUDENT
   </button>
@@ -1207,8 +1207,8 @@ function calculateImproved(){
     </div>`).join('')+
     (sorted.length>0?`
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-grn btn-sm" onclick="spotlightMostImproved()">🌟 Spotlight Most Improved</button>
-        <button class="btn btn-ghost btn-sm" onclick="awardImprovedPbis()">🏆 Award +5 PBIS to Most Improved</button>
+        <button class="btn btn-grn btn-sm teacher-only" onclick="spotlightMostImproved()">🌟 Spotlight Most Improved</button>
+        <button class="btn btn-ghost btn-sm teacher-only" onclick="awardImprovedPbis()">🏆 Award +5 PBIS to Most Improved</button>
       </div>`:''
     ):
     '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);padding:16px;text-align:center">Log student scores above to calculate improvement rankings.</div>';
@@ -1274,5 +1274,36 @@ if(typeof Platform !== 'undefined') {
   if(typeof Platform!=='undefined'){Platform.init('engagement');}
 }
 </script>
+
+<!-- Floating back to hub button -->
+<a id="floatingBackBtn" href="hub.html"
+  style="
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:rgba(5,8,16,0.92);
+  border:1.5px solid var(--acc);
+  color:var(--acc);
+  font-family:JetBrains Mono,monospace;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.5px;
+  padding:10px 18px;
+  border-radius:30px;
+  cursor:pointer;
+  z-index:800;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  backdrop-filter:blur(12px);
+  transition:all .2s;
+  box-shadow:0 4px 20px rgba(0,200,255,0.15);
+"
+  onmouseover="this.style.background='rgba(0,200,255,0.15)';this.style.transform='translateY(-2px)'"
+  onmouseout="this.style.background='rgba(5,8,16,0.92)';this.style.transform='translateY(0)'">
+  ← Hub
+</a>
+
 </body>
 </html>

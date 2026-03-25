@@ -6,6 +6,81 @@
 <title>CompTIA A+ · Mission Control</title>
 <link rel="stylesheet" href="platform.css">
 <style>
+
+/* ── TUTORIAL OVERLAY ── */
+.tut-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.tut-overlay.active { opacity: 1; pointer-events: all; }
+.tut-card {
+  background: var(--s1);
+  border: 1.5px solid var(--acc);
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 520px;
+  width: 90vw;
+  text-align: center;
+  position: relative;
+  animation: tutIn .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes tutIn {
+  from { transform: scale(.9) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+.tut-step-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.tut-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--b2);
+  transition: all .3s;
+}
+.tut-dot.active { background: var(--acc); width: 24px; border-radius: 4px; }
+.tut-dot.done   { background: var(--grn); }
+.tut-icon { font-size: 56px; margin-bottom: 16px; display: block; }
+.tut-title {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--tx);
+  margin-bottom: 10px;
+}
+.tut-body {
+  font-size: 13px;
+  color: var(--tx2);
+  line-height: 1.8;
+  margin-bottom: 24px;
+  min-height: 80px;
+}
+.tut-highlight {
+  background: var(--acc-d);
+  border: 1px solid var(--acc);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--acc);
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+.tut-actions { display: flex; gap: 10px; justify-content: center; }
+
 /* Hub-specific styles only — everything else from platform.css */
 .hero { padding: 72px 0 56px; text-align: center; }
 .hero-eye {
@@ -339,7 +414,7 @@ footer {
 <div class="wrap">
 
   <!-- First-run banner (only shows if setup not complete) -->
-  <div id="setupBanner" style="background:linear-gradient(135deg,rgba(0,200,255,0.08),rgba(187,68,255,0.05));border:1px solid var(--acc);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin:20px 0 0;position:relative">
+  <div id="setupBanner" class="teacher-only" style="background:linear-gradient(135deg,rgba(0,200,255,0.08),rgba(187,68,255,0.05));border:1px solid var(--acc);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin:20px 0 0;position:relative">
     <span style="font-size:24px">🚀</span>
     <div style="flex:1">
       <div style="font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);margin-bottom:3px">First time? Run the Setup Wizard</div>
@@ -374,7 +449,7 @@ footer {
         <div class="ann-label">Teacher Announcement</div>
         <div class="ann-text" id="annText">Welcome! Click Edit to post today's announcement for your class.</div>
       </div>
-      <button class="ann-edit" onclick="openAnnModal()">✏️ Edit</button>
+      <button class="ann-edit teacher-only" onclick="openAnnModal()">✏️ Edit</button>
     </div>
   </div>
 
@@ -628,6 +703,7 @@ const DAYS_DATA=[
 let currentWeek = pls('hub_week', 0);
 
 function init() {
+  if(typeof Platform!=="undefined") Platform.guardPage();
   const ann = pls('hub_announcement', '');
   if (ann) document.getElementById('annText').textContent = ann;
   renderCalendar();
@@ -643,6 +719,97 @@ function init() {
   applyMode(isTeacher);
 }
 
+
+// ── STUDENT ONBOARDING TUTORIAL ──────────────────────────
+const TUT_STEPS = [
+  {
+    icon: '👋',
+    title: 'Welcome to CompTIA A+!',
+    body: 'This is your classroom platform for the CompTIA A+ 220-1202 certification course. Let me show you the 4 tools you'll use every day. This takes about 60 seconds.',
+    highlight: null,
+  },
+  {
+    icon: '🏫',
+    title: 'Daily Classroom',
+    body: 'Every class starts here. You'll answer 5 warm-up questions, watch today's videos, submit your own question, and finish with a graded closing quiz.',
+    highlight: '📌 Your teacher opens this at the start of every class. Follow along on your Chromebook.',
+  },
+  {
+    icon: '📝',
+    title: 'Notes & Quizzes',
+    body: 'Cornell-style notes for all 27 chapters. Take notes while watching videos and use the quiz generator to test yourself on any chapter.',
+    highlight: '📌 Fill in your notes while watching videos — it counts toward your completion grade.',
+  },
+  {
+    icon: '🎮',
+    title: 'Command Center',
+    body: 'Your personal dashboard. See your exam readiness score, study queue, badges you've earned, and get a personalized "What to Study Tonight" plan.',
+    highlight: '📌 Check this before studying at home — it tells you exactly what to focus on.',
+  },
+  {
+    icon: '🏆',
+    title: 'PBIS Points',
+    body: 'Earn PBIS points by scoring 80%+ on quizzes, keeping a 7-day study streak, and completing study sessions. Points show up on the class leaderboard.',
+    highlight: '📌 Score 80%+ on the closing quiz = +5 PBIS points automatically.',
+  },
+  {
+    icon: '🎯',
+    title: 'One Important Rule',
+    body: 'Your student code is your only identifier — your real name is never stored. Write your code somewhere safe. If you forget it, your progress history gets disconnected.',
+    highlight: '⚠️ Write your code in your notebook right now. You'll need it every class.',
+  },
+  {
+    icon: '🚀',
+    title: 'You're Ready!',
+    body: 'Start by opening the Classroom tool below. Your teacher will guide you through the rest on your first day.',
+    highlight: null,
+  },
+];
+
+let tutStep = 0;
+
+function startTutorial() {
+  tutStep = 0;
+  document.getElementById('tutOverlay').classList.add('active');
+  renderTutStep();
+}
+
+function renderTutStep() {
+  const step = TUT_STEPS[tutStep];
+  const total = TUT_STEPS.length;
+
+  document.getElementById('tutIcon').textContent  = step.icon;
+  document.getElementById('tutTitle').textContent = step.title;
+  document.getElementById('tutBody').textContent  = step.body;
+
+  const hl = document.getElementById('tutHighlight');
+  if (step.highlight) { hl.textContent = step.highlight; hl.style.display = ''; }
+  else hl.style.display = 'none';
+
+  // Dots
+  document.getElementById('tutDots').innerHTML = TUT_STEPS.map((_,i) =>
+    `<div class="tut-dot ${i < tutStep ? 'done' : i === tutStep ? 'active' : ''}"></div>`
+  ).join('');
+
+  // Button label
+  const btn = document.getElementById('tutNext');
+  btn.textContent = tutStep === total-1 ? "Let's Go! 🚀" : 'Next →';
+}
+
+function nextTutStep() {
+  if (tutStep < TUT_STEPS.length - 1) {
+    tutStep++;
+    renderTutStep();
+  } else {
+    skipTutorial();
+  }
+}
+
+function skipTutorial() {
+  document.getElementById('tutOverlay').classList.remove('active');
+  localStorage.setItem('tut_complete', '1');
+}
+
 function saveStudentCode() {
   const val = document.getElementById('codeModalInput').value.trim().toUpperCase();
   if (!val || val.length < 3) {
@@ -654,6 +821,8 @@ function saveStudentCode() {
   localStorage.setItem('scc_code', JSON.stringify(val));
   localStorage.setItem('student_code', JSON.stringify(val));
   document.getElementById('codeModal').classList.remove('open');
+  // Show tutorial on first login
+  if (!localStorage.getItem('tut_complete')) { setTimeout(startTutorial, 400); }
   // Update code pill
   const pill = document.getElementById('platformCode');
   if (pill) { pill.textContent = val; pill.classList.remove('empty'); }
@@ -782,6 +951,22 @@ function nextWeek() { currentWeek++; psl('hub_week',currentWeek); renderCalendar
 
 init();
 </script>
+
+
+<!-- Student Onboarding Tutorial -->
+<div class="tut-overlay" id="tutOverlay">
+  <div class="tut-card" id="tutCard">
+    <div class="tut-step-dots" id="tutDots"></div>
+    <span class="tut-icon" id="tutIcon">👋</span>
+    <div class="tut-title" id="tutTitle">Welcome!</div>
+    <div class="tut-body" id="tutBody"></div>
+    <div class="tut-highlight" id="tutHighlight" style="display:none"></div>
+    <div class="tut-actions">
+      <button class="p-btn p-btn-ghost" id="tutSkip" onclick="skipTutorial()">Skip</button>
+      <button class="p-btn p-btn-acc" id="tutNext" onclick="nextTutStep()">Next →</button>
+    </div>
+  </div>
+</div>
 
 <!-- Student Code Modal (shown on first visit) -->
 <div class="modal-bg" id="codeModal" style="z-index:700">

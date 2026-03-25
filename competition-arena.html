@@ -321,7 +321,7 @@ nav::-webkit-scrollbar{height:2px}
   <div class="tab" onclick="switchTab('boss')">👹 Boss Battles</div>
   <div class="tab" onclick="switchTab('personal')">🌟 Personal Bests</div>
   <div class="tab" onclick="switchTab('voting')">🗳️ Question Voting</div>
-  <div class="tab" onclick="switchTab('setup')">⚙️ Setup</div>
+  <div class="tab teacher-only" onclick="switchTab('setup')">⚙️ Setup</div>
 </nav>
 
 <div class="content">
@@ -391,7 +391,7 @@ nav::-webkit-scrollbar{height:2px}
   </div>
 
   <!-- Teacher challenge creator -->
-  <div class="challenge-creator">
+  <div class="challenge-creator teacher-only">
     <div style="font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--amb);margin-bottom:12px">🎯 Set This Week's Challenge (Teacher)</div>
     <div class="cc-form">
       <input class="cf-inp" id="chNewTitle" placeholder="Challenge title (e.g. Networking Domination)">
@@ -441,7 +441,7 @@ nav::-webkit-scrollbar{height:2px}
       The class fights the boss together. Every correct answer deals damage. Hit the tier threshold to earn class-wide PBIS points!
     </div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap">
-      <select id="bossChapterSel" style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:8px 14px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none">
+      <select id="bossChapterSel" class="teacher-only" style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:8px 14px;color:var(--tx);font-family:var(--sans);font-size:12px;outline:none">
         <option value="Ch.1">Ch.1 Safety & Professionalism</option>
         <option value="Ch.2">Ch.2 Intro to Computers & OS</option>
         <option value="Ch.7">Ch.7 Power Supplies</option>
@@ -463,7 +463,7 @@ nav::-webkit-scrollbar{height:2px}
         <option value="Ch.29">Ch.29 Securing Endpoints</option>
         <option value="Ch.30">Ch.30 Operational Procedures</option>
       </select>
-      <button class="btn btn-red btn-lg" onclick="startBossBattle()" id="startBossBtn">⚔️ Start Boss Battle</button>
+      <button class="btn btn-red btn-lg teacher-only" onclick="startBossBattle()" id="startBossBtn">⚔️ Start Boss Battle</button>
     </div>
   </div>
 
@@ -642,6 +642,7 @@ const CATS = [
 
 // ── INIT ──
 function init(){
+  if(typeof Platform!=="undefined") Platform.guardPage();
   updateWeekLabel();
   renderLeaderboard('points');
   renderTicker();
@@ -863,7 +864,7 @@ function renderChallenges(){
         </div>
       </div>
       <div class="cc-action">
-        <button class="btn btn-ghost btn-sm" onclick="markComplete(${ch.id})">Mark Complete</button>
+        <button class="btn btn-ghost btn-sm teacher-only" onclick="markComplete(${ch.id})">Mark Complete</button>
       </div>
     </div>`).join(''):
     '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No past challenges yet.</div>';
@@ -1335,5 +1336,36 @@ function exportBossPDF() {
 }
 
 </script>
+
+<!-- Floating back to hub button -->
+<a id="floatingBackBtn" href="hub.html"
+  style="
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:rgba(5,8,16,0.92);
+  border:1.5px solid var(--acc);
+  color:var(--acc);
+  font-family:JetBrains Mono,monospace;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.5px;
+  padding:10px 18px;
+  border-radius:30px;
+  cursor:pointer;
+  z-index:800;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  backdrop-filter:blur(12px);
+  transition:all .2s;
+  box-shadow:0 4px 20px rgba(0,200,255,0.15);
+"
+  onmouseover="this.style.background='rgba(0,200,255,0.15)';this.style.transform='translateY(-2px)'"
+  onmouseout="this.style.background='rgba(5,8,16,0.92)';this.style.transform='translateY(0)'">
+  ← Hub
+</a>
+
 </body>
 </html>
