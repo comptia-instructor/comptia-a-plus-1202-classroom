@@ -490,7 +490,7 @@ footer {
 <div class="platform-shell">
 
 <!-- HEADER -->
-<header class="platform-header">
+<header class="platform-header" style="position:relative;z-index:1000">
   <a href="hub.html" class="ph-logo">A+</a>
   <div>
     <div class="ph-title">Mission <span>Control</span></div>
@@ -503,7 +503,7 @@ footer {
     <!-- Always visible teacher login button -->
     <button id="teacherLoginBtn"
       onclick="openTeacherLogin()"
-      style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;padding:6px 14px;border-radius:6px;border:1.5px solid var(--gold);background:var(--gold-d);color:var(--gold);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:5px">
+      style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;padding:6px 14px;border-radius:6px;border:1.5px solid var(--gold);background:var(--gold-d);color:var(--gold);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:5px;position:relative;z-index:1000">
       🔑 Teacher Login
     </button>
   </div>
@@ -999,6 +999,10 @@ function _renderTodayStripOLD() {
 
 function init() {
   if(typeof Platform!=="undefined") Platform.guardPage();
+  // Set default PIN to 1529 if never configured
+  if (!localStorage.getItem('teacher_pin')) {
+    localStorage.setItem('teacher_pin', '1529');
+  }
   const ann = pls('hub_announcement', '');
   if (ann) document.getElementById('annText').textContent = ann;
   renderCalendar();
@@ -1134,15 +1138,23 @@ function teacherEntry() {
 function openTeacherLogin() {
   // Close any open modals first
   document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('open'));
-  document.getElementById('teacherModal').classList.add('open');
-  document.getElementById('pinInput').value = '';
-  document.getElementById('pinError').textContent = '';
-  setTimeout(() => document.getElementById('pinInput').focus(), 200);
+  // Small delay to ensure close animation completes
+  setTimeout(() => {
+    const modal = document.getElementById('teacherModal');
+    if (modal) {
+      modal.classList.add('open');
+      modal.style.zIndex = '2000'; // ensure above everything
+    }
+    const pinEl = document.getElementById('pinInput');
+    if (pinEl) { pinEl.value = ''; pinEl.focus(); }
+    const errEl = document.getElementById('pinError');
+    if (errEl) errEl.textContent = '';
+  }, 50);
 }
 
 function checkTeacherPin() {
   const pin = document.getElementById('pinInput').value.trim();
-  const savedPin = localStorage.getItem('teacher_pin') || '1202';
+  const savedPin = localStorage.getItem('teacher_pin') || '1529';
   if (pin === savedPin) {
     localStorage.setItem('teacher_unlocked', 'true');
     localStorage.setItem('PLATFORM_CODE', JSON.stringify('TEACHER'));
@@ -1151,16 +1163,14 @@ function checkTeacherPin() {
     // After login, redirect to video selector
     window.location.href = 'today-video.html';
   } else {
-    document.getElementById('pinError').textContent = 'Incorrect PIN. Default is 1202 — change it in Setup Wizard.';
+    document.getElementById('pinError').textContent = 'Incorrect PIN. Contact your teacher.';
     document.getElementById('pinInput').value = '';
     document.getElementById('pinInput').style.borderColor = 'var(--red)';
   }
 }
 
 function recoverPin() {
-  var pin = localStorage.getItem('teacher_pin') || '1202';
-  var hint = 'Your PIN has ' + pin.length + ' characters and ends in "' + pin.slice(-2) + '"';
-  document.getElementById('pinError').textContent = hint;
+  document.getElementById('pinError').textContent = 'Contact your administrator to reset the PIN.';
   document.getElementById('pinError').style.color = 'var(--amb)';
 }
 
@@ -1282,7 +1292,7 @@ init();
 </div>
 
 <!-- Student Code Modal (shown on first visit) -->
-<div class="modal-bg" id="codeModal" style="z-index:700">
+<div class="modal-bg" id="codeModal" style="z-index:500">
   <div class="modal" style="text-align:center">
     <div style="font-size:48px;margin-bottom:12px">🎓</div>
     <h3>Welcome!</h3>
@@ -1303,7 +1313,7 @@ init();
 </div>
 
 <!-- Teacher PIN Modal -->
-<div class="modal-bg" id="teacherModal" style="z-index:800">
+<div class="modal-bg" id="teacherModal" style="z-index:2000">
   <div class="modal" style="text-align:center">
     <div style="font-size:48px;margin-bottom:12px">🔑</div>
     <h3>Teacher Access</h3>
@@ -1318,10 +1328,7 @@ init();
       <button class="p-btn p-btn-ghost p-btn-wide" onclick="closeTeacherModal()">← Back to Student View</button>
     </div>
     <div style="margin-top:10px;font-size:10px;color:var(--tx3);font-family:var(--mono)" id="pinError"></div>
-    <div style="margin-top:8px;font-size:10px;color:var(--tx3);font-family:var(--mono)">
-      Forgot your PIN?
-      <span style="color:var(--acc);cursor:pointer;text-decoration:underline" onclick="recoverPin()">Show hint</span>
-    </div>
+
   </div>
 </div>
 

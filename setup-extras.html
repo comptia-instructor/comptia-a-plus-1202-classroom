@@ -3,19 +3,48 @@
 <head>
 
 <script>
-// Teacher gate — students cannot access setup wizard
+// Teacher PIN gate — blocks all non-teachers with a PIN prompt
 (function() {
   var isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
-  if (!isTeacher) {
-    document.addEventListener('DOMContentLoaded', function() {
-      document.body.innerHTML = '';
-      document.body.style.cssText = 'background:#050810;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:JetBrains Mono,monospace;flex-direction:column;gap:16px;text-align:center;padding:24px';
-      document.body.innerHTML = '<div style="font-size:48px;margin-bottom:8px">🔒</div>' +
-        '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:800;color:#cdd6f0;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Teacher Access Only</div>' +
-        '<div style="font-size:12px;color:#6d7ca8;line-height:1.8;max-width:320px;margin-bottom:20px">This page is for your teacher only. Go back to the hub and enter your student code.</div>' +
-        '<a href="hub.html" style="background:#00c8ff;color:#050810;padding:10px 24px;border-radius:6px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none">← Back to Hub</a>';
-    });
-  }
+  if (isTeacher) return; // already authenticated, let through
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Build PIN gate overlay over the page
+    var gate = document.createElement('div');
+    gate.id = 'setupGate';
+    gate.style.cssText = 'position:fixed;inset:0;background:#050810;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:24px;font-family:JetBrains Mono,monospace';
+    gate.innerHTML =
+      '<div style="font-size:52px;margin-bottom:4px">🔑</div>' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:800;color:#cdd6f0;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Teacher Access Required</div>' +
+      '<div style="font-size:12px;color:#6d7ca8;line-height:1.8;max-width:300px;margin-bottom:8px">Enter your teacher PIN to access the setup area.</div>' +
+      '<input id="setupPinInput" type="password" maxlength="8" placeholder="Enter PIN"' +
+        ' style="background:#0d1117;border:1.5px solid #2a3040;border-radius:8px;padding:12px 20px;color:#cdd6f0;font-family:JetBrains Mono,monospace;font-size:22px;letter-spacing:6px;text-align:center;outline:none;width:200px"' +
+        ' onkeydown="if(event.key==='Enter')checkSetupPin()">' +
+      '<button onclick="checkSetupPin()" style="background:#00c8ff;color:#050810;border:none;border-radius:6px;padding:10px 28px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:4px">Unlock</button>' +
+      '<div id="setupPinError" style="font-size:11px;color:#ff2255;min-height:16px;margin-top:-8px"></div>' +
+      '<a href="hub.html" style="font-size:10px;color:#6d7ca8;text-decoration:underline;margin-top:8px;cursor:pointer">← Back to Hub</a>';
+
+    document.body.appendChild(gate);
+    setTimeout(function(){ document.getElementById('setupPinInput').focus(); }, 100);
+  });
+
+  window.checkSetupPin = function() {
+    var entered = document.getElementById('setupPinInput').value.trim();
+    var savedPin = localStorage.getItem('teacher_pin') || '1529';
+    if (entered === savedPin) {
+      localStorage.setItem('teacher_unlocked', 'true');
+      var gate = document.getElementById('setupGate');
+      if (gate) gate.remove();
+    } else {
+      document.getElementById('setupPinInput').value = '';
+      document.getElementById('setupPinError').textContent = 'Incorrect PIN.';
+      document.getElementById('setupPinInput').style.borderColor = '#ff2255';
+      setTimeout(function(){
+        document.getElementById('setupPinInput').style.borderColor = '#2a3040';
+        document.getElementById('setupPinError').textContent = '';
+      }, 2000);
+    }
+  };
 })();
 </script>
 
