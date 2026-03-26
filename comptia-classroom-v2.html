@@ -653,8 +653,11 @@ input::placeholder{color:var(--tx3)}
         <div id="sWaiting" style="text-align:center;padding:60px 20px">
           <div style="font-size:64px;margin-bottom:20px">📡</div>
           <div style="font-family:var(--display);font-size:28px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--tx);margin-bottom:10px">Waiting for class to start</div>
-          <div style="font-size:13px;color:var(--tx2);line-height:1.8;max-width:380px;margin:0 auto">Your teacher will start each phase.<br>This screen updates automatically.</div>
-          <div style="margin-top:24px;font-family:var(--mono);font-size:10px;color:var(--tx3)">● Connected — waiting for teacher</div>
+          <div style="font-size:13px;color:var(--tx2);line-height:1.8;max-width:380px;margin:0 auto">Your teacher will push each phase to your screen.<br>You don't need to navigate — just wait here.</div>
+          <div style="margin-top:24px;font-family:var(--mono);font-size:10px;color:var(--tx3);display:flex;align-items:center;justify-content:center;gap:6px">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 1.5s infinite"></div>
+            Connected — waiting for teacher
+          </div>
         </div>
         <div id="sPhaseContent" style="display:none"></div>
         <div id="sPhaseComplete" style="display:none;text-align:center;padding:40px 20px">
@@ -866,7 +869,15 @@ async function ai(prompt,sys='You are a CompTIA A+ 220-1202 instructor. Return o
 }
 
 // ── INIT ──
-function init(){buildSidebar();buildNavs();loadDay(1)}
+function init(){
+  buildSidebar();
+  buildNavs();
+  loadDay(pls ? pls('current_day',1) : 1);
+  // Auto-set correct mode based on teacher login state
+  var isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+  setMode(isTeacher ? 'teacher' : 'student');
+  renderPhasePushBar();
+}
 
 // ── SIDEBAR ──
 function buildSidebar(){
