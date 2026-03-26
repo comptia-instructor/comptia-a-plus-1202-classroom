@@ -384,6 +384,105 @@ footer {
 .modal p { font-size: 12px; color: var(--tx2); line-height: 1.7; margin-bottom: 16px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
 
+
+/* ── TODAY'S CLASS STRIP ── */
+.today-strip {
+  background: linear-gradient(135deg, rgba(0,200,255,0.06), rgba(0,240,128,0.04));
+  border: 1.5px solid var(--acc);
+  border-radius: var(--rl);
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.today-strip::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--acc), var(--grn), transparent);
+}
+.ts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ts-title {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.ts-day {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--tx3);
+  letter-spacing: .5px;
+}
+.ts-steps {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ts-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--r);
+  border: 1px solid var(--b1);
+  background: var(--s2);
+  flex: 1;
+  min-width: 140px;
+  text-decoration: none;
+  transition: all .2s;
+  cursor: pointer;
+}
+.ts-step:hover { border-color: var(--acc); background: var(--acc-d); }
+.ts-step.done  { border-color: var(--grn); background: var(--grn-d); opacity: .7; }
+.ts-step.current { border-color: var(--acc); background: var(--acc-d); box-shadow: 0 0 12px rgba(0,200,255,0.15); }
+.ts-step-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--s3);
+  border: 1.5px solid var(--b2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display);
+  font-size: 12px; font-weight: 800;
+  color: var(--tx3);
+  flex-shrink: 0;
+}
+.ts-step.done .ts-step-num   { background: var(--grn); border-color: var(--grn); color: var(--bg); }
+.ts-step.current .ts-step-num { background: var(--acc); border-color: var(--acc); color: var(--bg); }
+.ts-step-info { flex: 1; min-width: 0; }
+.ts-step-label {
+  font-family: var(--display);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  color: var(--tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ts-step.done .ts-step-label { color: var(--grn); }
+.ts-step.current .ts-step-label { color: var(--acc); }
+.ts-step-sub {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--tx3);
+  margin-top: 1px;
+  letter-spacing: .3px;
+}
+.ts-arrow { font-size: 12px; color: var(--tx3); flex-shrink: 0; }
+.ts-step.current .ts-arrow { color: var(--acc); }
+.ts-step.done .ts-arrow { color: var(--grn); }
+
 .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 </style>
 </head>
@@ -451,6 +550,61 @@ footer {
       </div>
       <button class="ann-edit teacher-only" onclick="openAnnModal()">✏️ Edit</button>
     </div>
+  </div>
+
+
+  <!-- TODAY'S CLASS STRIP -->
+  <div class="today-strip" id="todayStrip">
+    <div class="ts-header">
+      <div class="ts-title">⚡ Today's Class — What To Do</div>
+      <div class="ts-day" id="todayStripDay">Loading…</div>
+    </div>
+    <div class="ts-steps" id="todaySteps">
+      <div class="ts-step current" onclick="window.location='comptia-classroom-v2.html'">
+        <div class="ts-step-num">1</div>
+        <div class="ts-step-info">
+          <div class="ts-step-label">Cold Retrieval</div>
+          <div class="ts-step-sub">5 questions · not graded</div>
+        </div>
+        <div class="ts-arrow">→</div>
+      </div>
+      <div class="ts-step" onclick="window.location='comptia-classroom-v2.html'">
+        <div class="ts-step-num">2</div>
+        <div class="ts-step-info">
+          <div class="ts-step-label">Watch Videos</div>
+          <div class="ts-step-sub" id="todayVideosub">Today's Udemy videos</div>
+        </div>
+        <div class="ts-arrow">→</div>
+      </div>
+      <div class="ts-step" onclick="window.location='comptia-notes-quiz.html'">
+        <div class="ts-step-num">3</div>
+        <div class="ts-step-info">
+          <div class="ts-step-label">Take Notes</div>
+          <div class="ts-step-sub" id="todayNotessub">Cornell notes</div>
+        </div>
+        <div class="ts-arrow">→</div>
+      </div>
+      <div class="ts-step" onclick="window.location='comptia-classroom-v2.html'">
+        <div class="ts-step-num">4</div>
+        <div class="ts-step-info">
+          <div class="ts-step-label">Closing Quiz</div>
+          <div class="ts-step-sub">5 questions · GRADED</div>
+        </div>
+        <div class="ts-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEACHER: Today's Video prompt (shows when no video set) -->
+  <div class="teacher-only" id="noVideoPrompt" style="display:none">
+    <a href="today-video.html" style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(0,200,255,0.05));border:1.5px solid var(--gold);border-radius:var(--rl);padding:16px 20px;text-decoration:none;margin-bottom:16px;transition:all .2s">
+      <span style="font-size:32px">🎬</span>
+      <div style="flex:1">
+        <div style="font-family:var(--display);font-size:16px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);margin-bottom:3px">What video are you watching today?</div>
+        <div style="font-size:12px;color:var(--tx2);line-height:1.6">Select today's Udemy video to update all student content, the pacing guide, and cold retrieval questions.</div>
+      </div>
+      <div style="font-family:var(--display);font-size:13px;font-weight:800;color:var(--gold);white-space:nowrap">Select Video →</div>
+    </a>
   </div>
 
   <!-- CORE TOOLS -->
@@ -670,43 +824,185 @@ footer {
 
 <script src="platform.js"></script>
 <script>
+
+// ── LOGIN TRACKING ──────────────────────────────────────
+(function trackLogin() {
+  try {
+    var code = localStorage.getItem('PLATFORM_CODE');
+    if (!code) return;
+    code = JSON.parse(code);
+    if (!code || code === 'TEACHER') return;
+
+    var today = new Date().toDateString();
+    var tool  = document.title.replace('CompTIA A+ · ','').trim();
+    var key   = 'login_log';
+    var log   = [];
+    try { log = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+
+    // Only log once per tool per day
+    var alreadyLogged = log.some(function(e) {
+      return e.code === code && e.date === today && e.tool === tool;
+    });
+
+    if (!alreadyLogged) {
+      log.unshift({
+        code:  code,
+        date:  today,
+        time:  new Date().toLocaleTimeString(),
+        tool:  tool,
+        ts:    Date.now()
+      });
+      // Keep last 1000 entries
+      localStorage.setItem(key, JSON.stringify(log.slice(0, 1000)));
+
+      // Sync to Google Sheets if connected
+      var syncUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+      if (syncUrl) {
+        try { syncUrl = JSON.parse(syncUrl); } catch(e) {}
+        if (syncUrl && syncUrl.includes('script.google.com')) {
+          fetch(syncUrl + '?action=save_login&code=' + encodeURIComponent(code) +
+            '&tool=' + encodeURIComponent(tool) +
+            '&date=' + encodeURIComponent(today) +
+            '&time=' + encodeURIComponent(new Date().toLocaleTimeString()),
+            { mode: 'cors' }
+          ).catch(function(){});
+        }
+      }
+    }
+  } catch(e) {}
+})();
+
 // Fallback storage helpers (in case platform.js loads async)
 if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
 if(typeof Platform!=='undefined'){Platform.init('hub');}
 
-const DAYS_DATA=[
-  {day:1,section:'Ch.1 Safety'},{day:2,section:'Ch.1-2'},{day:3,section:'Ch.2 OS Intro'},
-  {day:4,section:'Ch.2 Windows'},{day:5,section:'Ch.2 macOS'},{day:6,section:'Ch.2 Linux'},
-  {day:7,section:'Ch.7 Power'},{day:8,section:'Ch.8-9 Storage'},{day:9,section:'Ch.9 Partitioning'},
-  {day:10,section:'Ch.9 File Systems'},{day:11,section:'Ch.9 Mass Storage'},{day:12,section:'Ch.9 RAID'},
-  {day:13,section:'Ch.9 Encryption'},{day:14,section:'Ch.10 Peripherals'},{day:15,section:'Ch.11 OS Install'},
-  {day:16,section:'Ch.11 Windows'},{day:17,section:'Ch.11 Linux'},{day:18,section:'Ch.12 Task Mgr'},
-  {day:19,section:'Ch.12 Registry'},{day:20,section:'Ch.12-13 OS Tools'},{day:21,section:'Ch.13 Users'},
-  {day:22,section:'Ch.13 NTFS'},{day:23,section:'Ch.13 Sharing'},{day:24,section:'Ch.14 Maintenance'},
-  {day:25,section:'Ch.14 Backup'},{day:26,section:'Ch.14-15 CLI'},{day:27,section:'Ch.15 CLI Nav'},
-  {day:28,section:'Ch.15 Files'},{day:29,section:'Ch.15 Commands'},{day:30,section:'Ch.15 Advanced'},
-  {day:31,section:'Ch.15 Scripting'},{day:32,section:'Ch.16 Recovery'},{day:33,section:'Ch.16 Boot'},
-  {day:34,section:'Ch.16 GUI'},{day:35,section:'Ch.16-17 Display'},{day:36,section:'Ch.17-18 Network'},
-  {day:37,section:'Ch.18-19 TCP/IP'},{day:38,section:'Ch.19 Subnetting'},{day:39,section:'Ch.19 NAT/DHCP'},
-  {day:40,section:'Ch.19-20 DNS'},{day:41,section:'Ch.20 AD/Groups'},{day:42,section:'Ch.20 Routers'},
-  {day:43,section:'Ch.20 Firewall'},{day:44,section:'Ch.20 Advanced'},{day:45,section:'Ch.20-21 Wireless'},
-  {day:46,section:'Ch.21 Wireless'},{day:47,section:'Ch.21 Enterprise'},{day:48,section:'Ch.21-22 Internet'},
-  {day:49,section:'Ch.22 Remote'},{day:50,section:'Ch.22 FTP/Proxy'},{day:51,section:'Ch.22 VPN/IoT'},
-  {day:52,section:'Ch.22 Troubleshoot'},{day:53,section:'Ch.23 Cloud'},{day:54,section:'Ch.23-24 Laptop'},
-  {day:55,section:'Ch.24 Portable'},{day:56,section:'Ch.25 Mobile'},{day:57,section:'Ch.26 Mobile Sec'},
-  {day:58,section:'Ch.26 MDM'},{day:59,section:'Ch.27 Printers'},{day:60,section:'Ch.28 Security'},
-  {day:61,section:'Ch.28 Auth'},{day:62,section:'Ch.28-29 Malware'},{day:63,section:'Ch.29 Anti-Malware'},
-  {day:64,section:'Ch.29 Social Eng'},{day:65,section:'Ch.29-30 Incident'},{day:66,section:'Ch.30 Docs'},
-  {day:67,section:'Ch.30 Backup'},{day:68,section:'Ch.30 Ticketing'},
+const DAYS_DATA = [
+  {day:1, section:'Ch.1 Safety and Professionalism', videos:['Professional Communication, Part I', 'Professional Communication, Part II'], mins:14},
+  {day:2, section:'Ch.1 Safety and Professionalism', videos:['Dealing with Difficult Customers', 'Physical Safety'], mins:14},
+  {day:3, section:'Ch.1 Safety and Professionalism', videos:['Common Safety Procedures', 'What\'s an Operating System?'], mins:14},
+  {day:4, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Users and Super Users', 'Why Windows?'], mins:14},
+  {day:5, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Windows 10 and 11', 'Touring the macOS, Part I'], mins:14},
+  {day:6, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring the macOS, Part II', 'Touring the macOS, Part III'], mins:14},
+  {day:7, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Linux', 'Power Protection'], mins:14},
+  {day:8, section:'Ch.7 Power Supplies', videos:['Cooling Your System', 'Boot Order'], mins:14},
+  {day:9, section:'Ch.9 Implementing Mass Storage', videos:['Understanding Partitioning', 'MBR Partitioning'], mins:14},
+  {day:10, section:'Ch.9 Implementing Mass Storage', videos:['GPT Partitioning', 'Understanding File Systems'], mins:14},
+  {day:11, section:'Ch.9 Implementing Mass Storage', videos:['Popular File Systems', 'Formatting in Action'], mins:14},
+  {day:12, section:'Ch.9 Implementing Mass Storage', videos:['Dynamic Disks', 'New Installation - First Drive'], mins:14},
+  {day:13, section:'Ch.9 Implementing Mass Storage', videos:['Hardware RAID', 'Software RAID in Storage Spaces'], mins:14},
+  {day:14, section:'Ch.9 Implementing Mass Storage', videos:['Encrypting Mass Storage', 'Maintaining Storage Disks'], mins:14},
+  {day:15, section:'Ch.10 Essential Peripherals', videos:['Understanding USB', 'Webcams and Videoconferencing'], mins:14},
+  {day:16, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Windows 11 Editions and Features', 'Boot from Everything'], mins:14},
+  {day:17, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Installing and Upgrading Windows', 'Post-installation Tasks'], mins:14},
+  {day:18, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Linux Features and Tools', 'Installing and Upgrading Linux'], mins:14},
+  {day:19, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Upgrading macOS', 'The Task Manager'], mins:14},
+  {day:20, section:'Ch.12 Working with Operating Systems', videos:['Windows Settings', 'MMC and Additional Tools'], mins:14},
+  {day:21, section:'Ch.12 Working with Operating Systems', videos:['What\'s the Registry?', 'macOS Core Tools'], mins:14},
+  {day:22, section:'Ch.13 Users, Groups, and Permissions', videos:['Introduction to Users and Groups', 'Managing Users and Groups'], mins:14},
+  {day:23, section:'Ch.13 Users, Groups, and Permissions', videos:['NTFS Permissions', 'Linux and macOS Permissions'], mins:14},
+  {day:24, section:'Ch.13 Users, Groups, and Permissions', videos:['File Explorer', 'Sharing Resources'], mins:14},
+  {day:25, section:'Ch.13 Users, Groups, and Permissions', videos:['Security Policies', 'Maintaining Windows'], mins:14},
+  {day:26, section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Maintaining macOS', 'Maintaining Linux'], mins:14},
+  {day:27, section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Working with Applications', 'Backing Up Your Data in Windows'], mins:14},
+  {day:28, section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Backing Up Your Data in Linux and macOS', 'Understanding the CLI'], mins:14},
+  {day:29, section:'Ch.15 Working with the Command-Line Interface', videos:['Navigating the CLI', 'Working with Folders'], mins:14},
+  {day:30, section:'Ch.15 Working with the Command-Line Interface', videos:['Working with Files', 'Working with Drives'], mins:14},
+  {day:31, section:'Ch.15 Working with the Command-Line Interface', videos:['Super Copy Commands', 'Command-Line Permissions'], mins:14},
+  {day:32, section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Windows Commands', 'Advanced Linux Commands, Part I'], mins:14},
+  {day:33, section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Linux Commands, Part II', 'Introduction to Scripting'], mins:14},
+  {day:34, section:'Ch.15 Working with the Command-Line Interface', videos:['Interpreted Languages', 'Scripting and the Terminal'], mins:14},
+  {day:35, section:'Ch.16 Troubleshooting Systems', videos:['Windows Recovery Environment', 'Advanced Windows Startup Options'], mins:14},
+  {day:36, section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Boot Problems', 'Troubleshooting at the GUI'], mins:14},
+  {day:37, section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Applications', 'Kernel Panic'], mins:14},
+  {day:38, section:'Ch.17 Display Technologies', videos:['Graphics Cards and Connections', 'Multiple Monitors'], mins:14},
+  {day:39, section:'Ch.18 Essentials of Networking', videos:['Introduction to Networking', 'Hexadecimal'], mins:14},
+  {day:40, section:'Ch.19 TCP/IP Basics', videos:['Introduction to TCP/IP', 'Network IDs and Subnet Masks'], mins:14},
+  {day:41, section:'Ch.19 TCP/IP Basics', videos:['Special IP Addresses', 'Network Address Translation (NAT)'], mins:14},
+  {day:42, section:'Ch.19 TCP/IP Basics', videos:['Dynamic IP Addressing', 'Working with Connections'], mins:14},
+  {day:43, section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with DNS', 'Windows Naming'], mins:14},
+  {day:44, section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with Workgroups', 'Working with Active Directory'], mins:14},
+  {day:45, section:'Ch.20 OS Networking and Troubleshooting', videos:['Windows Sharing with macOS and Linux', 'The net Command'], mins:14},
+  {day:46, section:'Ch.20 OS Networking and Troubleshooting', videos:['Routers', 'Basic Router Configuration'], mins:14},
+  {day:47, section:'Ch.20 OS Networking and Troubleshooting', videos:['Firewall Configuration', 'Windows Firewall'], mins:14},
+  {day:48, section:'Ch.20 OS Networking and Troubleshooting', videos:['Port Forwarding', 'Advanced Router Configuration', 'Virtual LANs (VLANs)'], mins:21},
+  {day:49, section:'Ch.21 Wireless Networking', videos:['Wireless Network Hardware', 'Basic WAP Setup'], mins:14},
+  {day:50, section:'Ch.21 Wireless Networking', videos:['Wireless Encryption', 'Connecting to a Wi-Fi Network', 'Enterprise Wireless'], mins:21},
+  {day:51, section:'Ch.21 Wireless Networking', videos:['Beyond Wi-Fi', 'Troubleshooting Wireless Connections'], mins:14},
+  {day:52, section:'Ch.22 Internet and SOHO Networking', videos:['Telnet and SSH', 'Remote Desktop Connections', 'The World Wide Web'], mins:21},
+  {day:53, section:'Ch.22 Internet and SOHO Networking', videos:['File Transfer Protocol (FTP)', 'Proxy Servers'], mins:14},
+  {day:54, section:'Ch.22 Internet and SOHO Networking', videos:['Virtual Private Networks (VPN)', 'Internet of Things (IoT)', 'Troubleshooting Internet Connections'], mins:21},
+  {day:55, section:'Ch.22 Internet and SOHO Networking', videos:['Browser Security', 'Application Integration'], mins:14},
+  {day:56, section:'Ch.23 Virtualization, Cloud Computing, and AI', videos:['AI Policies and Procedures', 'Limitations', 'Private vs. Public'], mins:21},
+  {day:57, section:'Ch.24 Portable Computing', videos:['Laptop Features', 'Laptop Hardware Troubleshooting - The Tools'], mins:14},
+  {day:58, section:'Ch.24 Portable Computing', videos:['Power Management', 'Touring Android', 'Touring iOS'], mins:21},
+  {day:59, section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Maintaining Mobile Devices', 'Mobile Devices and E-mail'], mins:14},
+  {day:60, section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Mobile Synchronization', 'Mobile Device Security', 'Mobile Security Troubleshooting'], mins:21},
+  {day:61, section:'Ch.27 Printers and Multifunction Devices', videos:['Installing a Local Printer', 'Sharing Printers'], mins:14},
+  {day:62, section:'Ch.28 Essential Security Practices', videos:['Threats', 'Dealing with Threats', 'Physical Security'], mins:21},
+  {day:63, section:'Ch.28 Essential Security Practices', videos:['Passwords and Authentication', 'Multifactor Authentication (MFA)'], mins:14},
+  {day:64, section:'Ch.29 Securing Endpoint Systems', videos:['Malware, Part I', 'Malware, Part II', 'Anti-Malware'], mins:21},
+  {day:65, section:'Ch.29 Securing Endpoint Systems', videos:['Social Engineering', 'Licensing'], mins:14},
+  {day:66, section:'Ch.29 Securing Endpoint Systems', videos:['Incident Response', 'Environmental Controls', 'Documents You Need to Know'], mins:21},
+  {day:67, section:'Ch.30 Operational Procedures', videos:['Data You Need to Know', 'Change Management'], mins:14},
+  {day:68, section:'Ch.30 Operational Procedures', videos:['The Zen of Backup', 'Recycling and Data Destruction', 'Ticketing Systems'], mins:21},
 ];
 
 let currentWeek = pls('hub_week', 0);
+
+
+// ── TODAY'S CLASS STRIP ──
+function renderTodayStrip() {
+  // Show today's selected video if set
+  const todayVideo = localStorage.getItem('today_video');
+  const isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+  if (todayVideo) {
+    try {
+      const v = JSON.parse(todayVideo);
+      const stripDay = document.getElementById('todayStripDay');
+      if (stripDay) stripDay.textContent = v.ch + ' · ' + v.video;
+      const videoSub = document.getElementById('todayVideosub');
+      if (videoSub) videoSub.textContent = v.video;
+      const notesSub = document.getElementById('todayNotessub');
+      if (notesSub) notesSub.textContent = v.ch + ' notes';
+    } catch(e) {}
+  }
+  // Show "change video" button for teachers
+  if (isTeacher) {
+    const strip = document.getElementById('todayStrip');
+    if (strip && !document.getElementById('changeVideoBtn')) {
+      const btn = document.createElement('a');
+      btn.id = 'changeVideoBtn';
+      btn.href = 'today-video.html';
+      btn.className = 'teacher-only';
+      btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--acc);text-decoration:none;letter-spacing:.5px;padding:4px 10px;border:1px solid var(--acc);border-radius:20px;background:var(--acc-d);transition:all .15s';
+      btn.textContent = '🎬 Change Today's Video';
+      strip.appendChild(btn);
+    }
+  }
+}
+
+function _renderTodayStripOLD() {
+  const day = parseInt(localStorage.getItem('current_day')) || 1;
+  const dayData = DAYS_DATA[Math.min(day-1, DAYS_DATA.length-1)];
+  const done = pls('hub_done', []);
+
+  document.getElementById('todayStripDay').textContent =
+    `Day ${day} · ${dayData ? dayData.section : 'CompTIA A+ 220-1202'}`;
+
+  if (dayData) {
+    document.getElementById('todayVideosub').textContent =
+      `${dayData.section} · Udemy`;
+    document.getElementById('todayNotessub').textContent =
+      `${dayData.section.split(' ')[0]} notes`;
+  }
+}
 
 function init() {
   if(typeof Platform!=="undefined") Platform.guardPage();
   const ann = pls('hub_announcement', '');
   if (ann) document.getElementById('annText').textContent = ann;
   renderCalendar();
+  renderTodayStrip();
 
   // Check if student code is set — if not, show welcome modal
   const code = localStorage.getItem('PLATFORM_CODE');
@@ -846,18 +1142,26 @@ function openTeacherLogin() {
 
 function checkTeacherPin() {
   const pin = document.getElementById('pinInput').value.trim();
-  const savedPin = localStorage.getItem('teacher_pin') || '1202'; // default PIN is 1202
+  const savedPin = localStorage.getItem('teacher_pin') || '1202';
   if (pin === savedPin) {
     localStorage.setItem('teacher_unlocked', 'true');
     localStorage.setItem('PLATFORM_CODE', JSON.stringify('TEACHER'));
     document.getElementById('teacherModal').classList.remove('open');
     applyMode(true);
-    if(typeof Platform !== 'undefined') Platform.toast('Teacher mode unlocked', 'ok');
+    // After login, redirect to video selector
+    window.location.href = 'today-video.html';
   } else {
     document.getElementById('pinError').textContent = 'Incorrect PIN. Default is 1202 — change it in Setup Wizard.';
     document.getElementById('pinInput').value = '';
     document.getElementById('pinInput').style.borderColor = 'var(--red)';
   }
+}
+
+function recoverPin() {
+  var pin = localStorage.getItem('teacher_pin') || '1202';
+  var hint = 'Your PIN has ' + pin.length + ' characters and ends in "' + pin.slice(-2) + '"';
+  document.getElementById('pinError').textContent = hint;
+  document.getElementById('pinError').style.color = 'var(--amb)';
 }
 
 function closeTeacherModal() {
@@ -869,6 +1173,15 @@ function closeTeacherModal() {
 }
 
 function applyMode(isTeacher) {
+  // Show "what video today?" prompt if teacher and no video set
+  const noVideoPrompt = document.getElementById('noVideoPrompt');
+  if (noVideoPrompt) {
+    const todayVideo = localStorage.getItem('today_video');
+    const todayDate = todayVideo ? JSON.parse(todayVideo || 'null')?.date : null;
+    const today = new Date().toDateString();
+    // Show prompt if teacher and either no video set, or video was set on a previous day
+    noVideoPrompt.style.display = (isTeacher && !todayVideo) ? 'block' : 'none';
+  }
   // Teacher-only elements
   document.querySelectorAll('.teacher-only').forEach(el => {
     el.style.display = isTeacher ? '' : 'none';
@@ -1005,6 +1318,10 @@ init();
       <button class="p-btn p-btn-ghost p-btn-wide" onclick="closeTeacherModal()">← Back to Student View</button>
     </div>
     <div style="margin-top:10px;font-size:10px;color:var(--tx3);font-family:var(--mono)" id="pinError"></div>
+    <div style="margin-top:8px;font-size:10px;color:var(--tx3);font-family:var(--mono)">
+      Forgot your PIN?
+      <span style="color:var(--acc);cursor:pointer;text-decoration:underline" onclick="recoverPin()">Show hint</span>
+    </div>
   </div>
 </div>
 

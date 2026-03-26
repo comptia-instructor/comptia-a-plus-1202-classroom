@@ -552,6 +552,7 @@ nav { display: flex; background: var(--s1); border-bottom: 1px solid var(--b1); 
       <span class="tag tag-acc" id="currentDayBadge">Day — not set</span>
     </div>
     <div class="card-body">
+      <div id="pacingTodayVideo" style="display:none;background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--grn)"></div>
       <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px">
         Type any part of a video title to find which day it belongs to. Selecting a video sets the current day across all tools — cold retrieval, timed practice, the hub calendar, and sub mode all update automatically.
       </div>
@@ -622,77 +623,110 @@ nav { display: flex; background: var(--s1); border-bottom: 1px solid var(--b1); 
 </div><!-- /shell -->
 <div class="toast" id="toast"></div>
 
+<script src="platform.js"></script>
 <script>
+
+// ── LOGIN TRACKING ──────────────────────────────────────
+(function trackLogin() {
+  try {
+    var code = localStorage.getItem('PLATFORM_CODE');
+    if (!code) return;
+    code = JSON.parse(code);
+    if (!code || code === 'TEACHER') return;
+    var today = new Date().toDateString();
+    var tool  = document.title.replace('CompTIA A+ · ','').trim();
+    var key   = 'login_log';
+    var log   = [];
+    try { log = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+    var alreadyLogged = log.some(function(e) {
+      return e.code === code && e.date === today && e.tool === tool;
+    });
+    if (!alreadyLogged) {
+      log.unshift({ code: code, date: today, time: new Date().toLocaleTimeString(), tool: tool, ts: Date.now() });
+      localStorage.setItem(key, JSON.stringify(log.slice(0, 1000)));
+      var syncUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+      if (syncUrl) {
+        try { syncUrl = JSON.parse(syncUrl); } catch(e) {}
+        if (syncUrl && syncUrl.includes('script.google.com')) {
+          fetch(syncUrl + '?action=save_login&code=' + encodeURIComponent(code) +
+            '&tool=' + encodeURIComponent(tool) + '&date=' + encodeURIComponent(today) +
+            '&time=' + encodeURIComponent(new Date().toLocaleTimeString()), { mode: 'cors' }
+          ).catch(function(){});
+        }
+      }
+    }
+  } catch(e) {}
+})();
 // ── ALL 147 VIDEOS MAPPED TO 68 DAYS ──────────────────────
 const ALL_DAYS = [
-  {day:1,  ch:'Ch.1',  section:'Safety & Professionalism', videos:['Professional Communication I','Professional Communication II'], mins:14},
-  {day:2,  ch:'Ch.1',  section:'Safety & Professionalism', videos:['Dealing with Difficult Customers','Physical Safety','Common Safety Procedures'], mins:18},
-  {day:3,  ch:'Ch.2',  section:'Intro to OS', videos:["What's an Operating System?",'Users and Super Users'], mins:14},
-  {day:4,  ch:'Ch.2',  section:'Windows', videos:['Why Windows?','Touring Windows 10 Part I','Touring Windows 10 Part II'], mins:20},
-  {day:5,  ch:'Ch.2',  section:'Windows 11 & macOS', videos:['Touring Windows 11','Touring macOS Part I'], mins:16},
-  {day:6,  ch:'Ch.2',  section:'macOS & Linux', videos:['Touring macOS Part II','Touring macOS Part III','Touring Linux'], mins:18},
-  {day:7,  ch:'Ch.7',  section:'Power Supplies', videos:['Power Protection','Cooling Your System','Maintaining Proper Airflow'], mins:18},
-  {day:8,  ch:'Ch.8',  section:'Mass Storage', videos:['Boot Order','Understanding Partitioning'], mins:14},
-  {day:9,  ch:'Ch.9',  section:'Partitioning', videos:['MBR Partitioning','GPT Partitioning'], mins:14},
-  {day:10, ch:'Ch.9',  section:'File Systems', videos:['Understanding File Systems','Popular File Systems'], mins:14},
-  {day:11, ch:'Ch.9',  section:'Implementing Mass Storage', videos:['Formatting in Action','Dynamic Disks'], mins:14},
-  {day:12, ch:'Ch.9',  section:'RAID', videos:['Understanding RAID','Implementing RAID'], mins:14},
-  {day:13, ch:'Ch.9',  section:'Encryption & Backup', videos:['Encrypting Mass Storage','Mass Storage Troubleshooting'], mins:14},
-  {day:14, ch:'Ch.10', section:'Essential Peripherals', videos:['Optical Media','USB Standards','Keyboards and Mice'], mins:18},
-  {day:15, ch:'Ch.10', section:'Peripherals II', videos:['Webcams','Monitors and Projectors','Scanners'], mins:18},
-  {day:16, ch:'Ch.11', section:'Installing & Upgrading OS', videos:['Planning Your OS Installation','Installing Windows'], mins:14},
-  {day:17, ch:'Ch.11', section:'OS Installation II', videos:['Post-Installation Tasks','Upgrading Windows','Linux Installation'], mins:18},
-  {day:18, ch:'Ch.12', section:'Working with OS', videos:['Task Manager','Performance Monitor'], mins:14},
-  {day:19, ch:'Ch.12', section:'OS Tools', videos:['The Windows Registry','Microsoft Management Console','Services'], mins:18},
-  {day:20, ch:'Ch.12', section:'OS Tools II', videos:['Tools for Programmers','Remote Desktop','System Restore'], mins:18},
-  {day:21, ch:'Ch.13', section:'Users Groups Permissions', videos:['Understanding Users and Groups','Managing Users in Windows'], mins:14},
-  {day:22, ch:'Ch.13', section:'NTFS Permissions', videos:['NTFS Permissions','Shares'], mins:14},
-  {day:23, ch:'Ch.13', section:'Sharing & Linux Users', videos:['Permissions in Linux','Scripting Basics'], mins:14},
-  {day:24, ch:'Ch.14', section:'Maintaining OS', videos:['Patch Management','Scheduling Maintenance'], mins:14},
-  {day:25, ch:'Ch.14', section:'Backup & Restore', videos:['Backup and Recovery','Imaging and Deployment'], mins:14},
-  {day:26, ch:'Ch.14', section:'Virtualization Intro', videos:['Introduction to Virtualization','Setting Up Virtual Machines'], mins:14},
-  {day:27, ch:'Ch.15', section:'CLI Navigation', videos:['Introduction to the CLI','Working with Directories'], mins:14},
-  {day:28, ch:'Ch.15', section:'CLI Files', videos:['Working with Files','CLI Wildcards and Redirection'], mins:14},
-  {day:29, ch:'Ch.15', section:'CLI Commands', videos:['CLI Tools for Configuration','CLI Networking Commands'], mins:14},
-  {day:30, ch:'Ch.15', section:'Advanced CLI', videos:['CLI Troubleshooting Tools','SFC and DISM'], mins:14},
-  {day:31, ch:'Ch.15', section:'Scripting', videos:['Introduction to Scripting','PowerShell Scripting'], mins:14},
-  {day:32, ch:'Ch.16', section:'Troubleshooting Systems', videos:['Troubleshooting Methodology','Troubleshooting Hard Drive Problems'], mins:14},
-  {day:33, ch:'Ch.16', section:'Boot Troubleshooting', videos:['Boot Problems','Windows Boot Troubleshooting'], mins:14},
-  {day:34, ch:'Ch.16', section:'GUI Troubleshooting', videos:['Working with Windows Processes','Troubleshooting Applications'], mins:14},
-  {day:35, ch:'Ch.16', section:'Advanced Troubleshooting', videos:['Troubleshooting Networks','Memory Troubleshooting'], mins:14},
-  {day:36, ch:'Ch.17', section:'Display Technologies', videos:['Display Technologies','Installing and Configuring Monitors'], mins:14},
-  {day:37, ch:'Ch.18', section:'Essentials of Networking', videos:['What Is a Network?','Hub vs Switch','MAC Addresses'], mins:18},
-  {day:38, ch:'Ch.18', section:'Networking II', videos:['Ethernet Standards','Installing a SOHO Network'], mins:14},
-  {day:39, ch:'Ch.19', section:'TCP/IP Basics', videos:['Introduction to IP Addressing','Subnet Masks'], mins:14},
-  {day:40, ch:'Ch.19', section:'IP Addressing', videos:['NAT and Private IP Addresses','Working with DHCP'], mins:14},
-  {day:41, ch:'Ch.19', section:'DNS & IPv6', videos:['Understanding DNS','Introduction to IPv6'], mins:14},
-  {day:42, ch:'Ch.20', section:'OS Networking', videos:['Configuring IP Addressing in Windows','Network Troubleshooting Tools'], mins:14},
-  {day:43, ch:'Ch.20', section:'AD & Routers', videos:['Introduction to Active Directory','Configuring SOHO Routers'], mins:14},
-  {day:44, ch:'Ch.20', section:'Firewall & VPN', videos:['Configuring Firewalls','Setting Up VPNs'], mins:14},
-  {day:45, ch:'Ch.20', section:'Advanced Networking', videos:['Proxy Servers','Load Balancers and QoS'], mins:14},
-  {day:46, ch:'Ch.21', section:'Wireless Networking', videos:['802.11 Standards','Antenna Types'], mins:14},
-  {day:47, ch:'Ch.21', section:'Wireless Config', videos:['Wi-Fi Encryption','Configuring 802.11 Networks'], mins:14},
-  {day:48, ch:'Ch.21', section:'Enterprise Wireless', videos:['Enterprise Wireless','Cellular Standards','Bluetooth'], mins:18},
-  {day:49, ch:'Ch.22', section:'Internet Connections', videos:['Connecting to the Internet','ISP Technologies'], mins:14},
-  {day:50, ch:'Ch.22', section:'Remote Access', videos:['Remote Access','FTP and File Sharing'], mins:14},
-  {day:51, ch:'Ch.22', section:'VPN & Proxy', videos:['VPN Technologies','Proxy Servers'], mins:14},
-  {day:52, ch:'Ch.22', section:'IoT & Troubleshooting', videos:['IoT Devices','Network Troubleshooting'], mins:14},
-  {day:53, ch:'Ch.23', section:'Virtualization & Cloud', videos:['Cloud Computing','Types of Cloud Services','Virtual Desktops'], mins:18},
-  {day:54, ch:'Ch.23', section:'Cloud II', videos:['Cloud Storage','Cloud Migration Considerations'], mins:14},
-  {day:55, ch:'Ch.24', section:'Portable Computing', videos:['Laptop Components','Laptop Disassembly'], mins:14},
-  {day:56, ch:'Ch.24', section:'Laptop Config', videos:['Configuring Laptops','Laptop Troubleshooting'], mins:14},
-  {day:57, ch:'Ch.25', section:'Mobile Devices', videos:['Mobile Device Types','Configuring Mobile Devices'], mins:14},
-  {day:58, ch:'Ch.25', section:'Mobile II', videos:['Mobile Device Connectivity','Troubleshooting Mobile Devices'], mins:14},
-  {day:59, ch:'Ch.26', section:'Securing Mobile Devices', videos:['Mobile Device Security','MDM Solutions'], mins:14},
-  {day:60, ch:'Ch.27', section:'Printers', videos:['Laser Printers','Inkjet Printers','Thermal Printers'], mins:18},
-  {day:61, ch:'Ch.27', section:'Printer Config', videos:['Installing Printers','Printer Troubleshooting'], mins:14},
-  {day:62, ch:'Ch.28', section:'Essential Security', videos:['Malware Types','Social Engineering'], mins:14},
-  {day:63, ch:'Ch.28', section:'Security II', videos:['Authentication Methods','Password Best Practices'], mins:14},
-  {day:64, ch:'Ch.29', section:'Securing Endpoints', videos:['Anti-Malware Tools','Patch Management'], mins:14},
-  {day:65, ch:'Ch.29', section:'Social Engineering Defense', videos:['Dealing with Social Engineering','Windows Defender'], mins:14},
-  {day:66, ch:'Ch.29', section:'Incident Response', videos:['Incident Response Procedures','Digital Forensics'], mins:14},
-  {day:67, ch:'Ch.30', section:'Operational Procedures', videos:['Documentation and Ticketing','Change Management'], mins:14},
-  {day:68, ch:'Ch.30', section:'Ops II', videos:['Backup Best Practices','Data Destruction','Environmental Controls'], mins:18},
+  {day:1, ch:'Ch.1', section:'Ch.1 Safety and Professionalism', videos:['Professional Communication, Part I', 'Professional Communication, Part II'], mins:14},
+  {day:2, ch:'Ch.1', section:'Ch.1 Safety and Professionalism', videos:['Dealing with Difficult Customers', 'Physical Safety'], mins:14},
+  {day:3, ch:'Ch.1', section:'Ch.1 Safety and Professionalism', videos:['Common Safety Procedures', 'What\'s an Operating System?'], mins:14},
+  {day:4, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Users and Super Users', 'Why Windows?'], mins:14},
+  {day:5, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Windows 10 and 11', 'Touring the macOS, Part I'], mins:14},
+  {day:6, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring the macOS, Part II', 'Touring the macOS, Part III'], mins:14},
+  {day:7, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Linux', 'Power Protection'], mins:14},
+  {day:8, ch:'Ch.7', section:'Ch.7 Power Supplies', videos:['Cooling Your System', 'Boot Order'], mins:14},
+  {day:9, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Understanding Partitioning', 'MBR Partitioning'], mins:14},
+  {day:10, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['GPT Partitioning', 'Understanding File Systems'], mins:14},
+  {day:11, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Popular File Systems', 'Formatting in Action'], mins:14},
+  {day:12, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Dynamic Disks', 'New Installation - First Drive'], mins:14},
+  {day:13, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Hardware RAID', 'Software RAID in Storage Spaces'], mins:14},
+  {day:14, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Encrypting Mass Storage', 'Maintaining Storage Disks'], mins:14},
+  {day:15, ch:'Ch.10', section:'Ch.10 Essential Peripherals', videos:['Understanding USB', 'Webcams and Videoconferencing'], mins:14},
+  {day:16, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Windows 11 Editions and Features', 'Boot from Everything'], mins:14},
+  {day:17, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Installing and Upgrading Windows', 'Post-installation Tasks'], mins:14},
+  {day:18, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Linux Features and Tools', 'Installing and Upgrading Linux'], mins:14},
+  {day:19, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Upgrading macOS', 'The Task Manager'], mins:14},
+  {day:20, ch:'Ch.12', section:'Ch.12 Working with Operating Systems', videos:['Windows Settings', 'MMC and Additional Tools'], mins:14},
+  {day:21, ch:'Ch.12', section:'Ch.12 Working with Operating Systems', videos:['What\'s the Registry?', 'macOS Core Tools'], mins:14},
+  {day:22, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['Introduction to Users and Groups', 'Managing Users and Groups'], mins:14},
+  {day:23, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['NTFS Permissions', 'Linux and macOS Permissions'], mins:14},
+  {day:24, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['File Explorer', 'Sharing Resources'], mins:14},
+  {day:25, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['Security Policies', 'Maintaining Windows'], mins:14},
+  {day:26, ch:'Ch.14', section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Maintaining macOS', 'Maintaining Linux'], mins:14},
+  {day:27, ch:'Ch.14', section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Working with Applications', 'Backing Up Your Data in Windows'], mins:14},
+  {day:28, ch:'Ch.14', section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Backing Up Your Data in Linux and macOS', 'Understanding the CLI'], mins:14},
+  {day:29, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Navigating the CLI', 'Working with Folders'], mins:14},
+  {day:30, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Working with Files', 'Working with Drives'], mins:14},
+  {day:31, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Super Copy Commands', 'Command-Line Permissions'], mins:14},
+  {day:32, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Windows Commands', 'Advanced Linux Commands, Part I'], mins:14},
+  {day:33, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Linux Commands, Part II', 'Introduction to Scripting'], mins:14},
+  {day:34, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Interpreted Languages', 'Scripting and the Terminal'], mins:14},
+  {day:35, ch:'Ch.16', section:'Ch.16 Troubleshooting Systems', videos:['Windows Recovery Environment', 'Advanced Windows Startup Options'], mins:14},
+  {day:36, ch:'Ch.16', section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Boot Problems', 'Troubleshooting at the GUI'], mins:14},
+  {day:37, ch:'Ch.16', section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Applications', 'Kernel Panic'], mins:14},
+  {day:38, ch:'Ch.17', section:'Ch.17 Display Technologies', videos:['Graphics Cards and Connections', 'Multiple Monitors'], mins:14},
+  {day:39, ch:'Ch.18', section:'Ch.18 Essentials of Networking', videos:['Introduction to Networking', 'Hexadecimal'], mins:14},
+  {day:40, ch:'Ch.19', section:'Ch.19 TCP/IP Basics', videos:['Introduction to TCP/IP', 'Network IDs and Subnet Masks'], mins:14},
+  {day:41, ch:'Ch.19', section:'Ch.19 TCP/IP Basics', videos:['Special IP Addresses', 'Network Address Translation (NAT)'], mins:14},
+  {day:42, ch:'Ch.19', section:'Ch.19 TCP/IP Basics', videos:['Dynamic IP Addressing', 'Working with Connections'], mins:14},
+  {day:43, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with DNS', 'Windows Naming'], mins:14},
+  {day:44, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with Workgroups', 'Working with Active Directory'], mins:14},
+  {day:45, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Windows Sharing with macOS and Linux', 'The net Command'], mins:14},
+  {day:46, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Routers', 'Basic Router Configuration'], mins:14},
+  {day:47, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Firewall Configuration', 'Windows Firewall'], mins:14},
+  {day:48, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Port Forwarding', 'Advanced Router Configuration', 'Virtual LANs (VLANs)'], mins:21},
+  {day:49, ch:'Ch.21', section:'Ch.21 Wireless Networking', videos:['Wireless Network Hardware', 'Basic WAP Setup'], mins:14},
+  {day:50, ch:'Ch.21', section:'Ch.21 Wireless Networking', videos:['Wireless Encryption', 'Connecting to a Wi-Fi Network', 'Enterprise Wireless'], mins:21},
+  {day:51, ch:'Ch.21', section:'Ch.21 Wireless Networking', videos:['Beyond Wi-Fi', 'Troubleshooting Wireless Connections'], mins:14},
+  {day:52, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['Telnet and SSH', 'Remote Desktop Connections', 'The World Wide Web'], mins:21},
+  {day:53, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['File Transfer Protocol (FTP)', 'Proxy Servers'], mins:14},
+  {day:54, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['Virtual Private Networks (VPN)', 'Internet of Things (IoT)', 'Troubleshooting Internet Connections'], mins:21},
+  {day:55, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['Browser Security', 'Application Integration'], mins:14},
+  {day:56, ch:'Ch.23', section:'Ch.23 Virtualization, Cloud Computing, and AI', videos:['AI Policies and Procedures', 'Limitations', 'Private vs. Public'], mins:21},
+  {day:57, ch:'Ch.24', section:'Ch.24 Portable Computing', videos:['Laptop Features', 'Laptop Hardware Troubleshooting - The Tools'], mins:14},
+  {day:58, ch:'Ch.24', section:'Ch.24 Portable Computing', videos:['Power Management', 'Touring Android', 'Touring iOS'], mins:21},
+  {day:59, ch:'Ch.26', section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Maintaining Mobile Devices', 'Mobile Devices and E-mail'], mins:14},
+  {day:60, ch:'Ch.26', section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Mobile Synchronization', 'Mobile Device Security', 'Mobile Security Troubleshooting'], mins:21},
+  {day:61, ch:'Ch.27', section:'Ch.27 Printers and Multifunction Devices', videos:['Installing a Local Printer', 'Sharing Printers'], mins:14},
+  {day:62, ch:'Ch.28', section:'Ch.28 Essential Security Practices', videos:['Threats', 'Dealing with Threats', 'Physical Security'], mins:21},
+  {day:63, ch:'Ch.28', section:'Ch.28 Essential Security Practices', videos:['Passwords and Authentication', 'Multifactor Authentication (MFA)'], mins:14},
+  {day:64, ch:'Ch.29', section:'Ch.29 Securing Endpoint Systems', videos:['Malware, Part I', 'Malware, Part II', 'Anti-Malware'], mins:21},
+  {day:65, ch:'Ch.29', section:'Ch.29 Securing Endpoint Systems', videos:['Social Engineering', 'Licensing'], mins:14},
+  {day:66, ch:'Ch.29', section:'Ch.29 Securing Endpoint Systems', videos:['Incident Response', 'Environmental Controls', 'Documents You Need to Know'], mins:21},
+  {day:67, ch:'Ch.30', section:'Ch.30 Operational Procedures', videos:['Data You Need to Know', 'Change Management'], mins:14},
+  {day:68, ch:'Ch.30', section:'Ch.30 Operational Procedures', videos:['The Zen of Backup', 'Recycling and Data Destruction', 'Ticketing Systems'], mins:21},
 ];
 
 const CHAPTERS = [
@@ -744,6 +778,15 @@ let ST = {
 // ── INIT ─────────────────────────────────────────────────
 function init() {
   if(typeof Platform!=="undefined") Platform.guardPage();
+  // Show today's selected video
+  const tv = localStorage.getItem('today_video');
+  if (tv) {
+    try {
+      const v = JSON.parse(tv);
+      const el = document.getElementById('pacingTodayVideo');
+      if (el) { el.textContent = '✓ Today: ' + v.video + ' · ' + v.ch; el.style.display='block'; }
+    } catch(e) {}
+  }
   // Restore saved values
   if(ST.semDays) document.getElementById('semDays').value = ST.semDays;
   if(ST.daysPerWeek) document.getElementById('daysPerWeek').value = ST.daysPerWeek;

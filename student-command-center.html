@@ -268,6 +268,7 @@ nav::-webkit-scrollbar{height:2px}
   <div class="nav-btn" onclick="goPanel('spaced')">Study Queue</div>
   <div class="nav-btn" onclick="goPanel('glossary')">Glossary</div>
   <div class="nav-btn" onclick="goPanel('confusion')">Confusion Flag</div>
+  <div class="nav-btn" onclick="goPanel('grades')">📊 My Grades</div>
   <div class="nav-btn" onclick="goPanel('tonight')">🎯 Study Tonight</div>
   <div class="nav-btn" onclick="goPanel('report')">My Report</div>
   <div class="nav-btn" onclick="goPanel('prep')">Teacher Prep</div>
@@ -647,6 +648,95 @@ nav::-webkit-scrollbar{height:2px}
 
   </div>
 
+  <!-- GRADES PANEL -->
+  <div class="panel" id="panelGrades">
+
+    <!-- Grade summary hero -->
+    <div class="card fade-up" id="gradeHeroCard" style="background:linear-gradient(135deg,rgba(0,200,255,0.06),rgba(0,240,128,0.04));border-color:var(--acc)">
+      <div class="card-body" style="padding:20px 22px">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:4px">Current Grade</div>
+            <div style="display:flex;align-items:baseline;gap:12px">
+              <div style="font-family:var(--display);font-size:56px;font-weight:900;line-height:1;letter-spacing:-2px" id="gradeFinalPct">—</div>
+              <div style="font-family:var(--display);font-size:36px;font-weight:900;color:var(--tx2)" id="gradeLetter">—</div>
+            </div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:4px" id="gradeLastUpdated">Not yet calculated</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            <button class="btn btn-acc btn-sm" onclick="buildGradeDashboard()">↺ Recalculate</button>
+            <button class="btn btn-ghost btn-sm" onclick="printGradeReport()">🖨️ Print Report</button>
+          </div>
+        </div>
+        <!-- Grade bar -->
+        <div style="margin-top:16px">
+          <div style="height:8px;background:var(--s3);border-radius:4px;overflow:hidden">
+            <div id="gradeFinalBar" style="height:100%;border-radius:4px;transition:width 1s ease;width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three category breakdown -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px" class="fade-up">
+
+      <!-- Notes + Quizzes — 35% -->
+      <div class="card" id="gradeNotesCard">
+        <div class="card-header" style="border-left:3px solid var(--acc)">
+          <h2>📝 Notes &amp; Quizzes</h2>
+          <span class="tag acc">35%</span>
+        </div>
+        <div class="card-body">
+          <div style="font-family:var(--display);font-size:36px;font-weight:900;color:var(--acc);line-height:1;margin-bottom:4px" id="gradeNotesPct">—</div>
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-bottom:12px">Notes completion + scenario attempts + timed quiz avg</div>
+          <div id="gradeNotesBreakdown" style="font-size:11px;color:var(--tx2);line-height:2"></div>
+        </div>
+      </div>
+
+      <!-- Discussions — 10% -->
+      <div class="card" id="gradeDiscCard">
+        <div class="card-header" style="border-left:3px solid var(--amb)">
+          <h2>💬 Discussions</h2>
+          <span class="tag amb">10%</span>
+        </div>
+        <div class="card-body">
+          <div style="font-family:var(--display);font-size:36px;font-weight:900;color:var(--amb);line-height:1;margin-bottom:4px" id="gradeDiscPct">—</div>
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-bottom:12px">Live discussion response completion</div>
+          <div id="gradeDiscBreakdown" style="font-size:11px;color:var(--tx2);line-height:2"></div>
+        </div>
+      </div>
+
+      <!-- Tests — 55% -->
+      <div class="card" id="gradeTestCard">
+        <div class="card-header" style="border-left:3px solid var(--pur)">
+          <h2>🎓 Chapter Tests</h2>
+          <span class="tag pur">55%</span>
+        </div>
+        <div class="card-body">
+          <div style="font-family:var(--display);font-size:36px;font-weight:900;color:var(--pur);line-height:1;margin-bottom:4px" id="gradeTestPct">—</div>
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-bottom:12px">Multi-chapter exam scores from Exam Suite</div>
+          <div id="gradeTestBreakdown" style="font-size:11px;color:var(--tx2);line-height:2"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Detailed score log -->
+    <div class="card fade-up">
+      <div class="card-header">
+        <h2>📋 Score History</h2>
+        <span class="tag acc" id="gradeScoreCount">0 scores</span>
+      </div>
+      <div class="card-body" id="gradeScoreLog">
+        <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">Complete quizzes and discussions to see your score history here.</div>
+      </div>
+    </div>
+
+    <!-- Sync status -->
+    <div id="gradeSyncStatus" style="font-family:var(--mono);font-size:10px;color:var(--tx3);text-align:center;padding:8px"></div>
+
+  </div>
+
 </div><!-- /content -->
 </div><!-- /app -->
 
@@ -654,6 +744,54 @@ nav::-webkit-scrollbar{height:2px}
 
 <script src="platform.js"></script>
 <script>
+
+// ── LOGIN TRACKING ──────────────────────────────────────
+(function trackLogin() {
+  try {
+    var code = localStorage.getItem('PLATFORM_CODE');
+    if (!code) return;
+    code = JSON.parse(code);
+    if (!code || code === 'TEACHER') return;
+
+    var today = new Date().toDateString();
+    var tool  = document.title.replace('CompTIA A+ · ','').trim();
+    var key   = 'login_log';
+    var log   = [];
+    try { log = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+
+    // Only log once per tool per day
+    var alreadyLogged = log.some(function(e) {
+      return e.code === code && e.date === today && e.tool === tool;
+    });
+
+    if (!alreadyLogged) {
+      log.unshift({
+        code:  code,
+        date:  today,
+        time:  new Date().toLocaleTimeString(),
+        tool:  tool,
+        ts:    Date.now()
+      });
+      // Keep last 1000 entries
+      localStorage.setItem(key, JSON.stringify(log.slice(0, 1000)));
+
+      // Sync to Google Sheets if connected
+      var syncUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+      if (syncUrl) {
+        try { syncUrl = JSON.parse(syncUrl); } catch(e) {}
+        if (syncUrl && syncUrl.includes('script.google.com')) {
+          fetch(syncUrl + '?action=save_login&code=' + encodeURIComponent(code) +
+            '&tool=' + encodeURIComponent(tool) +
+            '&date=' + encodeURIComponent(today) +
+            '&time=' + encodeURIComponent(new Date().toLocaleTimeString()),
+            { mode: 'cors' }
+          ).catch(function(){});
+        }
+      }
+    }
+  } catch(e) {}
+})();
+
 // Fallback storage helpers (in case platform.js loads async)
 if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
 // ══════════════════════════════════════════════════════
@@ -918,6 +1056,135 @@ function calcDomainScores(){
 }
 
 // ── STUDY TONIGHT ──────────────────────────────────────────
+
+// ═════════════════ GRADE DASHBOARD ═════════════════
+function buildGradeDashboard() {
+  const code = ST.code;
+  if (!code) { const el=document.getElementById('gradeFinalPct'); if(el)el.textContent='Log in first'; return; }
+  const notes=loadLS('st_notes',{});
+  const discAns=loadLS('st_ans',{});
+  const classScores=loadLS('st_scores',{});
+  const examScores=loadLS('exam_scores',[]);
+
+  // Notes avg
+  const noteArr=[];
+  Object.entries(notes).forEach(([k,v])=>{
+    if(!k.includes('_'+code))return;
+    const done=[v.terms,v.how,v.real,v.traps].filter(f=>f&&f.trim().length>=20).length;
+    noteArr.push(Math.round(done/4*100));
+  });
+  const notesAvg=noteArr.length?Math.round(noteArr.reduce((a,b)=>a+b,0)/noteArr.length):null;
+
+  // Timed quizzes by chapter
+  const byChap={};
+  const addToChap=(ch,pct)=>{ if(!byChap[ch])byChap[ch]=[]; byChap[ch].push(pct); };
+  Object.entries(classScores).forEach(([k,v])=>{
+    if(!k.includes(code))return;
+    const pct=v&&v.pct!==undefined?v.pct:(typeof v==='number'?v:null);
+    if(pct===null)return;
+    addToChap((v&&v.ch)||'General',pct);
+  });
+  if(ST.scores)Object.entries(ST.scores).forEach(([k,v])=>{
+    if(!k.includes(code))return;
+    const pct=v&&v.pct!==undefined?v.pct:null;
+    if(pct===null)return;
+    addToChap((v&&v.ch)||'General',pct);
+  });
+  const chapAvgs=Object.entries(byChap).map(([ch,vals])=>({ch,avg:Math.round(vals.reduce((a,b)=>a+b,0)/vals.length)}));
+  const timedAvg=chapAvgs.length?Math.round(chapAvgs.reduce((a,b)=>a+b.avg,0)/chapAvgs.length):null;
+
+  // Notes+Quizzes 35%
+  const nqParts=[notesAvg,timedAvg].filter(v=>v!==null);
+  const nqPct=nqParts.length?Math.round(nqParts.reduce((a,b)=>a+b,0)/nqParts.length):null;
+
+  // Discussion 10%
+  const discArr=[];
+  Object.entries(discAns).forEach(([k,v])=>{
+    if(!k.includes(code))return;
+    if(!k.startsWith('disc_')&&!k.startsWith('ldisc_'))return;
+    const done=Object.values(v).filter(r=>r&&r.trim().length>=15).length;
+    discArr.push(Math.round(done/Math.max(Object.keys(v).length,1)*100));
+  });
+  const discPct=discArr.length?Math.round(discArr.reduce((a,b)=>a+b,0)/discArr.length):null;
+
+  // Tests 55%
+  const myTests=Array.isArray(examScores)?examScores.filter(s=>!s.code||s.code===code):[];
+  const testPct=myTests.length?Math.round(myTests.reduce((a,b)=>a+(b.pct||0),0)/myTests.length):null;
+
+  // Weighted final
+  let wSum=0,wPct=0;
+  if(nqPct!==null){wPct+=nqPct*0.35;wSum+=0.35;}
+  if(discPct!==null){wPct+=discPct*0.10;wSum+=0.10;}
+  if(testPct!==null){wPct+=testPct*0.55;wSum+=0.55;}
+  const finalPct=wSum>0?Math.round(wPct/wSum*100):null;
+  const letter=finalPct===null?'—':finalPct>=90?'A':finalPct>=80?'B':finalPct>=70?'C':finalPct>=60?'D':'F';
+  const col=finalPct===null?'var(--tx3)':finalPct>=90?'var(--grn)':finalPct>=80?'var(--acc)':finalPct>=70?'var(--amb)':'var(--red)';
+
+  // Render hero
+  const fp=document.getElementById('gradeFinalPct');
+  const fl=document.getElementById('gradeLetter');
+  const fu=document.getElementById('gradeLastUpdated');
+  const fb=document.getElementById('gradeFinalBar');
+  if(fp){fp.textContent=finalPct!==null?finalPct+'%':'—';fp.style.color=col;}
+  if(fl){fl.textContent=letter;fl.style.color=col;}
+  if(fu)fu.textContent='Updated '+new Date().toLocaleTimeString();
+  if(fb){fb.style.width=(finalPct||0)+'%';fb.style.background='linear-gradient(90deg,'+col+',var(--acc))';}
+
+  // Render category cards
+  const setCard=(pctId,breakId,pct,parts,color)=>{
+    const el=document.getElementById(pctId);
+    if(el){el.textContent=pct!==null?pct+'%':'—';el.style.color=color;}
+    const br=document.getElementById(breakId);
+    if(br)br.innerHTML=parts.join('<br>');
+  };
+  const nqCol=nqPct===null?'var(--tx3)':nqPct>=80?'var(--grn)':nqPct>=60?'var(--amb)':'var(--red)';
+  const dcCol=discPct===null?'var(--tx3)':discPct>=80?'var(--grn)':discPct>=60?'var(--amb)':'var(--red)';
+  const tsCol=testPct===null?'var(--tx3)':testPct>=80?'var(--grn)':testPct>=60?'var(--amb)':'var(--red)';
+
+  setCard('gradeNotesPct','gradeNotesBreakdown',nqPct,[
+    notesAvg!==null?'Cornell Notes avg: <strong>'+notesAvg+'%</strong> ('+noteArr.length+' days)':'Cornell Notes: no data yet',
+    timedAvg!==null?'Closing quiz avg: <strong>'+timedAvg+'%</strong> ('+chapAvgs.length+' chapters)':'Closing quizzes: no data yet',
+    chapAvgs.length?'<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">'+chapAvgs.map(c=>'<span style="background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:2px 8px;font-family:var(--mono);font-size:9px;color:'+(c.avg>=80?'var(--grn)':c.avg>=60?'var(--amb)':'var(--red)')+'">'+c.ch+': '+c.avg+'%</span>').join('')+'</div>':'',
+  ],nqCol);
+  setCard('gradeDiscPct','gradeDiscBreakdown',discPct,[
+    discPct!==null?discArr.length+' session'+(discArr.length!==1?'s':'')+' · avg: <strong>'+discPct+'%</strong>':'No discussion data yet',
+  ],dcCol);
+  setCard('gradeTestPct','gradeTestBreakdown',testPct,[
+    myTests.length?myTests.slice(-5).reverse().map(s=>'<span style="font-family:var(--mono);font-size:10px;color:var(--tx2)">'+new Date(s.ts||0).toLocaleDateString()+': <strong style="color:'+(s.pct>=80?'var(--grn)':s.pct>=60?'var(--amb)':'var(--red)')+'">'+s.pct+'%</strong></span>').join('<br>'):'No test scores yet — take a chapter test in the Exam Suite',
+  ],tsCol);
+
+  // Score log
+  const log=[];
+  noteArr.forEach((p,i)=>log.push({icon:'📝',label:'Cornell Notes Day '+(i+1),pct:p,ts:i}));
+  chapAvgs.forEach(c=>log.push({icon:'⏱',label:'Closing Quizzes — '+c.ch,pct:c.avg,ts:100}));
+  discArr.forEach((p,i)=>log.push({icon:'💬',label:'Discussion '+(i+1),pct:p,ts:200+i}));
+  myTests.forEach(s=>log.push({icon:'🎓',label:'Chapter Test',pct:s.pct||0,ts:s.ts||300}));
+  log.sort((a,b)=>b.ts-a.ts);
+  const sc=document.getElementById('gradeScoreCount');
+  const sl=document.getElementById('gradeScoreLog');
+  if(sc)sc.textContent=log.length+' scores';
+  if(sl)sl.innerHTML=log.length
+    ?'<div style="display:flex;flex-direction:column;gap:6px">'+log.slice(0,20).map(s=>'<div style="display:flex;align-items:center;gap:12px;padding:9px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r)"><span style="font-size:18px">'+s.icon+'</span><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--tx)">'+s.label+'</div></div><div style="font-family:var(--display);font-size:18px;font-weight:800;color:'+(s.pct>=80?'var(--grn)':s.pct>=60?'var(--amb)':'var(--red)')+'">'+s.pct+'%</div></div>').join('')+'</div>'
+    :'<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No scores yet.</div>';
+
+  // Sync to Google Sheets
+  if(finalPct!==null)syncGradeToSheets(code,nqPct||0,discPct||0,testPct||0,finalPct,letter);
+}
+
+function syncGradeToSheets(code,nqPct,discPct,testPct,finalPct,letter){
+  let url=localStorage.getItem('PLATFORM_SYNC_URL');
+  if(!url)return;
+  try{url=JSON.parse(url);}catch(e){}
+  if(!url||!url.includes('script.google.com'))return;
+  const p=new URLSearchParams({action:'save_grade',code,notes_pct:nqPct,disc_pct:discPct,test_pct:testPct,final_pct:finalPct,letter});
+  fetch(url+'?'+p,{mode:'cors'})
+    .then(()=>{const el=document.getElementById('gradeSyncStatus');if(el)el.textContent='✓ Grade synced to Google Sheets — '+new Date().toLocaleTimeString();})
+    .catch(()=>{const el=document.getElementById('gradeSyncStatus');if(el)el.textContent='Grade will sync when connected';});
+}
+
+function printGradeReport(){window.print();}
+
+
 function buildStudyPlan() {
   const domainScores = calcDomainScores();
   const readiness    = calcReadiness();
@@ -1582,12 +1849,14 @@ function goPanel(id){
     (id==='glossary'&&b.textContent==='Glossary')||
     (id==='confusion'&&b.textContent==='Confusion Flag')||
     (id==='report'&&b.textContent==='My Report')||
+    (id==='grades'&&b.textContent==='📊 My Grades')||
     (id==='tonight'&&b.textContent==='🎯 Study Tonight')||
     (id==='prep'&&b.textContent==='Teacher Prep'))b.classList.add('active');});
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel'+id.charAt(0).toUpperCase()+id.slice(1))?.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='tonight') buildStudyPlan();
+  if(id==='grades') buildGradeDashboard();
 }
 
 // ── TOAST ──

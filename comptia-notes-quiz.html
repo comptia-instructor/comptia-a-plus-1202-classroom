@@ -518,64 +518,86 @@ main{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 53px)}
 
 <script src="platform.js"></script>
 <script>
+
+// ── LOGIN TRACKING ──────────────────────────────────────
+(function trackLogin() {
+  try {
+    var code = localStorage.getItem('PLATFORM_CODE');
+    if (!code) return;
+    code = JSON.parse(code);
+    if (!code || code === 'TEACHER') return;
+
+    var today = new Date().toDateString();
+    var tool  = document.title.replace('CompTIA A+ · ','').trim();
+    var key   = 'login_log';
+    var log   = [];
+    try { log = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+
+    // Only log once per tool per day
+    var alreadyLogged = log.some(function(e) {
+      return e.code === code && e.date === today && e.tool === tool;
+    });
+
+    if (!alreadyLogged) {
+      log.unshift({
+        code:  code,
+        date:  today,
+        time:  new Date().toLocaleTimeString(),
+        tool:  tool,
+        ts:    Date.now()
+      });
+      // Keep last 1000 entries
+      localStorage.setItem(key, JSON.stringify(log.slice(0, 1000)));
+
+      // Sync to Google Sheets if connected
+      var syncUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+      if (syncUrl) {
+        try { syncUrl = JSON.parse(syncUrl); } catch(e) {}
+        if (syncUrl && syncUrl.includes('script.google.com')) {
+          fetch(syncUrl + '?action=save_login&code=' + encodeURIComponent(code) +
+            '&tool=' + encodeURIComponent(tool) +
+            '&date=' + encodeURIComponent(today) +
+            '&time=' + encodeURIComponent(new Date().toLocaleTimeString()),
+            { mode: 'cors' }
+          ).catch(function(){});
+        }
+      }
+    }
+  } catch(e) {}
+})();
+
 // Fallback storage helpers (in case platform.js loads async)
 if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
 // ════════════════════════════════════════════
 // CHAPTERS DATA
 // ════════════════════════════════════════════
 const CHAPTERS = [
-  {id:0, ch:'Chapter 1', title:'Safety and Professionalism', videos:['Professional Communication I & II','Dealing with Difficult Customers','Physical Safety'],
-   prompts:{overview:'Describe the key principles of IT professional communication and workplace safety.',terms:'List safety equipment, ESD, PPE terms.',process:'Explain proper safety procedures when working on hardware.',realworld:'Describe a scenario where improper safety leads to equipment damage.',traps:'Common A+ mistakes around ESD and physical safety.'}},
-  {id:1, ch:'Chapter 2', title:'Introduction to Computers and Operating Systems', videos:['Common Safety Procedures','What\'s an Operating System?','Users and Super Users','Why Windows?','Touring Windows 10/11','Touring macOS','Touring Linux'],
-   prompts:{overview:'Explain what an operating system does and compare Windows, macOS, and Linux.',terms:'OS, kernel, GUI, CLI, superuser, root, administrator.',process:'Describe how user accounts and permissions differ across OS platforms.',realworld:'A user needs elevated permissions to install software. What steps do you take?',traps:'Confusing administrator vs standard user rights on different OS platforms.'}},
-  {id:2, ch:'Chapter 7', title:'Power Supplies', videos:['Power Protection','Cooling Your System'],
-   prompts:{overview:'Explain power protection concepts and system cooling methods for CompTIA A+.',terms:'UPS, surge protector, ATX, wattage, thermal paste, heat sink, fan.',process:'Describe the steps to safely replace a power supply unit.',realworld:'A workstation keeps shutting down randomly. Walk through your troubleshooting process.',traps:'Confusing surge protector with UPS; ignoring wattage requirements.'}},
-  {id:3, ch:'Chapter 8', title:'Mass Storage Technologies', videos:['Boot Order'],
-   prompts:{overview:'Describe different mass storage technologies and boot order configuration.',terms:'HDD, SSD, NVMe, SATA, BIOS, UEFI, boot sequence.',process:'Explain how to configure boot order in BIOS/UEFI.',realworld:'A technician installs a new OS drive. How do they ensure it boots correctly?',traps:'Mixing up BIOS and UEFI settings; incorrect boot priority.'}},
-  {id:4, ch:'Chapter 9', title:'Implementing Mass Storage', videos:['Understanding Partitioning','MBR Partitioning','GPT Partitioning','Understanding File Systems','Popular File Systems','Formatting in Action','Dynamic Disks','New Installation','Hardware RAID','Software RAID','Encrypting Mass Storage','Maintaining Storage Disks'],
-   prompts:{overview:'Explain partitioning schemes, file systems, RAID configurations, and storage encryption.',terms:'MBR, GPT, NTFS, FAT32, exFAT, RAID 0/1/5/10, BitLocker, partition, volume.',process:'Walk through the steps to set up a new drive with GPT partitioning and NTFS.',realworld:'A company needs redundant storage. Compare RAID 1 vs RAID 5 for their needs.',traps:'Mixing up MBR vs GPT limits; RAID is not a backup; RAID levels performance vs redundancy.'}},
-  {id:5, ch:'Chapter 10', title:'Essential Peripherals', videos:['Understanding USB','Webcams and Videoconferencing'],
-   prompts:{overview:'Describe USB standards, peripheral connections, and videoconferencing hardware.',terms:'USB 2.0, 3.0, 3.1, Type-A, Type-C, Thunderbolt, bandwidth.',process:'Explain how to install and troubleshoot USB peripherals.',realworld:'A user\'s USB webcam is not recognized. Describe your troubleshooting steps.',traps:'Confusing USB versions and speeds; not checking driver issues first.'}},
-  {id:6, ch:'Chapter 11', title:'Installing and Upgrading Operating Systems', videos:['Windows 11 Editions','Boot from Everything','Installing Windows','Post-installation Tasks','Linux Features','Installing Linux','Upgrading macOS'],
-   prompts:{overview:'Explain the process of installing, upgrading, and configuring operating systems.',terms:'Clean install, upgrade, in-place upgrade, ISO, bootable media, activation.',process:'Describe the steps for a clean Windows 11 installation from USB.',realworld:'A client needs to upgrade from Windows 10 to 11 without losing data. Plan the process.',traps:'Skipping post-installation tasks; not checking hardware compatibility before upgrading.'}},
-  {id:7, ch:'Chapter 12', title:'Working with Operating Systems', videos:['Task Manager','Windows Settings','MMC and Additional Tools','What is the Registry?','macOS Core Tools'],
-   prompts:{overview:'Explain core OS tools: Task Manager, Registry, MMC, and macOS equivalents.',terms:'Task Manager, Registry, MMC, snap-in, regedit, Activity Monitor, Finder.',process:'Describe how to use Task Manager to identify and end a misbehaving process.',realworld:'An application is using 95% CPU. What tools do you use and what steps do you take?',traps:'Editing the registry without backing it up; confusing macOS tools with Windows equivalents.'}},
-  {id:8, ch:'Chapter 13', title:'Users, Groups, and Permissions', videos:['Introduction to Users and Groups','Managing Users and Groups','NTFS Permissions','Linux and macOS Permissions','File Explorer','Sharing Resources','Security Policies'],
-   prompts:{overview:'Explain user account management, NTFS permissions, and sharing resources across platforms.',terms:'NTFS permissions, share permissions, ACL, group policy, chmod, sudo, UAC.',process:'Explain how NTFS and share permissions interact when a user accesses a network share.',realworld:'A user cannot access a shared folder even though they are in the correct group. Debug this.',traps:'NTFS vs share permissions: the most restrictive applies; not understanding inheritance.'}},
-  {id:9, ch:'Chapter 14', title:'Maintaining and Optimizing Operating Systems', videos:['Maintaining Windows','Maintaining macOS','Maintaining Linux','Working with Applications','Backing Up Data in Windows','Backing Up in Linux/macOS'],
-   prompts:{overview:'Describe OS maintenance tasks, backup strategies, and application management.',terms:'Windows Update, Time Machine, rsync, Task Scheduler, cron, disk cleanup, defrag.',process:'Describe a complete Windows maintenance routine for a business workstation.',realworld:'A client\'s computer is running slowly after 2 years. What maintenance steps do you perform?',traps:'Defragging SSDs; skipping OS updates; confusing backup types (full, incremental, differential).'}},
-  {id:10, ch:'Chapter 15', title:'Working with the Command-Line Interface', videos:['Understanding CLI','Navigating CLI','Working with Folders','Working with Files','Working with Drives','Super Copy Commands','CLI Permissions','Advanced Windows Commands','Advanced Linux Commands I & II','Introduction to Scripting','Interpreted Languages','Scripting and the Terminal'],
-   prompts:{overview:'Explain CLI navigation, file management commands, and basic scripting for Windows and Linux.',terms:'cd, dir/ls, mkdir, del/rm, copy/cp, move/mv, ipconfig, ping, chmod, grep, PowerShell.',process:'List and explain 5 essential CLI commands a technician uses daily.',realworld:'You need to copy 10,000 files from one server to another efficiently. What CLI approach do you use?',traps:'Confusing Windows vs Linux commands; rm -rf with no confirmation; not understanding paths.'}},
-  {id:11, ch:'Chapter 16', title:'Troubleshooting Systems', videos:['Windows Recovery Environment','Advanced Startup Options','Troubleshooting Boot Problems','Troubleshooting at the GUI','Troubleshooting Applications','Kernel Panic'],
-   prompts:{overview:'Explain systematic approaches to troubleshooting OS and boot problems.',terms:'WinRE, Safe Mode, Last Known Good Configuration, System Restore, kernel panic, BSOD.',process:'Describe the 6-step CompTIA troubleshooting methodology.',realworld:'A Windows PC shows a BSOD on every startup. Walk through your troubleshooting process.',traps:'Skipping steps in the troubleshooting process; not documenting findings; reinstalling OS first.'}},
-  {id:12, ch:'Chapter 17', title:'Display Technologies', videos:['Graphics Cards and Connections','Multiple Monitors'],
-   prompts:{overview:'Explain display technologies, connector types, and multiple monitor configuration.',terms:'HDMI, DisplayPort, DVI, VGA, resolution, refresh rate, GPU, integrated graphics.',process:'Explain how to set up dual monitors in Windows including display settings.',realworld:'A user reports their external monitor flickers. Describe your troubleshooting approach.',traps:'Confusing display connector types; not checking resolution/refresh rate compatibility.'}},
-  {id:13, ch:'Chapter 18', title:'Essentials of Networking', videos:['Introduction to Networking','Hexadecimal'],
-   prompts:{overview:'Explain fundamental networking concepts and hexadecimal number system for A+ exam.',terms:'LAN, WAN, MAC address, IP address, hexadecimal, binary, OSI model, TCP/IP.',process:'Convert the IP address 192.168.1.1 to binary and explain what each octet represents.',realworld:'A new employee needs network access. What networking components are involved?',traps:'Confusing MAC address with IP address; OSI layer responsibilities.'}},
-  {id:14, ch:'Chapter 19', title:'TCP/IP Basics', videos:['Introduction to TCP/IP','Network IDs and Subnet Masks','Special IP Addresses','Network Address Translation (NAT)','Dynamic IP Addressing','Working with Connections'],
-   prompts:{overview:'Explain TCP/IP addressing, subnetting, NAT, and DHCP for the A+ exam.',terms:'IP address, subnet mask, default gateway, DHCP, NAT, loopback (127.0.0.1), APIPA (169.254.x.x).',process:'Explain how a device gets an IP address using DHCP, step by step.',realworld:'A computer has an APIPA address (169.254.x.x). What does this indicate and what do you do?',traps:'Confusing public vs private IP ranges; misidentifying subnet masks; APIPA as a working configuration.'}},
-  {id:15, ch:'Chapter 20', title:'OS Networking and Network Troubleshooting', videos:['Working with DNS','Windows Naming','Working with Workgroups','Working with Active Directory','Windows Sharing','The net Command','Routers','Basic Router Configuration','Firewall Configuration','Windows Firewall','Port Forwarding','Advanced Router Configuration','Virtual LANs (VLANs)'],
-   prompts:{overview:'Explain DNS, Active Directory, network sharing, firewall configuration, and VLANs.',terms:'DNS, WINS, workgroup, domain, Active Directory, VLAN, port forwarding, firewall rule.',process:'Explain how DNS resolves a domain name when a user types a URL into a browser.',realworld:'Users on VLAN 10 cannot communicate with users on VLAN 20. What is the likely cause?',traps:'Confusing DNS vs WINS; workgroup vs domain limitations; VLANs requiring Layer 3 for inter-VLAN routing.'}},
-  {id:16, ch:'Chapter 21', title:'Wireless Networking', videos:['Wireless Network Hardware','Basic WAP Setup','Wireless Encryption','Connecting to Wi-Fi','Enterprise Wireless','Beyond Wi-Fi','Troubleshooting Wireless'],
-   prompts:{overview:'Explain wireless standards, encryption types, and wireless troubleshooting techniques.',terms:'802.11a/b/g/n/ac/ax, WPA2, WPA3, SSID, WAP, 2.4GHz, 5GHz, MIMO, enterprise wireless.',process:'Explain the difference between WPA2-Personal and WPA2-Enterprise and when each is used.',realworld:'Users in a conference room report slow Wi-Fi. What do you investigate first?',traps:'Confusing wireless standards and speeds; WPA vs WPA2 security differences; channel overlap on 2.4GHz.'}},
-  {id:17, ch:'Chapter 22', title:'Internet and SOHO Networking', videos:['Telnet and SSH','Remote Desktop Connections','The World Wide Web','File Transfer Protocol (FTP)','Proxy Servers','Virtual Private Networks (VPN)','Internet of Things (IoT)','Troubleshooting Internet Connections','Browser Security'],
-   prompts:{overview:'Explain internet protocols, remote access tools, VPNs, and browser security concepts.',terms:'SSH, RDP, FTP, SFTP, HTTP, HTTPS, VPN, proxy server, IoT, SSL/TLS, certificate.',process:'Compare Telnet and SSH. Why is SSH preferred and how does it work?',realworld:'A remote employee cannot connect via VPN. Walk through your troubleshooting steps.',traps:'Using Telnet instead of SSH; not verifying SSL certificates; assuming all IoT devices are secure.'}},
-  {id:18, ch:'Chapter 23', title:'Virtualization, Cloud Computing, and AI', videos:['Application Integration','AI Policies and Procedures','Limitations','Private vs. Public Cloud'],
-   prompts:{overview:'Explain virtualization concepts, cloud service models, and AI considerations in IT.',terms:'VM, hypervisor, Type 1/Type 2, IaaS, PaaS, SaaS, public/private/hybrid cloud, AI policy.',process:'Explain the difference between Type 1 and Type 2 hypervisors with examples.',realworld:'A company wants to move their servers to the cloud. Compare IaaS, PaaS, and SaaS options.',traps:'Confusing hypervisor types; cloud service model responsibilities (shared responsibility model).'}},
-  {id:19, ch:'Chapter 24', title:'Portable Computing', videos:['Laptop Features','Laptop Hardware Troubleshooting','Power Management'],
-   prompts:{overview:'Explain laptop-specific components, hardware troubleshooting, and power management.',terms:'LCD, OLED, inverter, Wi-Fi card, SO-DIMM, M.2, sleep, hibernate, battery calibration.',process:'Explain how to safely replace a laptop battery and keyboard.',realworld:'A laptop display is dark but the image is visible with a flashlight. What is the likely cause?',traps:'Confusing laptop vs desktop components; sleep vs hibernate behavior; battery calibration timing.'}},
-  {id:20, ch:'Chapter 25', title:'Mobile Devices', videos:['Touring Android','Touring iOS'],
-   prompts:{overview:'Compare Android and iOS mobile operating systems for the A+ exam.',terms:'Android, iOS, APK, App Store, Google Play, MDM, rooting, jailbreaking.',process:'Explain the difference between rooting an Android device and jailbreaking an iOS device.',realworld:'A user wants to install an app not in the App Store. What are the risks and alternatives?',traps:'Confusing Android vs iOS file systems; MDM enrollment requirements; security implications of rooting.'}},
-  {id:21, ch:'Chapter 26', title:'Maintaining and Securing Mobile Devices', videos:['Maintaining Mobile Devices','Mobile Devices and E-mail','Mobile Synchronization','Mobile Device Security','Mobile Security Troubleshooting'],
-   prompts:{overview:'Explain mobile device management, email configuration, sync, and security.',terms:'MDM, IMAP, POP3, Exchange ActiveSync, remote wipe, screen lock, encryption, 2FA.',process:'Describe how to configure corporate email on a mobile device using Exchange ActiveSync.',realworld:'A company-owned phone is reported stolen. What immediate steps do you take?',traps:'Confusing IMAP vs POP3 for mobile; not having remote wipe enabled before loss occurs.'}},
-  {id:22, ch:'Chapter 27', title:'Printers and Multifunction Devices', videos:['Installing a Local Printer','Sharing Printers'],
-   prompts:{overview:'Explain printer types, installation, sharing, and troubleshooting for A+.',terms:'laser printer, inkjet, thermal, 3D printer, print spooler, PCL, PostScript, driver.',process:'Explain the laser printing process in order (the 7 steps of laser printing).',realworld:'A user prints but pages come out with vertical black lines. What is the likely cause?',traps:'Confusing printer types and their maintenance; forgetting the print spooler when troubleshooting.'}},
-  {id:23, ch:'Chapter 28', title:'Essential Security Practices', videos:['Threats','Dealing with Threats','Physical Security','Passwords and Authentication','Multifactor Authentication (MFA)'],
-   prompts:{overview:'Explain security threats, authentication methods, physical security, and MFA.',terms:'MFA, biometrics, smart card, RFID, tailgating, mantrap, social engineering, zero-day.',process:'Explain the three factors of authentication and give an example of each.',realworld:'An employee holds the door open for an unknown person into a secure area. What policy was violated?',traps:'Confusing authentication factors; physical security often overlooked; MFA bypass methods.'}},
-  {id:24, ch:'Chapter 29', title:'Securing Endpoint Systems', videos:['Malware Part I & II','Anti-Malware','Social Engineering','Licensing','Incident Response','Environmental Controls'],
-   prompts:{overview:'Explain malware types, anti-malware strategies, social engineering, and incident response.',terms:'virus, worm, Trojan, ransomware, spyware, phishing, vishing, whaling, incident response, chain of custody.',process:'Describe the CompTIA A+ incident response steps when malware is detected.',realworld:'A user clicks a link and their files are suddenly encrypted. Describe your immediate response.',traps:'Confusing malware types; not isolating infected machines immediately; skipping documentation.'}},
-  {id:25, ch:'Chapter 30', title:'Operational Procedures', videos:['Documents You Need to Know','Data You Need to Know','Change Management','The Zen of Backup','Recycling and Data Destruction','Ticketing Systems'],
-   prompts:{overview:'Explain operational procedures, documentation, change management, backups, and data destruction.',terms:'SLA, AUP, NDA, change management, ticketing system, full backup, incremental, differential, shredding, degaussing.',process:'Explain the difference between full, incremental, and differential backups with use cases.',realworld:'A tech replaces a hard drive containing sensitive data. Describe proper data destruction methods.',traps:'Backup types: incremental vs differential restore time; improper data destruction methods; skipping change management.'}},
+  {id:0, ch:'Chapter 1', chTag:'Ch.1', title:'Safety and Professionalism', videos:['Professional Communication, Part I', 'Professional Communication, Part II', 'Dealing with Difficult Customers', 'Physical Safety']},
+  {id:1, ch:'Chapter 2', chTag:'Ch.2', title:'Introduction to Computers and Operating Systems', videos:['Common Safety Procedures', 'What`s an Operating System?', 'Users and Super Users', 'Why Windows?', 'Touring Windows 10 and 11', 'Touring the macOS, Part I', 'Touring the macOS, Part II', 'Touring the macOS, Part III', 'Touring Linux']},
+  {id:2, ch:'Chapter 7', chTag:'Ch.7', title:'Power Supplies', videos:['Power Protection', 'Cooling Your System']},
+  {id:3, ch:'Chapter 8', chTag:'Ch.8', title:'Mass Storage Technologies', videos:['Boot Order']},
+  {id:4, ch:'Chapter 9', chTag:'Ch.9', title:'Implementing Mass Storage', videos:['Understanding Partitioning', 'MBR Partitioning', 'GPT Partitioning', 'Understanding File Systems', 'Popular File Systems', 'Formatting in Action', 'Dynamic Disks', 'New Installation - First Drive', 'Hardware RAID', 'Software RAID in Storage Spaces', 'Encrypting Mass Storage', 'Maintaining Storage Disks']},
+  {id:5, ch:'Chapter 10', chTag:'Ch.10', title:'Essential Peripherals', videos:['Understanding USB', 'Webcams and Videoconferencing']},
+  {id:6, ch:'Chapter 11', chTag:'Ch.11', title:'Installing and Upgrading Operating Systems', videos:['Windows 11 Editions and Features', 'Boot from Everything', 'Installing and Upgrading Windows', 'Post-installation Tasks', 'Linux Features and Tools', 'Installing and Upgrading Linux', 'Upgrading macOS']},
+  {id:7, ch:'Chapter 12', chTag:'Ch.12', title:'Working with Operating Systems', videos:['The Task Manager', 'Windows Settings', 'MMC and Additional Tools', 'What`s the Registry?', 'macOS Core Tools']},
+  {id:8, ch:'Chapter 13', chTag:'Ch.13', title:'Users, Groups, and Permissions', videos:['Introduction to Users and Groups', 'Managing Users and Groups', 'NTFS Permissions', 'Linux and macOS Permissions', 'File Explorer', 'Sharing Resources', 'Security Policies']},
+  {id:9, ch:'Chapter 14', chTag:'Ch.14', title:'Maintaining and Optimizing Operating Systems', videos:['Maintaining Windows', 'Maintaining macOS', 'Maintaining Linux', 'Working with Applications', 'Backing Up Your Data in Windows', 'Backing Up Your Data in Linux and macOS']},
+  {id:10, ch:'Chapter 15', chTag:'Ch.15', title:'Working with the Command-Line Interface', videos:['Understanding the CLI', 'Navigating the CLI', 'Working with Folders', 'Working with Files', 'Working with Drives', 'Super Copy Commands', 'Command-Line Permissions', 'Advanced Windows Commands', 'Advanced Linux Commands, Part I', 'Advanced Linux Commands, Part II', 'Introduction to Scripting', 'Interpreted Languages', 'Scripting and the Terminal']},
+  {id:11, ch:'Chapter 16', chTag:'Ch.16', title:'Troubleshooting Systems', videos:['Windows Recovery Environment', 'Advanced Windows Startup Options', 'Troubleshooting Boot Problems', 'Troubleshooting at the GUI', 'Troubleshooting Applications', 'Kernel Panic']},
+  {id:12, ch:'Chapter 17', chTag:'Ch.17', title:'Display Technologies', videos:['Graphics Cards and Connections', 'Multiple Monitors']},
+  {id:13, ch:'Chapter 18', chTag:'Ch.18', title:'Essentials of Networking', videos:['Introduction to Networking', 'Hexadecimal']},
+  {id:14, ch:'Chapter 19', chTag:'Ch.19', title:'TCP/IP Basics', videos:['Introduction to TCP/IP', 'Network IDs and Subnet Masks', 'Special IP Addresses', 'Network Address Translation (NAT)', 'Dynamic IP Addressing', 'Working with Connections']},
+  {id:15, ch:'Chapter 20', chTag:'Ch.20', title:'OS Networking and Troubleshooting', videos:['Working with DNS', 'Windows Naming', 'Working with Workgroups', 'Working with Active Directory', 'Windows Sharing with macOS and Linux', 'The net Command', 'Routers', 'Basic Router Configuration', 'Firewall Configuration', 'Windows Firewall', 'Port Forwarding', 'Advanced Router Configuration', 'Virtual LANs (VLANs)']},
+  {id:16, ch:'Chapter 21', chTag:'Ch.21', title:'Wireless Networking', videos:['Wireless Network Hardware', 'Basic WAP Setup', 'Wireless Encryption', 'Connecting to a Wi-Fi Network', 'Enterprise Wireless', 'Beyond Wi-Fi', 'Troubleshooting Wireless Connections']},
+  {id:17, ch:'Chapter 22', chTag:'Ch.22', title:'Internet and SOHO Networking', videos:['Telnet and SSH', 'Remote Desktop Connections', 'The World Wide Web', 'File Transfer Protocol (FTP)', 'Proxy Servers', 'Virtual Private Networks (VPN)', 'Internet of Things (IoT)', 'Troubleshooting Internet Connections', 'Browser Security']},
+  {id:18, ch:'Chapter 23', chTag:'Ch.23', title:'Virtualization, Cloud Computing, and AI', videos:['Application Integration', 'AI Policies and Procedures', 'Limitations', 'Private vs. Public']},
+  {id:19, ch:'Chapter 24', chTag:'Ch.24', title:'Portable Computing', videos:['Laptop Features', 'Laptop Hardware Troubleshooting - The Tools', 'Power Management']},
+  {id:20, ch:'Chapter 25', chTag:'Ch.25', title:'Mobile Devices', videos:['Touring Android', 'Touring iOS']},
+  {id:21, ch:'Chapter 26', chTag:'Ch.26', title:'Maintaining and Securing Mobile Devices', videos:['Maintaining Mobile Devices', 'Mobile Devices and E-mail', 'Mobile Synchronization', 'Mobile Device Security', 'Mobile Security Troubleshooting']},
+  {id:22, ch:'Chapter 27', chTag:'Ch.27', title:'Printers and Multifunction Devices', videos:['Installing a Local Printer', 'Sharing Printers']},
+  {id:23, ch:'Chapter 28', chTag:'Ch.28', title:'Essential Security Practices', videos:['Threats', 'Dealing with Threats', 'Physical Security', 'Passwords and Authentication', 'Multifactor Authentication (MFA)']},
+  {id:24, ch:'Chapter 29', chTag:'Ch.29', title:'Securing Endpoint Systems', videos:['Malware, Part I', 'Malware, Part II', 'Anti-Malware', 'Social Engineering', 'Licensing', 'Incident Response', 'Environmental Controls']},
+  {id:25, ch:'Chapter 30', chTag:'Ch.30', title:'Operational Procedures', videos:['Documents You Need to Know', 'Data You Need to Know', 'Change Management', 'The Zen of Backup', 'Recycling and Data Destruction', 'Ticketing Systems']},
 ];
 
 const NOTE_FIELDS = [
@@ -603,7 +625,58 @@ function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):
 function saveLS(k,v){localStorage.setItem(k,JSON.stringify(v))}
 
 // ── INIT ──
+
+// Auto-open today's chapter if teacher has selected a video
+function autoSelectTodayChapter() {
+  const todayVideo = localStorage.getItem('today_video');
+  if (!todayVideo) return;
+  try {
+    const v = JSON.parse(todayVideo);
+    const ch = v.ch; // e.g. "Ch.15"
+    const chNum = ch.replace('Ch.','');
+    
+    // Find the chapter in CHAPTERS array
+    const chapterIdx = CHAPTERS.findIndex(c =>
+      c.ch === 'Chapter ' + chNum || c.chTag === ch
+    );
+    if (chapterIdx === -1) return;
+    
+    // Show a "Today's chapter" banner at the top
+    const banner = document.getElementById('todayChapterBanner');
+    if (banner) {
+      banner.style.display = 'block';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="font-size:18px">📌</span>
+          <div style="flex:1">
+            <div style="font-family:var(--display);font-size:14px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--grn);margin-bottom:2px">Today — ${v.ch}: ${v.title || ''}</div>
+            <div style="font-size:11px;color:var(--tx2)">Current video: <strong>${v.video}</strong></div>
+          </div>
+          <button onclick="selectTodayChapter(${chapterIdx})"
+            style="background:var(--grn);color:var(--bg);border:none;border-radius:6px;padding:8px 16px;font-family:var(--display);font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;cursor:pointer">
+            Open Notes →
+          </button>
+        </div>`;
+    }
+    
+    // Auto-select the chapter after a short delay
+    setTimeout(() => selectTodayChapter(chapterIdx), 300);
+  } catch(e) {}
+}
+
+function selectTodayChapter(idx) {
+  // Call the existing chapter selection function
+  if (typeof selectChapter === 'function') selectChapter(idx);
+  else if (typeof loadChapter === 'function') loadChapter(idx);
+  else {
+    // Fallback: click the chapter chip
+    const chips = document.querySelectorAll('.ch-chip, .chapter-chip, [onclick*="selectChapter"], [onclick*="loadChapter"]');
+    if (chips[idx]) chips[idx].click();
+  }
+}
+
 function init(){
+  autoSelectTodayChapter();
   buildSidebar();
   buildProgressCards();
   buildChapChips();

@@ -88,6 +88,48 @@
       return existing;
     },
 
+
+    // ── TEACHER/STUDENT MODE ──
+    isTeacher: function() {
+      return localStorage.getItem('teacher_unlocked') === 'true';
+    },
+
+    // Call on page load — hides all .teacher-only elements if not teacher
+    // Shows a lock icon on hover so teacher knows it's there
+    guardPage: function() {
+      const teacher = this.isTeacher();
+      document.addEventListener('DOMContentLoaded', () => {
+        this._applyGuard(teacher);
+      });
+      // Also apply immediately if DOM already ready
+      if(document.readyState !== 'loading') this._applyGuard(teacher);
+    },
+
+    _applyGuard: function(isTeacher) {
+      document.querySelectorAll('.teacher-only').forEach(el => {
+        el.style.display = isTeacher ? '' : 'none';
+      });
+      document.querySelectorAll('.student-only').forEach(el => {
+        el.style.display = isTeacher ? 'none' : '';
+      });
+      // Add teacher badge to any page that has teacher mode active
+      if(isTeacher) {
+        const existing = document.getElementById('globalTeacherBadge');
+        if(!existing) {
+          const badge = document.createElement('div');
+          badge.id = 'globalTeacherBadge';
+          badge.style.cssText = 'position:fixed;bottom:16px;left:16px;background:rgba(255,215,0,0.15);border:1px solid #ffd700;color:#ffd700;font-family:JetBrains Mono,monospace;font-size:9px;padding:5px 12px;border-radius:20px;z-index:9999;cursor:pointer;letter-spacing:.5px';
+          badge.textContent = '👨‍🏫 Teacher Mode';
+          badge.title = 'Click to exit teacher mode';
+          badge.onclick = () => {
+            localStorage.removeItem('teacher_unlocked');
+            location.reload();
+          };
+          document.body.appendChild(badge);
+        }
+      }
+    },
+
     // ── PDF EXPORT ──
     // Call with an array of question objects and optional metadata
     // questions: [{q, opts:{A,B,C,D}, answer, rationale, type, domain, studentAnswer}]

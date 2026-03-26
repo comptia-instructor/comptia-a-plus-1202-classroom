@@ -271,6 +271,7 @@ nav::-webkit-scrollbar{height:2px}
   <div class="tab teacher-only" id="tab-parent-btn" onclick="switchTab('parent')">✉️ Parent Comms</div>
   <div class="tab teacher-only" id="tab-sub-btn" onclick="switchTab('sub')">🔄 Sub Mode</div>
   <div class="tab teacher-only" id="tab-calendar-btn" onclick="switchTab('calendar')">📅 Calendar</div>
+  <div class="tab teacher-only" onclick="switchTab('attend')">📋 Attendance Log</div>
   <div class="tab" onclick="switchTab('assess')">💭 Self-Assessment</div>
   <div class="tab teacher-only" onclick="switchTab('retake')">🔁 Retake Manager</div>
 </nav>
@@ -693,12 +694,97 @@ nav::-webkit-scrollbar{height:2px}
   </div>
 </div>
 
+
+<!-- ATTENDANCE LOG -->
+<div class="panel" id="tab-attend">
+  <div class="card">
+    <div class="card-hdr">
+      <h2>📋 Student Attendance Log</h2>
+      <span class="tag acc" id="attendCount">0 logins today</span>
+      <button class="btn btn-ghost btn-sm" onclick="exportAttendance()">↓ Export CSV</button>
+    </div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px">
+        Shows every time a student code was active on the platform. Updates automatically when students open any tool.
+      </div>
+
+      <!-- Filter bar -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+        <select id="attendDateFilter" onchange="renderAttendance()"
+          style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-family:var(--mono);font-size:11px;outline:none">
+        </select>
+        <select id="attendCodeFilter" onchange="renderAttendance()"
+          style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;color:var(--tx);font-family:var(--mono);font-size:11px;outline:none">
+          <option value="">All students</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="clearAttendLog()">Clear Log</button>
+      </div>
+
+      <!-- Present/Absent summary for selected day -->
+      <div id="attendSummary" style="margin-bottom:14px"></div>
+
+      <!-- Log list -->
+      <div id="attendList" style="display:flex;flex-direction:column;gap:5px;max-height:400px;overflow-y:auto">
+        <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No login data yet. Students must open the platform to appear here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /content -->
 </div><!-- /app -->
 <div class="toast" id="toast"></div>
 
 <script src="platform.js"></script>
 <script>
+
+// ── LOGIN TRACKING ──────────────────────────────────────
+(function trackLogin() {
+  try {
+    var code = localStorage.getItem('PLATFORM_CODE');
+    if (!code) return;
+    code = JSON.parse(code);
+    if (!code || code === 'TEACHER') return;
+
+    var today = new Date().toDateString();
+    var tool  = document.title.replace('CompTIA A+ · ','').trim();
+    var key   = 'login_log';
+    var log   = [];
+    try { log = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+
+    // Only log once per tool per day
+    var alreadyLogged = log.some(function(e) {
+      return e.code === code && e.date === today && e.tool === tool;
+    });
+
+    if (!alreadyLogged) {
+      log.unshift({
+        code:  code,
+        date:  today,
+        time:  new Date().toLocaleTimeString(),
+        tool:  tool,
+        ts:    Date.now()
+      });
+      // Keep last 1000 entries
+      localStorage.setItem(key, JSON.stringify(log.slice(0, 1000)));
+
+      // Sync to Google Sheets if connected
+      var syncUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+      if (syncUrl) {
+        try { syncUrl = JSON.parse(syncUrl); } catch(e) {}
+        if (syncUrl && syncUrl.includes('script.google.com')) {
+          fetch(syncUrl + '?action=save_login&code=' + encodeURIComponent(code) +
+            '&tool=' + encodeURIComponent(tool) +
+            '&date=' + encodeURIComponent(today) +
+            '&time=' + encodeURIComponent(new Date().toLocaleTimeString()),
+            { mode: 'cors' }
+          ).catch(function(){});
+        }
+      }
+    }
+  } catch(e) {}
+})();
+
 // Fallback storage helpers (in case platform.js loads async)
 if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
 // ══════════════════════════════════════════════════
@@ -712,17 +798,75 @@ const DOMAINS = [
   {name:'HW & Network Troubleshooting',weight:.10,color:'var(--red)',qs:9},
 ];
 
-const DAYS_DATA=[
-  {day:1,section:'Ch.1 Safety & Professionalism',videos:['Professional Communication I','Professional Communication II'],time:14},
-  {day:2,section:'Ch.1-2',videos:['Dealing with Difficult Customers','Physical Safety','Common Safety Procedures'],time:14},
-  {day:3,section:'Ch.2 Operating Systems',videos:["What's an OS?","Users and Super Users"],time:14},
-  {day:4,section:'Ch.2 Windows',videos:['Why Windows?','Touring Windows 10 and 11'],time:14},
-  {day:5,section:'Ch.2 macOS',videos:['Touring macOS Part I & II'],time:14},
-  {day:6,section:'Ch.2 Linux',videos:['Touring macOS Part III','Touring Linux'],time:14},
-  {day:7,section:'Ch.7 Power Supplies',videos:['Power Protection','Cooling Your System'],time:14},
-  {day:8,section:'Ch.8-9 Storage',videos:['Boot Order','Understanding Partitioning'],time:14},
-  {day:9,section:'Ch.9 Partitioning',videos:['MBR Partitioning','GPT Partitioning','Understanding File Systems'],time:14},
-  {day:10,section:'Ch.9 File Systems',videos:['Popular File Systems','Formatting in Action'],time:14},
+const DAYS_DATA = [
+  {day:1, section:'Ch.1 Safety and Professionalism', videos:['Professional Communication, Part I', 'Professional Communication, Part II'], mins:14},
+  {day:2, section:'Ch.1 Safety and Professionalism', videos:['Dealing with Difficult Customers', 'Physical Safety'], mins:14},
+  {day:3, section:'Ch.1 Safety and Professionalism', videos:['Common Safety Procedures', 'What\'s an Operating System?'], mins:14},
+  {day:4, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Users and Super Users', 'Why Windows?'], mins:14},
+  {day:5, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Windows 10 and 11', 'Touring the macOS, Part I'], mins:14},
+  {day:6, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring the macOS, Part II', 'Touring the macOS, Part III'], mins:14},
+  {day:7, section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Linux', 'Power Protection'], mins:14},
+  {day:8, section:'Ch.7 Power Supplies', videos:['Cooling Your System', 'Boot Order'], mins:14},
+  {day:9, section:'Ch.9 Implementing Mass Storage', videos:['Understanding Partitioning', 'MBR Partitioning'], mins:14},
+  {day:10, section:'Ch.9 Implementing Mass Storage', videos:['GPT Partitioning', 'Understanding File Systems'], mins:14},
+  {day:11, section:'Ch.9 Implementing Mass Storage', videos:['Popular File Systems', 'Formatting in Action'], mins:14},
+  {day:12, section:'Ch.9 Implementing Mass Storage', videos:['Dynamic Disks', 'New Installation - First Drive'], mins:14},
+  {day:13, section:'Ch.9 Implementing Mass Storage', videos:['Hardware RAID', 'Software RAID in Storage Spaces'], mins:14},
+  {day:14, section:'Ch.9 Implementing Mass Storage', videos:['Encrypting Mass Storage', 'Maintaining Storage Disks'], mins:14},
+  {day:15, section:'Ch.10 Essential Peripherals', videos:['Understanding USB', 'Webcams and Videoconferencing'], mins:14},
+  {day:16, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Windows 11 Editions and Features', 'Boot from Everything'], mins:14},
+  {day:17, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Installing and Upgrading Windows', 'Post-installation Tasks'], mins:14},
+  {day:18, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Linux Features and Tools', 'Installing and Upgrading Linux'], mins:14},
+  {day:19, section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Upgrading macOS', 'The Task Manager'], mins:14},
+  {day:20, section:'Ch.12 Working with Operating Systems', videos:['Windows Settings', 'MMC and Additional Tools'], mins:14},
+  {day:21, section:'Ch.12 Working with Operating Systems', videos:['What\'s the Registry?', 'macOS Core Tools'], mins:14},
+  {day:22, section:'Ch.13 Users, Groups, and Permissions', videos:['Introduction to Users and Groups', 'Managing Users and Groups'], mins:14},
+  {day:23, section:'Ch.13 Users, Groups, and Permissions', videos:['NTFS Permissions', 'Linux and macOS Permissions'], mins:14},
+  {day:24, section:'Ch.13 Users, Groups, and Permissions', videos:['File Explorer', 'Sharing Resources'], mins:14},
+  {day:25, section:'Ch.13 Users, Groups, and Permissions', videos:['Security Policies', 'Maintaining Windows'], mins:14},
+  {day:26, section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Maintaining macOS', 'Maintaining Linux'], mins:14},
+  {day:27, section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Working with Applications', 'Backing Up Your Data in Windows'], mins:14},
+  {day:28, section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Backing Up Your Data in Linux and macOS', 'Understanding the CLI'], mins:14},
+  {day:29, section:'Ch.15 Working with the Command-Line Interface', videos:['Navigating the CLI', 'Working with Folders'], mins:14},
+  {day:30, section:'Ch.15 Working with the Command-Line Interface', videos:['Working with Files', 'Working with Drives'], mins:14},
+  {day:31, section:'Ch.15 Working with the Command-Line Interface', videos:['Super Copy Commands', 'Command-Line Permissions'], mins:14},
+  {day:32, section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Windows Commands', 'Advanced Linux Commands, Part I'], mins:14},
+  {day:33, section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Linux Commands, Part II', 'Introduction to Scripting'], mins:14},
+  {day:34, section:'Ch.15 Working with the Command-Line Interface', videos:['Interpreted Languages', 'Scripting and the Terminal'], mins:14},
+  {day:35, section:'Ch.16 Troubleshooting Systems', videos:['Windows Recovery Environment', 'Advanced Windows Startup Options'], mins:14},
+  {day:36, section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Boot Problems', 'Troubleshooting at the GUI'], mins:14},
+  {day:37, section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Applications', 'Kernel Panic'], mins:14},
+  {day:38, section:'Ch.17 Display Technologies', videos:['Graphics Cards and Connections', 'Multiple Monitors'], mins:14},
+  {day:39, section:'Ch.18 Essentials of Networking', videos:['Introduction to Networking', 'Hexadecimal'], mins:14},
+  {day:40, section:'Ch.19 TCP/IP Basics', videos:['Introduction to TCP/IP', 'Network IDs and Subnet Masks'], mins:14},
+  {day:41, section:'Ch.19 TCP/IP Basics', videos:['Special IP Addresses', 'Network Address Translation (NAT)'], mins:14},
+  {day:42, section:'Ch.19 TCP/IP Basics', videos:['Dynamic IP Addressing', 'Working with Connections'], mins:14},
+  {day:43, section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with DNS', 'Windows Naming'], mins:14},
+  {day:44, section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with Workgroups', 'Working with Active Directory'], mins:14},
+  {day:45, section:'Ch.20 OS Networking and Troubleshooting', videos:['Windows Sharing with macOS and Linux', 'The net Command'], mins:14},
+  {day:46, section:'Ch.20 OS Networking and Troubleshooting', videos:['Routers', 'Basic Router Configuration'], mins:14},
+  {day:47, section:'Ch.20 OS Networking and Troubleshooting', videos:['Firewall Configuration', 'Windows Firewall'], mins:14},
+  {day:48, section:'Ch.20 OS Networking and Troubleshooting', videos:['Port Forwarding', 'Advanced Router Configuration', 'Virtual LANs (VLANs)'], mins:21},
+  {day:49, section:'Ch.21 Wireless Networking', videos:['Wireless Network Hardware', 'Basic WAP Setup'], mins:14},
+  {day:50, section:'Ch.21 Wireless Networking', videos:['Wireless Encryption', 'Connecting to a Wi-Fi Network', 'Enterprise Wireless'], mins:21},
+  {day:51, section:'Ch.21 Wireless Networking', videos:['Beyond Wi-Fi', 'Troubleshooting Wireless Connections'], mins:14},
+  {day:52, section:'Ch.22 Internet and SOHO Networking', videos:['Telnet and SSH', 'Remote Desktop Connections', 'The World Wide Web'], mins:21},
+  {day:53, section:'Ch.22 Internet and SOHO Networking', videos:['File Transfer Protocol (FTP)', 'Proxy Servers'], mins:14},
+  {day:54, section:'Ch.22 Internet and SOHO Networking', videos:['Virtual Private Networks (VPN)', 'Internet of Things (IoT)', 'Troubleshooting Internet Connections'], mins:21},
+  {day:55, section:'Ch.22 Internet and SOHO Networking', videos:['Browser Security', 'Application Integration'], mins:14},
+  {day:56, section:'Ch.23 Virtualization, Cloud Computing, and AI', videos:['AI Policies and Procedures', 'Limitations', 'Private vs. Public'], mins:21},
+  {day:57, section:'Ch.24 Portable Computing', videos:['Laptop Features', 'Laptop Hardware Troubleshooting - The Tools'], mins:14},
+  {day:58, section:'Ch.24 Portable Computing', videos:['Power Management', 'Touring Android', 'Touring iOS'], mins:21},
+  {day:59, section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Maintaining Mobile Devices', 'Mobile Devices and E-mail'], mins:14},
+  {day:60, section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Mobile Synchronization', 'Mobile Device Security', 'Mobile Security Troubleshooting'], mins:21},
+  {day:61, section:'Ch.27 Printers and Multifunction Devices', videos:['Installing a Local Printer', 'Sharing Printers'], mins:14},
+  {day:62, section:'Ch.28 Essential Security Practices', videos:['Threats', 'Dealing with Threats', 'Physical Security'], mins:21},
+  {day:63, section:'Ch.28 Essential Security Practices', videos:['Passwords and Authentication', 'Multifactor Authentication (MFA)'], mins:14},
+  {day:64, section:'Ch.29 Securing Endpoint Systems', videos:['Malware, Part I', 'Malware, Part II', 'Anti-Malware'], mins:21},
+  {day:65, section:'Ch.29 Securing Endpoint Systems', videos:['Social Engineering', 'Licensing'], mins:14},
+  {day:66, section:'Ch.29 Securing Endpoint Systems', videos:['Incident Response', 'Environmental Controls', 'Documents You Need to Know'], mins:21},
+  {day:67, section:'Ch.30 Operational Procedures', videos:['Data You Need to Know', 'Change Management'], mins:14},
+  {day:68, section:'Ch.30 Operational Procedures', videos:['The Zen of Backup', 'Recycling and Data Destruction', 'Ticketing Systems'], mins:21},
 ];
 
 function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
@@ -754,9 +898,11 @@ function init(){
   // Check URL hash for direct tab
   const hash = window.location.hash.replace('#','');
   if(hash) switchTab(hash);
+  initAttendance();
 }
 
 function switchTab(id){
+  if(id==='attend') setTimeout(initAttendance, 50);
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   const tabEl = document.getElementById(`tab-${id}-btn`) || document.querySelector(`.tab[onclick*="${id}"]`);
@@ -1486,6 +1632,115 @@ function exportRetakes(){
 // ══════════════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════════════
+
+// ── ATTENDANCE LOG ──────────────────────────────────────
+function initAttendance() {
+  const log = getLoginLog();
+  // Populate date filter
+  const dates = [...new Set(log.map(e => e.date))].sort().reverse();
+  const sel = document.getElementById('attendDateFilter');
+  if (!sel) return;
+  sel.innerHTML = dates.length
+    ? dates.map(d => `<option value="${d}">${d}</option>`).join('')
+    : '<option value="">No data yet</option>';
+
+  // Populate code filter
+  const codes = [...new Set(log.map(e => e.code))].sort();
+  const codeSel = document.getElementById('attendCodeFilter');
+  codeSel.innerHTML = '<option value="">All students</option>' +
+    codes.map(c => `<option value="${c}">${c}</option>`).join('');
+
+  renderAttendance();
+}
+
+function getLoginLog() {
+  try { return JSON.parse(localStorage.getItem('login_log')) || []; }
+  catch(e) { return []; }
+}
+
+function renderAttendance() {
+  const log    = getLoginLog();
+  const date   = document.getElementById('attendDateFilter')?.value || '';
+  const code   = document.getElementById('attendCodeFilter')?.value || '';
+
+  const filtered = log.filter(e =>
+    (!date || e.date === date) &&
+    (!code || e.code === code)
+  );
+
+  // Today's count
+  const today = new Date().toDateString();
+  const todayActive = [...new Set(log.filter(e => e.date === today).map(e => e.code))];
+  const countEl = document.getElementById('attendCount');
+  if (countEl) countEl.textContent = `${todayActive.length} active today`;
+
+  // Summary: present/absent for selected date
+  const summary = document.getElementById('attendSummary');
+  if (summary && date) {
+    const allCodes = pls('platform_student_codes', []);
+    const activeCodes = [...new Set(filtered.map(e => e.code))];
+    const absent = allCodes.filter(c => !activeCodes.includes(c));
+    summary.innerHTML = `
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:8px 14px;text-align:center">
+          <div style="font-family:var(--display);font-size:24px;font-weight:800;color:var(--grn)">${activeCodes.length}</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Present</div>
+        </div>
+        <div style="background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:8px 14px;text-align:center">
+          <div style="font-family:var(--display);font-size:24px;font-weight:800;color:var(--red)">${absent.length}</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Not seen</div>
+        </div>
+      </div>
+      ${absent.length ? `<div style="font-size:11px;color:var(--tx2);font-family:var(--mono)">Not seen: ${absent.join(', ')}</div>` : ''}
+    `;
+  } else if (summary) {
+    summary.innerHTML = '';
+  }
+
+  // Log list
+  const list = document.getElementById('attendList');
+  if (!list) return;
+
+  // Group by student for cleaner display
+  const byCode = {};
+  filtered.forEach(e => {
+    if (!byCode[e.code]) byCode[e.code] = [];
+    byCode[e.code].push(e);
+  });
+
+  const entries = Object.entries(byCode).sort((a,b) => a[0].localeCompare(b[0]));
+
+  list.innerHTML = entries.length ? entries.map(([code, events]) => `
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:11px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--acc)">${code}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">First seen: ${events[events.length-1].time}</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${events.map(e => `<span style="font-size:9px;font-family:var(--mono);background:var(--s3);border:1px solid var(--b1);padding:2px 8px;border-radius:3px;color:var(--tx2)">${e.tool} · ${e.time}</span>`).join('')}
+      </div>
+    </div>
+  `).join('') : '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No entries match the filter.</div>';
+}
+
+function exportAttendance() {
+  const log = getLoginLog();
+  const lines = ['Date,Student Code,Tool,Time'];
+  log.forEach(e => lines.push(`"${e.date}","${e.code}","${e.tool}","${e.time}"`));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download = 'Student_Attendance_Log.csv';
+  a.click();
+  if(typeof Platform!=='undefined') Platform.toast('Attendance exported!','ok');
+}
+
+function clearAttendLog() {
+  if (!confirm('Clear all attendance data?')) return;
+  localStorage.removeItem('login_log');
+  renderAttendance();
+}
+
+
 function toast(msg,type=''){
   const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
   setTimeout(()=>t.className='toast',3500);

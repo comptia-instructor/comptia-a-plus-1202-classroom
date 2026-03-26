@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Today's Video</title>
+<link rel="stylesheet" href="platform.css">
+<style>
+body { font-family: var(--sans); background: var(--bg); color: var(--tx); min-height: 100vh; }
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 32px 24px; }
+
+/* Search */
+.search-hero {
+  text-align: center;
+  padding: 40px 0 28px;
+}
+.sh-title {
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: var(--tx);
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.sh-title span { color: var(--acc); }
+.sh-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--tx3);
+  letter-spacing: .8px;
+  margin-bottom: 24px;
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: 8px;
+}
+.search-inp {
+  width: 100%;
+  background: var(--s2);
+  border: 2px solid var(--b2);
+  border-radius: 40px;
+  padding: 16px 20px 16px 52px;
+  color: var(--tx);
+  font-family: var(--sans);
+  font-size: 16px;
+  outline: none;
+  transition: border-color .2s;
+}
+.search-inp:focus { border-color: var(--acc); }
+.search-inp::placeholder { color: var(--tx3); }
+.search-icon {
+  position: absolute;
+  left: 18px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+}
+.search-hint {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  text-align: center;
+  letter-spacing: .5px;
+}
+
+/* Currently set banner */
+.current-banner {
+  background: linear-gradient(135deg, var(--grn-d), var(--acc-d));
+  border: 1.5px solid var(--grn);
+  border-radius: var(--rl);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: none;
+}
+.current-banner.show { display: block; }
+.cb-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--grn);
+  margin-bottom: 6px;
+}
+.cb-video {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  color: var(--tx);
+  margin-bottom: 3px;
+}
+.cb-chapter {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--tx2);
+}
+.cb-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Chapter groups */
+.chapter-group {
+  margin-bottom: 6px;
+  border-radius: var(--rl);
+  overflow: hidden;
+  border: 1px solid var(--b1);
+  background: var(--s1);
+}
+.ch-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  cursor: pointer;
+  transition: background .15s;
+  user-select: none;
+}
+.ch-header:hover { background: var(--s2); }
+.ch-header.open { background: var(--s2); border-bottom: 1px solid var(--b1); }
+.ch-num {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--acc);
+  min-width: 48px;
+}
+.ch-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tx);
+}
+.ch-count {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  letter-spacing: .3px;
+}
+.ch-arrow {
+  font-size: 12px;
+  color: var(--tx3);
+  transition: transform .2s;
+}
+.ch-header.open .ch-arrow { transform: rotate(90deg); }
+
+.ch-videos {
+  display: none;
+  padding: 6px 8px;
+}
+.ch-header.open + .ch-videos { display: block; }
+
+.video-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 2px;
+}
+.video-item:hover { background: var(--acc-d); }
+.video-item.current { background: var(--grn-d); border: 1px solid var(--grn); }
+.video-num {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--tx3);
+  min-width: 28px;
+  flex-shrink: 0;
+}
+.video-item.current .video-num { color: var(--grn); }
+.video-name {
+  flex: 1;
+  font-size: 12px;
+  color: var(--tx2);
+  font-weight: 500;
+}
+.video-item:hover .video-name { color: var(--tx); }
+.video-item.current .video-name { color: var(--grn); font-weight: 600; }
+.video-select-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--b2);
+  background: transparent;
+  color: var(--tx3);
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.video-item:hover .video-select-btn {
+  border-color: var(--acc);
+  color: var(--acc);
+  background: var(--acc-d);
+}
+.video-item.current .video-select-btn {
+  border-color: var(--grn);
+  color: var(--grn);
+  background: var(--grn-d);
+}
+
+/* No results */
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--tx3);
+  font-family: var(--mono);
+  font-size: 11px;
+  display: none;
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--s2); border: 1px solid var(--b2);
+  border-radius: var(--r); padding: 10px 16px;
+  font-family: var(--mono); font-size: 11px; color: var(--tx);
+  z-index: 1000; opacity: 0; transform: translateY(8px);
+  transition: all .25s; max-width: 300px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.ok  { border-color: var(--grn); color: var(--grn); }
+
+.btn { padding: 8px 18px; border-radius: var(--r); border: none; cursor: pointer; font-family: var(--display); font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { transform: translateY(-1px); }
+.btn-acc  { background: var(--acc); color: var(--bg); }
+.btn-grn  { background: var(--grn); color: var(--bg); }
+.btn-ghost { background: transparent; border: 1px solid var(--b2); color: var(--tx2); }
+.btn-ghost:hover { border-color: var(--b3); color: var(--tx); }
+.btn-sm { padding: 5px 12px; font-size: 10px; border-radius: 5px; }
+
+/* Back btn */
+#floatingBackBtn {
+  position: fixed; bottom: 20px; right: 20px;
+  background: rgba(5,8,16,0.92); border: 1.5px solid var(--acc);
+  color: var(--acc); font-family: var(--mono); font-size: 11px;
+  font-weight: 700; letter-spacing: .5px; padding: 10px 18px;
+  border-radius: 30px; cursor: pointer; z-index: 800;
+  text-decoration: none; display: flex; align-items: center; gap: 7px;
+  backdrop-filter: blur(12px); transition: all .2s;
+  box-shadow: 0 4px 20px rgba(0,200,255,0.15);
+}
+#floatingBackBtn:hover { background: rgba(0,200,255,0.15); transform: translateY(-2px); }
+</style>
+</head>
+<body class="platform-atmosphere">
+
+<div class="wrap">
+
+  <!-- Currently playing banner -->
+  <div class="current-banner" id="currentBanner">
+    <div class="cb-label">✓ Currently set — all tools updated</div>
+    <div class="cb-video" id="cbVideo">—</div>
+    <div class="cb-chapter" id="cbChapter">—</div>
+    <div class="cb-actions">
+      <a href="hub.html" class="btn btn-grn btn-sm">← Back to Hub</a>
+      <a href="comptia-classroom-v2.html" class="btn btn-acc btn-sm">Start Class →</a>
+    </div>
+  </div>
+
+  <!-- Hero search -->
+  <div class="search-hero">
+    <div class="sh-title">What video are you<br><span>watching today?</span></div>
+    <div class="sh-sub">Select a video to update all student content and the pacing guide</div>
+    <div class="search-box">
+      <div class="search-icon">🔍</div>
+      <input class="search-inp" type="text" id="searchInp"
+        placeholder="Type a video name or chapter…"
+        oninput="filterVideos(this.value)"
+        autocomplete="off">
+    </div>
+    <div class="search-hint">147 videos across 26 chapters · All data from your Udemy course</div>
+  </div>
+
+  <!-- Video list grouped by chapter -->
+  <div id="videoList"></div>
+  <div class="no-results" id="noResults">No videos match that search. Try a different keyword.</div>
+
+</div>
+
+<a id="floatingBackBtn" href="hub.html">← Hub</a>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── ALL 147 VIDEOS ────────────────────────────────────────
+const ALL_VIDEOS = [
+  // Ch.1
+  {num:7,  ch:'Ch.1',  title:'Safety and Professionalism', video:'Professional Communication, Part I'},
+  {num:8,  ch:'Ch.1',  title:'Safety and Professionalism', video:'Professional Communication, Part II'},
+  {num:9,  ch:'Ch.1',  title:'Safety and Professionalism', video:'Dealing with Difficult Customers'},
+  {num:10, ch:'Ch.1',  title:'Safety and Professionalism', video:'Physical Safety'},
+  {num:11, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Common Safety Procedures'},
+  // Ch.2
+  {num:12, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:"What's an Operating System?"},
+  {num:13, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Users and Super Users'},
+  {num:14, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Why Windows?'},
+  {num:15, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Touring Windows 10 and 11'},
+  {num:16, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Touring the macOS, Part I'},
+  {num:17, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Touring the macOS, Part II'},
+  {num:18, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Touring the macOS, Part III'},
+  {num:19, ch:'Ch.2',  title:'Introduction to Computers and Operating Systems', video:'Touring Linux'},
+  // Ch.7
+  {num:20, ch:'Ch.7',  title:'Power Supplies', video:'Power Protection'},
+  {num:21, ch:'Ch.7',  title:'Power Supplies', video:'Cooling Your System'},
+  // Ch.8
+  {num:22, ch:'Ch.8',  title:'Mass Storage Technologies', video:'Boot Order'},
+  // Ch.9
+  {num:23, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Understanding Partitioning'},
+  {num:24, ch:'Ch.9',  title:'Implementing Mass Storage', video:'MBR Partitioning'},
+  {num:25, ch:'Ch.9',  title:'Implementing Mass Storage', video:'GPT Partitioning'},
+  {num:26, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Understanding File Systems'},
+  {num:27, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Popular File Systems'},
+  {num:28, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Formatting in Action'},
+  {num:29, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Dynamic Disks'},
+  {num:30, ch:'Ch.9',  title:'Implementing Mass Storage', video:'New Installation - First Drive'},
+  {num:31, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Hardware RAID'},
+  {num:32, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Software RAID in Storage Spaces'},
+  {num:33, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Encrypting Mass Storage'},
+  {num:34, ch:'Ch.9',  title:'Implementing Mass Storage', video:'Maintaining Storage Disks'},
+  // Ch.10
+  {num:35, ch:'Ch.10', title:'Essential Peripherals', video:'Understanding USB'},
+  {num:36, ch:'Ch.10', title:'Essential Peripherals', video:'Webcams and Videoconferencing'},
+  // Ch.11
+  {num:37, ch:'Ch.11', title:'Installing and Upgrading Operating Systems', video:'Windows 11 Editions and Features'},
+  {num:38, ch:'Ch.11', title:'Installing and Upgrading Operating Systems', video:'Boot from Everything'},
+  {num:39, ch:'Ch.11', title:'Installing and Upgrading Operating Systems', video:'Installing and Upgrading Windows'},
+  {num:40, ch:'Ch.11', title:'Installing and Upgrading Operating Systems', video:'Post-installation Tasks'},
+  {num:41, ch:'Ch.11', title:'Installing and Upgrading Operating Systems', video:'Linux Features and Tools'},
+  {num:42, ch:'Ch.11', title:'Installing and Upgrading Operating Systems', video:'Installing and Upgrading Linux'},
+  {num:43, ch:'Ch.11', title:'Installing and Upgrading Operating Systems', video:'Upgrading macOS'},
+  // Ch.12
+  {num:44, ch:'Ch.12', title:'Working with Operating Systems', video:'The Task Manager'},
+  {num:45, ch:'Ch.12', title:'Working with Operating Systems', video:'Windows Settings'},
+  {num:46, ch:'Ch.12', title:'Working with Operating Systems', video:'MMC and Additional Tools'},
+  {num:47, ch:'Ch.12', title:'Working with Operating Systems', video:"What's the Registry?"},
+  {num:48, ch:'Ch.12', title:'Working with Operating Systems', video:'macOS Core Tools'},
+  // Ch.13
+  {num:49, ch:'Ch.13', title:'Users, Groups, and Permissions', video:'Introduction to Users and Groups'},
+  {num:50, ch:'Ch.13', title:'Users, Groups, and Permissions', video:'Managing Users and Groups'},
+  {num:51, ch:'Ch.13', title:'Users, Groups, and Permissions', video:'NTFS Permissions'},
+  {num:52, ch:'Ch.13', title:'Users, Groups, and Permissions', video:'Linux and macOS Permissions'},
+  {num:53, ch:'Ch.13', title:'Users, Groups, and Permissions', video:'File Explorer'},
+  {num:54, ch:'Ch.13', title:'Users, Groups, and Permissions', video:'Sharing Resources'},
+  {num:55, ch:'Ch.13', title:'Users, Groups, and Permissions', video:'Security Policies'},
+  // Ch.14
+  {num:56, ch:'Ch.14', title:'Maintaining and Optimizing Operating Systems', video:'Maintaining Windows'},
+  {num:57, ch:'Ch.14', title:'Maintaining and Optimizing Operating Systems', video:'Maintaining macOS'},
+  {num:58, ch:'Ch.14', title:'Maintaining and Optimizing Operating Systems', video:'Maintaining Linux'},
+  {num:59, ch:'Ch.14', title:'Maintaining and Optimizing Operating Systems', video:'Working with Applications'},
+  {num:60, ch:'Ch.14', title:'Maintaining and Optimizing Operating Systems', video:'Backing Up Your Data in Windows'},
+  {num:61, ch:'Ch.14', title:'Maintaining and Optimizing Operating Systems', video:'Backing Up Your Data in Linux and macOS'},
+  // Ch.15
+  {num:62, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Understanding the CLI'},
+  {num:63, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Navigating the CLI'},
+  {num:64, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Working with Folders'},
+  {num:65, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Working with Files'},
+  {num:66, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Working with Drives'},
+  {num:67, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Super Copy Commands'},
+  {num:68, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Command-Line Permissions'},
+  {num:69, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Advanced Windows Commands'},
+  {num:70, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Advanced Linux Commands, Part I'},
+  {num:71, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Advanced Linux Commands, Part II'},
+  {num:72, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Introduction to Scripting'},
+  {num:73, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Interpreted Languages'},
+  {num:74, ch:'Ch.15', title:'Working with the Command-Line Interface', video:'Scripting and the Terminal'},
+  // Ch.16
+  {num:75, ch:'Ch.16', title:'Troubleshooting Systems', video:'Windows Recovery Environment'},
+  {num:76, ch:'Ch.16', title:'Troubleshooting Systems', video:'Advanced Windows Startup Options'},
+  {num:77, ch:'Ch.16', title:'Troubleshooting Systems', video:'Troubleshooting Boot Problems'},
+  {num:78, ch:'Ch.16', title:'Troubleshooting Systems', video:'Troubleshooting at the GUI'},
+  {num:79, ch:'Ch.16', title:'Troubleshooting Systems', video:'Troubleshooting Applications'},
+  {num:80, ch:'Ch.16', title:'Troubleshooting Systems', video:'Kernel Panic'},
+  // Ch.17
+  {num:81, ch:'Ch.17', title:'Display Technologies', video:'Graphics Cards and Connections'},
+  {num:82, ch:'Ch.17', title:'Display Technologies', video:'Multiple Monitors'},
+  // Ch.18
+  {num:83, ch:'Ch.18', title:'Essentials of Networking', video:'Introduction to Networking'},
+  {num:84, ch:'Ch.18', title:'Essentials of Networking', video:'Hexadecimal'},
+  // Ch.19
+  {num:85, ch:'Ch.19', title:'TCP/IP Basics', video:'Introduction to TCP/IP'},
+  {num:86, ch:'Ch.19', title:'TCP/IP Basics', video:'Network IDs and Subnet Masks'},
+  {num:87, ch:'Ch.19', title:'TCP/IP Basics', video:'Special IP Addresses'},
+  {num:88, ch:'Ch.19', title:'TCP/IP Basics', video:'Network Address Translation (NAT)'},
+  {num:89, ch:'Ch.19', title:'TCP/IP Basics', video:'Dynamic IP Addressing'},
+  {num:90, ch:'Ch.19', title:'TCP/IP Basics', video:'Working with Connections'},
+  // Ch.20
+  {num:91, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Working with DNS'},
+  {num:92, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Windows Naming'},
+  {num:93, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Working with Workgroups'},
+  {num:94, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Working with Active Directory'},
+  {num:95, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Windows Sharing with macOS and Linux'},
+  {num:96, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'The net Command'},
+  {num:97, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Routers'},
+  {num:98, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Basic Router Configuration'},
+  {num:99, ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Firewall Configuration'},
+  {num:100,ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Windows Firewall'},
+  {num:101,ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Port Forwarding'},
+  {num:102,ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Advanced Router Configuration'},
+  {num:103,ch:'Ch.20', title:'OS Networking and Troubleshooting', video:'Virtual LANs (VLANs)'},
+  // Ch.21
+  {num:104,ch:'Ch.21', title:'Wireless Networking', video:'Wireless Network Hardware'},
+  {num:105,ch:'Ch.21', title:'Wireless Networking', video:'Basic WAP Setup'},
+  {num:106,ch:'Ch.21', title:'Wireless Networking', video:'Wireless Encryption'},
+  {num:107,ch:'Ch.21', title:'Wireless Networking', video:'Connecting to a Wi-Fi Network'},
+  {num:108,ch:'Ch.21', title:'Wireless Networking', video:'Enterprise Wireless'},
+  {num:109,ch:'Ch.21', title:'Wireless Networking', video:'Beyond Wi-Fi'},
+  {num:110,ch:'Ch.21', title:'Wireless Networking', video:'Troubleshooting Wireless Connections'},
+  // Ch.22
+  {num:111,ch:'Ch.22', title:'Internet and SOHO Networking', video:'Telnet and SSH'},
+  {num:112,ch:'Ch.22', title:'Internet and SOHO Networking', video:'Remote Desktop Connections'},
+  {num:113,ch:'Ch.22', title:'Internet and SOHO Networking', video:'The World Wide Web'},
+  {num:114,ch:'Ch.22', title:'Internet and SOHO Networking', video:'File Transfer Protocol (FTP)'},
+  {num:115,ch:'Ch.22', title:'Internet and SOHO Networking', video:'Proxy Servers'},
+  {num:116,ch:'Ch.22', title:'Internet and SOHO Networking', video:'Virtual Private Networks (VPN)'},
+  {num:117,ch:'Ch.22', title:'Internet and SOHO Networking', video:'Internet of Things (IoT)'},
+  {num:118,ch:'Ch.22', title:'Internet and SOHO Networking', video:'Troubleshooting Internet Connections'},
+  {num:119,ch:'Ch.22', title:'Internet and SOHO Networking', video:'Browser Security'},
+  // Ch.23
+  {num:120,ch:'Ch.23', title:'Virtualization, Cloud Computing, and AI', video:'Application Integration'},
+  {num:121,ch:'Ch.23', title:'Virtualization, Cloud Computing, and AI', video:'AI Policies and Procedures'},
+  {num:122,ch:'Ch.23', title:'Virtualization, Cloud Computing, and AI', video:'Limitations'},
+  {num:123,ch:'Ch.23', title:'Virtualization, Cloud Computing, and AI', video:'Private vs. Public'},
+  // Ch.24
+  {num:124,ch:'Ch.24', title:'Portable Computing', video:'Laptop Features'},
+  {num:125,ch:'Ch.24', title:'Portable Computing', video:'Laptop Hardware Troubleshooting - The Tools'},
+  {num:126,ch:'Ch.24', title:'Portable Computing', video:'Power Management'},
+  // Ch.25
+  {num:127,ch:'Ch.25', title:'Mobile Devices', video:'Touring Android'},
+  {num:128,ch:'Ch.25', title:'Mobile Devices', video:'Touring iOS'},
+  // Ch.26
+  {num:129,ch:'Ch.26', title:'Maintaining and Securing Mobile Devices', video:'Maintaining Mobile Devices'},
+  {num:130,ch:'Ch.26', title:'Maintaining and Securing Mobile Devices', video:'Mobile Devices and E-mail'},
+  {num:131,ch:'Ch.26', title:'Maintaining and Securing Mobile Devices', video:'Mobile Synchronization'},
+  {num:132,ch:'Ch.26', title:'Maintaining and Securing Mobile Devices', video:'Mobile Device Security'},
+  {num:133,ch:'Ch.26', title:'Maintaining and Securing Mobile Devices', video:'Mobile Security Troubleshooting'},
+  // Ch.27
+  {num:134,ch:'Ch.27', title:'Printers and Multifunction Devices', video:'Installing a Local Printer'},
+  {num:135,ch:'Ch.27', title:'Printers and Multifunction Devices', video:'Sharing Printers'},
+  // Ch.28
+  {num:136,ch:'Ch.28', title:'Essential Security Practices', video:'Threats'},
+  {num:137,ch:'Ch.28', title:'Essential Security Practices', video:'Dealing with Threats'},
+  {num:138,ch:'Ch.28', title:'Essential Security Practices', video:'Physical Security'},
+  {num:139,ch:'Ch.28', title:'Essential Security Practices', video:'Passwords and Authentication'},
+  {num:140,ch:'Ch.28', title:'Essential Security Practices', video:'Multifactor Authentication (MFA)'},
+  // Ch.29
+  {num:141,ch:'Ch.29', title:'Securing Endpoint Systems', video:'Malware, Part I'},
+  {num:142,ch:'Ch.29', title:'Securing Endpoint Systems', video:'Malware, Part II'},
+  {num:143,ch:'Ch.29', title:'Securing Endpoint Systems', video:'Anti-Malware'},
+  {num:144,ch:'Ch.29', title:'Securing Endpoint Systems', video:'Social Engineering'},
+  {num:145,ch:'Ch.29', title:'Securing Endpoint Systems', video:'Licensing'},
+  {num:146,ch:'Ch.29', title:'Securing Endpoint Systems', video:'Incident Response'},
+  {num:147,ch:'Ch.29', title:'Securing Endpoint Systems', video:'Environmental Controls'},
+  // Ch.30
+  {num:148,ch:'Ch.30', title:'Operational Procedures', video:'Documents You Need to Know'},
+  {num:149,ch:'Ch.30', title:'Operational Procedures', video:'Data You Need to Know'},
+  {num:150,ch:'Ch.30', title:'Operational Procedures', video:'Change Management'},
+  {num:151,ch:'Ch.30', title:'Operational Procedures', video:'The Zen of Backup'},
+  {num:152,ch:'Ch.30', title:'Operational Procedures', video:'Recycling and Data Destruction'},
+  {num:153,ch:'Ch.30', title:'Operational Procedures', video:'Ticketing Systems'},
+];
+
+// ── STATE ──────────────────────────────────────────────
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function sl(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+let currentVideo = ls('today_video', null);
+let currentFilter = '';
+
+// ── INIT ──────────────────────────────────────────────
+function init() {
+  // Redirect non-teachers
+  if (localStorage.getItem('teacher_unlocked') !== 'true') {
+    window.location.href = 'hub.html';
+    return;
+  }
+  renderCurrentBanner();
+  renderVideoList('');
+  document.getElementById('searchInp').focus();
+}
+
+// ── CURRENT BANNER ────────────────────────────────────
+function renderCurrentBanner() {
+  const v = ls('today_video', null);
+  const banner = document.getElementById('currentBanner');
+  if (v) {
+    document.getElementById('cbVideo').textContent = v.video;
+    document.getElementById('cbChapter').textContent = v.ch + ' · ' + v.title;
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+// ── SELECT A VIDEO ─────────────────────────────────────
+function selectVideo(num) {
+  const v = ALL_VIDEOS.find(x => x.num === num);
+  if (!v) return;
+
+  // Save to localStorage — all tools read from these keys
+  sl('today_video', v);
+  sl('today_video_name', v.video);
+  sl('today_chapter', v.ch);
+  sl('today_chapter_title', v.title);
+  sl('today_video_num', v.num);
+
+  // Also update the video-index based day number
+  // Find which "day" this video falls on based on sequential order
+  const idx = ALL_VIDEOS.findIndex(x => x.num === v.num);
+  // Map video index to approximate day (147 videos / 68 days ≈ 2.16 per day)
+  const approxDay = Math.min(68, Math.ceil((idx + 1) / ALL_VIDEOS.length * 68));
+  sl('current_day', approxDay);
+
+  // Sync to legacy keys used by other tools
+  sl('scc_today_video', v.video);
+  sl('scc_today_chapter', v.ch);
+  localStorage.setItem('current_video_num', String(v.num));
+
+  currentVideo = v;
+  renderCurrentBanner();
+  renderVideoList(currentFilter);
+  toast('✓ Set! All tools updated — ' + v.video, 'ok');
+}
+
+// ── RENDER VIDEO LIST ──────────────────────────────────
+function renderVideoList(query) {
+  currentFilter = query;
+  const q = query.trim().toLowerCase();
+
+  // Filter videos
+  const filtered = q
+    ? ALL_VIDEOS.filter(v =>
+        v.video.toLowerCase().includes(q) ||
+        v.ch.toLowerCase().includes(q) ||
+        v.title.toLowerCase().includes(q) ||
+        String(v.num).includes(q)
+      )
+    : ALL_VIDEOS;
+
+  if (!filtered.length) {
+    document.getElementById('videoList').innerHTML = '';
+    document.getElementById('noResults').style.display = 'block';
+    return;
+  }
+  document.getElementById('noResults').style.display = 'none';
+
+  // Group by chapter
+  const groups = {};
+  filtered.forEach(v => {
+    if (!groups[v.ch]) groups[v.ch] = { title: v.title, ch: v.ch, videos: [] };
+    groups[v.ch].videos.push(v);
+  });
+
+  const isCurrent = v => currentVideo && currentVideo.num === v.num;
+
+  // When searching, auto-expand all groups; otherwise collapsed by default
+  const autoExpand = q.length > 0;
+
+  document.getElementById('videoList').innerHTML = Object.values(groups).map(g => `
+    <div class="chapter-group">
+      <div class="ch-header ${autoExpand ? 'open' : ''}" onclick="toggleChapter(this)">
+        <div class="ch-num">${g.ch}</div>
+        <div class="ch-title">${g.title}</div>
+        <div class="ch-count">${g.videos.length} video${g.videos.length !== 1 ? 's' : ''}</div>
+        <div class="ch-arrow">›</div>
+      </div>
+      <div class="ch-videos">
+        ${g.videos.map(v => `
+          <div class="video-item ${isCurrent(v) ? 'current' : ''}" onclick="selectVideo(${v.num})">
+            <div class="video-num">#${v.num}</div>
+            <div class="video-name">${v.video}</div>
+            <button class="video-select-btn" onclick="event.stopPropagation();selectVideo(${v.num})">
+              ${isCurrent(v) ? '✓ Current' : 'Select'}
+            </button>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  // Auto-expand if currently selected chapter is in view
+  if (!autoExpand && currentVideo) {
+    const headers = document.querySelectorAll('.ch-header');
+    headers.forEach(h => {
+      const num = h.querySelector('.ch-num')?.textContent;
+      if (num === currentVideo.ch) h.classList.add('open');
+    });
+  }
+}
+
+function filterVideos(q) {
+  renderVideoList(q);
+}
+
+function toggleChapter(el) {
+  el.classList.toggle('open');
+}
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast', 3500);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -247,6 +247,120 @@ input::placeholder{color:var(--tx3)}
 .progress-ring::after{content:'';position:absolute;width:44px;height:44px;border-radius:50%;background:var(--s2)}
 .pr-num{position:relative;z-index:1;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--tx)}
 
+
+/* ── DAILY ROUTINE MODE ── */
+.routine-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 600;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  text-align: center;
+}
+.routine-overlay.active { display: flex; }
+.routine-phase-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--tx3);
+  margin-bottom: 10px;
+}
+.routine-phase-num {
+  font-family: var(--display);
+  font-size: clamp(80px, 15vw, 140px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -4px;
+  margin-bottom: 10px;
+}
+.routine-phase-name {
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--tx);
+  margin-bottom: 12px;
+  line-height: 1.1;
+}
+.routine-phase-desc {
+  font-size: 14px;
+  color: var(--tx2);
+  line-height: 1.8;
+  max-width: 480px;
+  margin: 0 auto 28px;
+}
+.routine-action-btn {
+  padding: 16px 40px;
+  border-radius: 40px;
+  border: none;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.routine-action-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.routine-progress {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.rp-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--b2);
+  transition: all .3s;
+}
+.rp-dot.done   { background: var(--grn); }
+.rp-dot.active { background: var(--acc); width: 28px; border-radius: 5px; }
+.routine-exit {
+  position: absolute;
+  top: 20px; right: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--tx3);
+  cursor: pointer;
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  padding: 6px 14px;
+  border-radius: 20px;
+  transition: all .15s;
+}
+.routine-exit:hover { border-color: var(--b2); color: var(--tx2); }
+.routine-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.routine-nav-btn {
+  padding: 10px 24px;
+  border-radius: 20px;
+  border: 1.5px solid var(--b2);
+  background: transparent;
+  color: var(--tx2);
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .15s;
+}
+.routine-nav-btn:hover { border-color: var(--b3); color: var(--tx); }
+.routine-nav-btn.primary { background: var(--acc); border-color: var(--acc); color: var(--bg); }
+.routine-nav-btn.primary:hover { background: var(--acc2); }
+
 /* Student Login */
 .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 57px);gap:20px;padding:40px}
 .login-screen h2{font-size:24px;font-weight:700;letter-spacing:-.5px}
@@ -272,6 +386,11 @@ input::placeholder{color:var(--tx3)}
     <div class="header-sub">220-1202 · 68 days · 147 videos</div>
   </div>
   <div class="header-right">
+    <button class="teacher-only" onclick="startRoutine()"
+      style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;padding:6px 14px;border-radius:6px;border:1.5px solid var(--acc);background:var(--acc-d);color:var(--acc);cursor:pointer;transition:all .15s;margin-right:8px"
+      title="Show students one phase at a time on the projector">
+      ▶ Routine Mode
+    </button>
     <div class="mode-toggle">
       <button class="mode-btn active" onclick="setMode('teacher')" id="mTeacher">Teacher</button>
       <button class="mode-btn" onclick="setMode('student')" id="mStudent">Student</button>
@@ -295,6 +414,11 @@ input::placeholder{color:var(--tx3)}
   <!-- TEACHER VIEW -->
   <div id="tvTeacher">
     <div class="top-nav" id="teacherNav"></div>
+    <div style="padding:8px 12px;background:var(--s2);border-bottom:1px solid var(--b1);display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.5px;margin-right:4px">PUSH TO STUDENTS:</span>
+      <div id="phasePushBar" style="display:flex;gap:5px;flex:1;flex-wrap:wrap"></div>
+      <button onclick="endClass()" style="font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid var(--b2);background:transparent;color:var(--tx3);cursor:pointer">End Class</button>
+    </div>
 
     <!-- 1. OVERVIEW -->
     <div class="panel active" id="tp-overview">
@@ -349,11 +473,57 @@ input::placeholder{color:var(--tx3)}
       <div class="card">
         <div class="card-top">
           <span class="tag purple">Phase 2</span>
-          <h2>Scenario Questions · 2 Scenarios</h2>
+          <h2>Scenario Questions</h2>
           <button class="btn btn-acc btn-sm" onclick="genScenarios()" id="btnScenario">Generate</button>
         </div>
         <div class="card-body" id="scenarioBody">
           <div class="empty-state"><div class="ei">🎯</div><h3>Ready to generate</h3><p>Scenario questions based on today's video topics.</p></div>
+        </div>
+      </div>
+
+      <!-- LIVE DISCUSSION INPUT — teacher types, students see instantly -->
+      <div class="card" style="margin-top:12px;border-color:var(--amb)">
+        <div class="card-top">
+          <span class="tag amber">Live Discussion</span>
+          <h2>Type Questions for Students</h2>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-left:auto">Students see these instantly</span>
+        </div>
+        <div class="card-body">
+          <div id="liveDiscWall" style="margin-bottom:14px;display:none">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+              <span>STUDENT RESPONSES</span>
+              <span id="liveDiscCount" style="color:var(--amb)">0 responses</span>
+            </div>
+            <div id="liveDiscResponses" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px" id="liveDiscSlots">
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <div style="font-family:var(--display);font-size:13px;font-weight:800;color:var(--amb);min-width:24px;padding-top:10px">Q1</div>
+              <input id="liveQ1" placeholder="Type a discussion question — students see it as you type…" oninput="pushLiveDisc()"
+                style="flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 13px;color:var(--tx);font-size:13px;outline:none;transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--amb)'" onblur="this.style.borderColor='var(--b2)'">
+              <span id="liveQ1status" style="font-size:16px;padding-top:8px;min-width:20px"></span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <div style="font-family:var(--display);font-size:13px;font-weight:800;color:var(--amb);min-width:24px;padding-top:10px">Q2</div>
+              <input id="liveQ2" placeholder="Optional second question…" oninput="pushLiveDisc()"
+                style="flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 13px;color:var(--tx);font-size:13px;outline:none;transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--amb)'" onblur="this.style.borderColor='var(--b2)'">
+              <span id="liveQ2status" style="font-size:16px;padding-top:8px;min-width:20px"></span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <div style="font-family:var(--display);font-size:13px;font-weight:800;color:var(--amb);min-width:24px;padding-top:10px">Q3</div>
+              <input id="liveQ3" placeholder="Optional third question…" oninput="pushLiveDisc()"
+                style="flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 13px;color:var(--tx);font-size:13px;outline:none;transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--amb)'" onblur="this.style.borderColor='var(--b2)'">
+              <span id="liveQ3status" style="font-size:16px;padding-top:8px;min-width:20px"></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="clearLiveDisc()">Clear</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleLiveWall()">View Responses</button>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--grn);margin-left:auto" id="liveDiscPushedMsg"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -458,6 +628,16 @@ input::placeholder{color:var(--tx3)}
 
   <!-- STUDENT VIEW -->
   <div id="tvStudent" style="display:none">
+  <!-- Phase instruction bar — always visible -->
+  <div id="phaseInstructionBar" style="background:var(--acc-d);border-bottom:1px solid var(--acc);padding:10px 20px;display:flex;align-items:center;gap:12px">
+    <span id="phaseBarIcon" style="font-size:20px">⏳</span>
+    <div style="flex:1">
+      <div id="phaseBarTitle" style="font-family:var(--display);font-size:14px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Waiting for teacher to start class</div>
+      <div id="phaseBarDesc" style="font-size:11px;color:var(--tx2);margin-top:1px">Your teacher will advance each phase. Follow along on your Chromebook.</div>
+    </div>
+    <div id="phaseBarStep" style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;white-space:nowrap"></div>
+  </div>
+
     <!-- Login -->
     <div class="login-screen" id="sLogin">
       <div style="font-family:var(--mono);font-size:48px;color:var(--acc);letter-spacing:-2px">A+</div>
@@ -466,134 +646,58 @@ input::placeholder{color:var(--tx3)}
       <input class="login-code-input" id="sCodeInput" placeholder="STU-001" maxlength="8" oninput="this.value=this.value.toUpperCase()">
       <button class="btn btn-grn" onclick="studentLogin()" style="width:220px;justify-content:center">Enter Classroom</button>
     </div>
-    <!-- Dashboard -->
+    <!-- Dashboard — phase driven, teacher controls student screens -->
     <div id="sDash" style="display:none">
-      <div class="top-nav" id="studentNav"></div>
-      <!-- s-cold -->
-      <div class="panel active" id="sp-cold">
-        <div class="card">
-          <div class="card-top"><span class="tag blue">Cold Retrieval</span><h2>5 Questions · Practice Only</h2><span class="tag" id="sColdTag">Waiting</span></div>
-          <div class="card-body" id="sColdBody"><div class="empty-state"><div class="ei">⏳</div><h3>Waiting for teacher</h3></div></div>
+      <!-- PHASE DISPLAY — single view, teacher controlled -->
+      <div id="sPhaseDisplay" style="padding:20px;max-width:800px;margin:0 auto">
+        <div id="sWaiting" style="text-align:center;padding:60px 20px">
+          <div style="font-size:64px;margin-bottom:20px">📡</div>
+          <div style="font-family:var(--display);font-size:28px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--tx);margin-bottom:10px">Waiting for class to start</div>
+          <div style="font-size:13px;color:var(--tx2);line-height:1.8;max-width:380px;margin:0 auto">Your teacher will start each phase.<br>This screen updates automatically.</div>
+          <div style="margin-top:24px;font-family:var(--mono);font-size:10px;color:var(--tx3)">● Connected — waiting for teacher</div>
+        </div>
+        <div id="sPhaseContent" style="display:none"></div>
+        <div id="sPhaseComplete" style="display:none;text-align:center;padding:40px 20px">
+          <div style="font-size:56px;margin-bottom:16px">✅</div>
+          <div style="font-family:var(--display);font-size:24px;font-weight:900;color:var(--grn);text-transform:uppercase;margin-bottom:8px">Phase Complete</div>
+          <div style="font-size:13px;color:var(--tx2);line-height:1.8">Good work. Wait for your teacher to advance to the next phase.</div>
+          <div style="margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--tx3)">● Waiting for next phase…</div>
         </div>
       </div>
-      <!-- s-scenario -->
-      <div class="panel" id="sp-scenario">
-        <div class="card">
-          <div class="card-top"><span class="tag purple">Scenarios</span><h2>2 Scenario Questions</h2></div>
-          <div class="card-body" id="sScenBody"><div class="empty-state"><div class="ei">⏳</div><h3>Waiting for teacher</h3></div></div>
-        </div>
+      <!-- Hidden compat elements for existing render functions -->
+      <div style="display:none">
+        <div id="sp-cold"><div id="sColdBody"></div></div>
+        <div id="sp-scenario"><div id="sScenBody"></div></div>
+        <div id="sp-notes"></div>
+        <div id="sp-discussion"><div id="sDiscBody"></div></div>
+        <div id="sp-timed"><div id="sTimedBody"></div></div>
+        <div id="sp-flash"><div id="flashBody"></div></div>
+        <div id="sp-exam"><div id="examBody"></div></div>
+        <div id="sp-guide"><div id="sGuideBody"></div></div>
+        <input id="sqQ"><input id="sqA"><input id="sqB"><input id="sqC"><input id="sqD">
+        <select id="sqCorrect"><option>A</option><option>B</option><option>C</option><option>D</option></select>
+        <select id="flashFilter"><option value="all">All</option><option value="missed">Missed</option></select>
+        <span id="sColdTag"></span><span id="sTimedTag"></span>
       </div>
-      <!-- s-notes (STRUCTURED) -->
-      <div class="panel" id="sp-notes">
-        <div class="card">
-          <div class="card-top"><span class="tag amber">Notes</span><h2>Guided Notes</h2>
-            <button class="btn btn-acc btn-sm" onclick="saveNotes()">Save</button>
-          </div>
-          <div class="card-body">
-            <p style="font-size:11px;color:var(--tx3);margin-bottom:14px;line-height:1.6;font-family:var(--mono)">Fill in each section while watching. Your notes power the closing questions.</p>
-            <div class="notes-grid">
-              <div class="note-section">
-                <div class="note-section-header"><span class="note-section-icon">🔑</span><span class="note-section-title">Key Terms & Definitions</span></div>
-                <textarea class="note-textarea" id="nTerms" placeholder="Term: definition&#10;Term: definition&#10;…" rows="6"></textarea>
-              </div>
-              <div class="note-section">
-                <div class="note-section-header"><span class="note-section-icon">⚙️</span><span class="note-section-title">How It Works</span></div>
-                <textarea class="note-textarea" id="nHow" placeholder="Explain the main process or concept in your own words…" rows="6"></textarea>
-              </div>
-              <div class="note-section">
-                <div class="note-section-header"><span class="note-section-icon">🌐</span><span class="note-section-title">Real-World Connection</span></div>
-                <textarea class="note-textarea" id="nReal" placeholder="Where would a technician use this? What problem does it solve?" rows="5"></textarea>
-              </div>
-              <div class="note-section">
-                <div class="note-section-header"><span class="note-section-icon">⚠️</span><span class="note-section-title">Common Mistakes / Traps</span></div>
-                <textarea class="note-textarea" id="nTraps" placeholder="What might trip you up on the exam? What are easy mistakes?" rows="5"></textarea>
-              </div>
-            </div>
-            <div class="note-section" style="margin-top:12px">
-              <div class="note-section-header"><span class="note-section-icon">❓</span><span class="note-section-title">My Question (for the bank)</span></div>
-              <textarea class="note-textarea" id="nQuestion" placeholder="Write one question you could ask a classmate about today's content…" rows="3"></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- s-discussion -->
-      <div class="panel" id="sp-discussion">
-        <div class="card">
-          <div class="card-top"><span class="tag amber">Discussion</span><h2>Respond to Prompts</h2></div>
-          <div class="card-body" id="sDiscBody"><div class="empty-state"><div class="ei">💬</div><h3>Waiting for teacher</h3></div></div>
-        </div>
-      </div>
-      <!-- s-sq -->
-      <div class="panel" id="sp-sq">
-        <div class="card">
-          <div class="card-top"><span class="tag green">Submit Question</span><h2>Create a Question</h2></div>
-          <div class="card-body">
-            <p style="font-size:12px;color:var(--tx2);margin-bottom:14px;line-height:1.7">Write a question from today's lesson. It gets cleaned to CompTIA format and may appear on a future cold retrieval!</p>
-            <input type="text" id="sqQ" placeholder="Your question…" style="margin-bottom:8px">
-            <div class="two-col" style="gap:8px;margin-bottom:8px">
-              <input type="text" id="sqA" placeholder="Option A">
-              <input type="text" id="sqB" placeholder="Option B">
-              <input type="text" id="sqC" placeholder="Option C">
-              <input type="text" id="sqD" placeholder="Option D">
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-              <span style="font-size:12px;color:var(--tx3)">Correct:</span>
-              <select id="sqCorrect" style="background:var(--s3);border:1px solid var(--b1);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;outline:none">
-                <option>A</option><option>B</option><option>C</option><option>D</option>
-              </select>
-              <button class="btn btn-grn btn-sm" onclick="submitSQ()" style="margin-left:auto">Submit Question</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- s-timed -->
-      <div class="panel" id="sp-timed">
-        <div class="card">
-          <div class="card-top"><span class="tag red">Timed Practice</span><h2>Closing 5 · Graded</h2><span class="tag" id="sTimedTag">Waiting</span></div>
-          <div class="card-body" id="sTimedBody"><div class="empty-state"><div class="ei">⏳</div><h3>Waiting for teacher</h3></div></div>
-        </div>
-      </div>
-      <!-- s-flashcards -->
-      <div class="panel" id="sp-flash">
-        <div class="card">
-          <div class="card-top"><span class="tag cyan">Flashcards</span><h2>Question Bank Drill</h2>
-            <select id="flashFilter" onchange="initFlash()" style="background:var(--s3);border:1px solid var(--b1);border-radius:6px;padding:5px 10px;color:var(--tx);font-size:11px;outline:none">
-              <option value="all">All questions</option>
-              <option value="missed">Missed only</option>
-            </select>
-          </div>
-          <div class="card-body" id="flashBody">
-            <div class="empty-state"><div class="ei">🃏</div><h3>No questions yet</h3><p>Questions appear here as students submit them throughout the course.</p></div>
-          </div>
-        </div>
-      </div>
-      <!-- s-exam -->
-      <div class="panel" id="sp-exam">
-        <div class="card">
-          <div class="card-top"><span class="tag red">Exam Sim</span><h2>Practice Exam · 10 Questions · 20 min</h2></div>
-          <div class="card-body" id="examBody">
-            <div class="empty-state">
-              <div class="ei">🎓</div>
-              <h3>Ready for a practice exam?</h3>
-              <p>10 random questions from across all chapters. Timed. Scored like the real thing.</p>
-              <button class="btn btn-grn" onclick="startExam()" style="margin-top:16px">Start Practice Exam</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- s-guide -->
-      <div class="panel" id="sp-guide">
-        <div class="card">
-          <div class="card-top"><span class="tag cyan">Study Guide</span><h2>My Study Guide</h2></div>
-          <div class="card-body" id="sGuideBody">
-            <div class="empty-state"><div class="ei">📖</div><h3>No guide yet</h3><p>Your teacher will generate the study guide for today's chapter.</p></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div><!-- /tvStudent -->
 
 </div><!-- /content -->
+
+<!-- Daily Routine Mode Overlay -->
+<div class="routine-overlay" id="routineOverlay">
+  <button class="routine-exit" onclick="exitRoutine()">✕ Exit Routine Mode</button>
+  <div class="routine-phase-label" id="rPhaseLabel">Phase 1 of 4</div>
+  <div class="routine-progress" id="rProgress"></div>
+  <div class="routine-phase-num" id="rPhaseNum" style="color:var(--acc)">1</div>
+  <div class="routine-phase-name" id="rPhaseName">Cold Retrieval</div>
+  <div class="routine-phase-desc" id="rPhaseDesc">Open your Chromebook and answer 5 warm-up questions from previous lessons. This is not graded — it helps your brain wake up and remember what you learned before.</div>
+  <a id="rActionBtn" href="comptia-classroom-v2.html" class="routine-action-btn" style="background:var(--acc);color:var(--bg)">Start Cold Retrieval →</a>
+  <div class="routine-nav">
+    <button class="routine-nav-btn" onclick="prevRoutineStep()" id="rPrevBtn">← Back</button>
+    <button class="routine-nav-btn primary" onclick="nextRoutineStep()" id="rNextBtn">Next Phase →</button>
+  </div>
+</div>
+
 </main>
 </div><!-- /app -->
 
@@ -601,12 +705,129 @@ input::placeholder{color:var(--tx3)}
 
 <script src="platform.js"></script>
 <script>
+
+// ── LOGIN TRACKING ──────────────────────────────────────
+(function trackLogin() {
+  try {
+    var code = localStorage.getItem('PLATFORM_CODE');
+    if (!code) return;
+    code = JSON.parse(code);
+    if (!code || code === 'TEACHER') return;
+
+    var today = new Date().toDateString();
+    var tool  = document.title.replace('CompTIA A+ · ','').trim();
+    var key   = 'login_log';
+    var log   = [];
+    try { log = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+
+    // Only log once per tool per day
+    var alreadyLogged = log.some(function(e) {
+      return e.code === code && e.date === today && e.tool === tool;
+    });
+
+    if (!alreadyLogged) {
+      log.unshift({
+        code:  code,
+        date:  today,
+        time:  new Date().toLocaleTimeString(),
+        tool:  tool,
+        ts:    Date.now()
+      });
+      // Keep last 1000 entries
+      localStorage.setItem(key, JSON.stringify(log.slice(0, 1000)));
+
+      // Sync to Google Sheets if connected
+      var syncUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+      if (syncUrl) {
+        try { syncUrl = JSON.parse(syncUrl); } catch(e) {}
+        if (syncUrl && syncUrl.includes('script.google.com')) {
+          fetch(syncUrl + '?action=save_login&code=' + encodeURIComponent(code) +
+            '&tool=' + encodeURIComponent(tool) +
+            '&date=' + encodeURIComponent(today) +
+            '&time=' + encodeURIComponent(new Date().toLocaleTimeString()),
+            { mode: 'cors' }
+          ).catch(function(){});
+        }
+      }
+    }
+  } catch(e) {}
+})();
+
 // Fallback storage helpers (in case platform.js loads async)
 if(typeof pls==='undefined'){window.pls=function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};window.psl=function(k,v){localStorage.setItem(k,JSON.stringify(v));};}
 // ════════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════════
-const DAYS = [{"day":1,"videos":[{"num":7,"title":"Professional Communication, Part I","min":8,"section":"Chapter 1: Safety and Professionalism","minutes_today":8},{"num":8,"title":"Professional Communication, Part II","min":7,"section":"Chapter 1: Safety and Professionalism","minutes_today":6}],"total_min":14},{"day":2,"videos":[{"num":8,"title":"Professional Communication, Part II","min":7,"section":"Chapter 1: Safety and Professionalism","minutes_today":1},{"num":9,"title":"Dealing with Difficult Customers","min":6,"section":"Chapter 1: Safety and Professionalism","minutes_today":6},{"num":10,"title":"Physical Safety","min":3,"section":"Chapter 1: Safety and Professionalism","minutes_today":3},{"num":11,"title":"Common Safety Procedures","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":4}],"total_min":14},{"day":3,"videos":[{"num":11,"title":"Common Safety Procedures","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":2},{"num":12,"title":"What's an Operating System?","min":8,"section":"Chapter 2: Introduction to Computers","minutes_today":8},{"num":13,"title":"Users and Super Users","min":5,"section":"Chapter 2: Introduction to Computers","minutes_today":4}],"total_min":14},{"day":4,"videos":[{"num":13,"title":"Users and Super Users","min":5,"section":"Chapter 2: Introduction to Computers","minutes_today":1},{"num":14,"title":"Why Windows?","min":7,"section":"Chapter 2: Introduction to Computers","minutes_today":7},{"num":15,"title":"Touring Windows 10 and 11","min":9,"section":"Chapter 2: Introduction to Computers","minutes_today":6}],"total_min":14},{"day":5,"videos":[{"num":15,"title":"Touring Windows 10 and 11","min":9,"section":"Chapter 2: Introduction to Computers","minutes_today":3},{"num":16,"title":"Touring the macOS, Part I","min":10,"section":"Chapter 2: Introduction to Computers","minutes_today":10},{"num":17,"title":"Touring the macOS, Part II","min":7,"section":"Chapter 2: Introduction to Computers","minutes_today":1}],"total_min":14},{"day":6,"videos":[{"num":17,"title":"Touring the macOS, Part II","min":7,"section":"Chapter 2: Introduction to Computers","minutes_today":6},{"num":18,"title":"Touring the macOS, Part III","min":3,"section":"Chapter 2: Introduction to Computers","minutes_today":3},{"num":19,"title":"Touring Linux","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":5}],"total_min":14},{"day":7,"videos":[{"num":19,"title":"Touring Linux","min":6,"section":"Chapter 2: Introduction to Computers","minutes_today":1},{"num":20,"title":"Power Protection","min":8,"section":"Chapter 7: Power Supplies","minutes_today":8},{"num":21,"title":"Cooling Your System","min":8,"section":"Chapter 7: Power Supplies","minutes_today":5}],"total_min":14},{"day":8,"videos":[{"num":21,"title":"Cooling Your System","min":8,"section":"Chapter 7: Power Supplies","minutes_today":3},{"num":22,"title":"Boot Order","min":7,"section":"Chapter 8: Mass Storage Technologies","minutes_today":7},{"num":23,"title":"Understanding Partitioning","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":4}],"total_min":14},{"day":9,"videos":[{"num":23,"title":"Understanding Partitioning","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":3},{"num":24,"title":"MBR Partitioning","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6},{"num":25,"title":"GPT Partitioning","min":5,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5}],"total_min":14},{"day":10,"videos":[{"num":26,"title":"Understanding File Systems","min":8,"section":"Chapter 9: Implementing Mass Storage","minutes_today":8},{"num":27,"title":"Popular File Systems","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6}],"total_min":14},{"day":11,"videos":[{"num":27,"title":"Popular File Systems","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":1},{"num":28,"title":"Formatting in Action","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6},{"num":29,"title":"Dynamic Disks","min":5,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5},{"num":30,"title":"New Installation - First Drive","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":2}],"total_min":14},{"day":12,"videos":[{"num":30,"title":"New Installation - First Drive","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5},{"num":31,"title":"Hardware RAID","min":8,"section":"Chapter 9: Implementing Mass Storage","minutes_today":8},{"num":32,"title":"Software RAID in Storage Spaces","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":1}],"total_min":14},{"day":13,"videos":[{"num":32,"title":"Software RAID in Storage Spaces","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":6},{"num":33,"title":"Encrypting Mass Storage","min":7,"section":"Chapter 9: Implementing Mass Storage","minutes_today":7},{"num":34,"title":"Maintaining Storage Disks","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":1}],"total_min":14},{"day":14,"videos":[{"num":34,"title":"Maintaining Storage Disks","min":6,"section":"Chapter 9: Implementing Mass Storage","minutes_today":5},{"num":35,"title":"Understanding USB","min":8,"section":"Chapter 10: Essential Peripherals","minutes_today":8},{"num":36,"title":"Webcams and Videoconferencing","min":6,"section":"Chapter 10: Essential Peripherals","minutes_today":1}],"total_min":14},{"day":15,"videos":[{"num":36,"title":"Webcams and Videoconferencing","min":6,"section":"Chapter 10: Essential Peripherals","minutes_today":5},{"num":37,"title":"Windows 11 Editions and Features","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":6},{"num":38,"title":"Boot from Everything","min":5,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":3}],"total_min":14},{"day":16,"videos":[{"num":38,"title":"Boot from Everything","min":5,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":2},{"num":39,"title":"Installing and Upgrading Windows","min":7,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":7},{"num":40,"title":"Post-installation Tasks","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":5}],"total_min":14},{"day":17,"videos":[{"num":40,"title":"Post-installation Tasks","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":1},{"num":41,"title":"Linux Features and Tools","min":8,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":8},{"num":42,"title":"Installing and Upgrading Linux","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":5}],"total_min":14},{"day":18,"videos":[{"num":42,"title":"Installing and Upgrading Linux","min":6,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":1},{"num":43,"title":"Upgrading macOS","min":5,"section":"Chapter 11: Installing and Upgrading OS","minutes_today":5},{"num":44,"title":"The Task Manager","min":8,"section":"Chapter 12: Working with Operating Systems","minutes_today":8}],"total_min":14},{"day":19,"videos":[{"num":45,"title":"Windows Settings","min":6,"section":"Chapter 12: Working with Operating Systems","minutes_today":6},{"num":46,"title":"MMC and Additional Tools","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":7},{"num":47,"title":"What is the Registry?","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":1}],"total_min":14},{"day":20,"videos":[{"num":47,"title":"What is the Registry?","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":6},{"num":48,"title":"macOS Core Tools","min":7,"section":"Chapter 12: Working with Operating Systems","minutes_today":7},{"num":50,"title":"Introduction to Users and Groups","min":8,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":1}],"total_min":14},{"day":21,"videos":[{"num":50,"title":"Introduction to Users and Groups","min":8,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":7},{"num":51,"title":"Managing Users and Groups","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":6},{"num":52,"title":"NTFS Permissions","min":7,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":1}],"total_min":14},{"day":22,"videos":[{"num":52,"title":"NTFS Permissions","min":7,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":6},{"num":53,"title":"Linux and macOS Permissions","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":6},{"num":54,"title":"File Explorer","min":5,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":2}],"total_min":14},{"day":23,"videos":[{"num":54,"title":"File Explorer","min":5,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":3},{"num":55,"title":"Sharing Resources","min":7,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":7},{"num":56,"title":"Security Policies","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":4}],"total_min":14},{"day":24,"videos":[{"num":56,"title":"Security Policies","min":6,"section":"Chapter 13: Users, Groups, and Permissions","minutes_today":2},{"num":57,"title":"Maintaining Windows","min":5,"section":"Chapter 14: Maintaining OS","minutes_today":5},{"num":58,"title":"Maintaining macOS","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":7}],"total_min":14},{"day":25,"videos":[{"num":59,"title":"Maintaining Linux","min":6,"section":"Chapter 14: Maintaining OS","minutes_today":6},{"num":60,"title":"Working with Applications","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":7},{"num":61,"title":"Backing Up Your Data in Windows","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":1}],"total_min":14},{"day":26,"videos":[{"num":61,"title":"Backing Up Your Data in Windows","min":7,"section":"Chapter 14: Maintaining OS","minutes_today":6},{"num":62,"title":"Backing Up in Linux and macOS","min":6,"section":"Chapter 14: Maintaining OS","minutes_today":6},{"num":63,"title":"Understanding the CLI","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":2}],"total_min":14},{"day":27,"videos":[{"num":63,"title":"Understanding the CLI","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":6},{"num":64,"title":"Navigating the CLI","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":65,"title":"Working with Folders","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":3}],"total_min":14},{"day":28,"videos":[{"num":65,"title":"Working with Folders","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":66,"title":"Working with Files","min":6,"section":"Chapter 15: Command-Line Interface","minutes_today":6},{"num":67,"title":"Working with Drives","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":3}],"total_min":14},{"day":29,"videos":[{"num":67,"title":"Working with Drives","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":2},{"num":68,"title":"Super Copy Commands","min":7,"section":"Chapter 15: Command-Line Interface","minutes_today":7},{"num":69,"title":"Command-Line Permissions","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":5}],"total_min":14},{"day":30,"videos":[{"num":69,"title":"Command-Line Permissions","min":8,"section":"Chapter 15: Command-Line Interface","minutes_today":3},{"num":70,"title":"Advanced Windows Commands","min":7,"section":"Chapter 15: Command-Line Interface","minutes_today":7},{"num":71,"title":"Advanced Linux Commands, Part I","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":4}],"total_min":14},{"day":31,"videos":[{"num":71,"title":"Advanced Linux Commands, Part I","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":1},{"num":72,"title":"Advanced Linux Commands, Part II","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":73,"title":"Introduction to Scripting","min":7,"section":"Chapter 15: Command-Line Interface","minutes_today":7},{"num":74,"title":"Interpreted Languages","min":6,"section":"Chapter 15: Command-Line Interface","minutes_today":1}],"total_min":14},{"day":32,"videos":[{"num":74,"title":"Interpreted Languages","min":6,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":75,"title":"Scripting and the Terminal","min":5,"section":"Chapter 15: Command-Line Interface","minutes_today":5},{"num":76,"title":"Windows Recovery Environment","min":5,"section":"Chapter 16: Troubleshooting","minutes_today":4}],"total_min":14},{"day":33,"videos":[{"num":76,"title":"Windows Recovery Environment","min":5,"section":"Chapter 16: Troubleshooting","minutes_today":1},{"num":77,"title":"Advanced Windows Startup Options","min":8,"section":"Chapter 16: Troubleshooting","minutes_today":8},{"num":78,"title":"Troubleshooting Boot Problems","min":8,"section":"Chapter 16: Troubleshooting","minutes_today":5}],"total_min":14},{"day":34,"videos":[{"num":78,"title":"Troubleshooting Boot Problems","min":8,"section":"Chapter 16: Troubleshooting","minutes_today":3},{"num":79,"title":"Troubleshooting at the GUI","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":6},{"num":80,"title":"Troubleshooting Applications","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":5}],"total_min":14},{"day":35,"videos":[{"num":80,"title":"Troubleshooting Applications","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":1},{"num":81,"title":"Kernel Panic","min":6,"section":"Chapter 16: Troubleshooting","minutes_today":6},{"num":82,"title":"Graphics Cards and Connections","min":8,"section":"Chapter 17: Display Technologies","minutes_today":7}],"total_min":14},{"day":36,"videos":[{"num":82,"title":"Graphics Cards and Connections","min":8,"section":"Chapter 17: Display Technologies","minutes_today":1},{"num":83,"title":"Multiple Monitors","min":5,"section":"Chapter 17: Display Technologies","minutes_today":5},{"num":84,"title":"Introduction to Networking","min":7,"section":"Chapter 18: Essentials of Networking","minutes_today":7},{"num":85,"title":"Hexadecimal","min":6,"section":"Chapter 18: Essentials of Networking","minutes_today":1}],"total_min":14},{"day":37,"videos":[{"num":85,"title":"Hexadecimal","min":6,"section":"Chapter 18: Essentials of Networking","minutes_today":5},{"num":86,"title":"Introduction to TCP/IP","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":6},{"num":87,"title":"Network IDs and Subnet Masks","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":3}],"total_min":14},{"day":38,"videos":[{"num":87,"title":"Network IDs and Subnet Masks","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":3},{"num":88,"title":"Special IP Addresses","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":7},{"num":89,"title":"Network Address Translation (NAT)","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":4}],"total_min":14},{"day":39,"videos":[{"num":89,"title":"Network Address Translation (NAT)","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":3},{"num":90,"title":"Dynamic IP Addressing","min":7,"section":"Chapter 19: TCP/IP Basics","minutes_today":7},{"num":91,"title":"Working with Connections","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":4}],"total_min":14},{"day":40,"videos":[{"num":91,"title":"Working with Connections","min":6,"section":"Chapter 19: TCP/IP Basics","minutes_today":2},{"num":92,"title":"Working with DNS","min":7,"section":"Chapter 20: OS Networking","minutes_today":7},{"num":93,"title":"Windows Naming","min":5,"section":"Chapter 20: OS Networking","minutes_today":5}],"total_min":14},{"day":41,"videos":[{"num":94,"title":"Working with Workgroups","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":95,"title":"Working with Active Directory","min":7,"section":"Chapter 20: OS Networking","minutes_today":7},{"num":96,"title":"Windows Sharing with macOS and Linux","min":6,"section":"Chapter 20: OS Networking","minutes_today":1}],"total_min":14},{"day":42,"videos":[{"num":96,"title":"Windows Sharing with macOS and Linux","min":6,"section":"Chapter 20: OS Networking","minutes_today":5},{"num":97,"title":"The net Command","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":98,"title":"Routers","min":6,"section":"Chapter 20: OS Networking","minutes_today":3}],"total_min":14},{"day":43,"videos":[{"num":98,"title":"Routers","min":6,"section":"Chapter 20: OS Networking","minutes_today":3},{"num":99,"title":"Basic Router Configuration","min":5,"section":"Chapter 20: OS Networking","minutes_today":5},{"num":100,"title":"Firewall Configuration","min":6,"section":"Chapter 20: OS Networking","minutes_today":6}],"total_min":14},{"day":44,"videos":[{"num":101,"title":"Windows Firewall","min":5,"section":"Chapter 20: OS Networking","minutes_today":5},{"num":102,"title":"Port Forwarding","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":103,"title":"Advanced Router Configuration","min":6,"section":"Chapter 20: OS Networking","minutes_today":3}],"total_min":14},{"day":45,"videos":[{"num":103,"title":"Advanced Router Configuration","min":6,"section":"Chapter 20: OS Networking","minutes_today":3},{"num":104,"title":"Virtual LANs (VLANs)","min":6,"section":"Chapter 20: OS Networking","minutes_today":6},{"num":105,"title":"Wireless Network Hardware","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":5}],"total_min":14},{"day":46,"videos":[{"num":105,"title":"Wireless Network Hardware","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":2},{"num":106,"title":"Basic WAP Setup","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6},{"num":107,"title":"Wireless Encryption","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6}],"total_min":14},{"day":47,"videos":[{"num":108,"title":"Connecting to a Wi-Fi Network","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6},{"num":109,"title":"Enterprise Wireless","min":5,"section":"Chapter 21: Wireless Networking","minutes_today":5},{"num":110,"title":"Beyond Wi-Fi","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":3}],"total_min":14},{"day":48,"videos":[{"num":110,"title":"Beyond Wi-Fi","min":7,"section":"Chapter 21: Wireless Networking","minutes_today":4},{"num":111,"title":"Troubleshooting Wireless Connections","min":6,"section":"Chapter 21: Wireless Networking","minutes_today":6},{"num":112,"title":"Telnet and SSH","min":6,"section":"Chapter 22: Internet and SOHO","minutes_today":4}],"total_min":14},{"day":49,"videos":[{"num":112,"title":"Telnet and SSH","min":6,"section":"Chapter 22: Internet and SOHO","minutes_today":2},{"num":113,"title":"Remote Desktop Connections","min":6,"section":"Chapter 22: Internet and SOHO","minutes_today":6},{"num":114,"title":"The World Wide Web","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":6}],"total_min":14},{"day":50,"videos":[{"num":114,"title":"The World Wide Web","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":1},{"num":115,"title":"File Transfer Protocol (FTP)","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":7},{"num":116,"title":"Proxy Servers","min":8,"section":"Chapter 22: Internet and SOHO","minutes_today":6}],"total_min":14},{"day":51,"videos":[{"num":116,"title":"Proxy Servers","min":8,"section":"Chapter 22: Internet and SOHO","minutes_today":2},{"num":117,"title":"Virtual Private Networks (VPN)","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":7},{"num":118,"title":"Internet of Things (IoT)","min":5,"section":"Chapter 22: Internet and SOHO","minutes_today":5}],"total_min":14},{"day":52,"videos":[{"num":119,"title":"Troubleshooting Internet Connections","min":8,"section":"Chapter 22: Internet and SOHO","minutes_today":8},{"num":120,"title":"Browser Security","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":6}],"total_min":14},{"day":53,"videos":[{"num":120,"title":"Browser Security","min":7,"section":"Chapter 22: Internet and SOHO","minutes_today":1},{"num":121,"title":"Application Integration","min":5,"section":"Chapter 23: Virtualization and Cloud","minutes_today":5},{"num":122,"title":"AI Policies and Procedures","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":6},{"num":123,"title":"Limitations","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":2}],"total_min":14},{"day":54,"videos":[{"num":123,"title":"Limitations","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":4},{"num":124,"title":"Private vs. Public","min":6,"section":"Chapter 23: Virtualization and Cloud","minutes_today":6},{"num":125,"title":"Laptop Features","min":6,"section":"Chapter 24: Portable Computing","minutes_today":4}],"total_min":14},{"day":55,"videos":[{"num":125,"title":"Laptop Features","min":6,"section":"Chapter 24: Portable Computing","minutes_today":2},{"num":126,"title":"Laptop Hardware Troubleshooting","min":6,"section":"Chapter 24: Portable Computing","minutes_today":6},{"num":127,"title":"Power Management","min":6,"section":"Chapter 24: Portable Computing","minutes_today":6}],"total_min":14},{"day":56,"videos":[{"num":128,"title":"Touring Android","min":7,"section":"Chapter 25: Mobile Devices","minutes_today":7},{"num":129,"title":"Touring iOS","min":7,"section":"Chapter 25: Mobile Devices","minutes_today":7}],"total_min":14},{"day":57,"videos":[{"num":130,"title":"Maintaining Mobile Devices","min":5,"section":"Chapter 26: Securing Mobile Devices","minutes_today":5},{"num":131,"title":"Mobile Devices and E-mail","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":6},{"num":132,"title":"Mobile Synchronization","min":7,"section":"Chapter 26: Securing Mobile Devices","minutes_today":3}],"total_min":14},{"day":58,"videos":[{"num":132,"title":"Mobile Synchronization","min":7,"section":"Chapter 26: Securing Mobile Devices","minutes_today":4},{"num":133,"title":"Mobile Device Security","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":6},{"num":134,"title":"Mobile Security Troubleshooting","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":4}],"total_min":14},{"day":59,"videos":[{"num":134,"title":"Mobile Security Troubleshooting","min":6,"section":"Chapter 26: Securing Mobile Devices","minutes_today":2},{"num":135,"title":"Installing a Local Printer","min":8,"section":"Chapter 27: Printers","minutes_today":8},{"num":136,"title":"Sharing Printers","min":6,"section":"Chapter 27: Printers","minutes_today":4}],"total_min":14},{"day":60,"videos":[{"num":136,"title":"Sharing Printers","min":6,"section":"Chapter 27: Printers","minutes_today":2},{"num":137,"title":"Threats","min":7,"section":"Chapter 28: Essential Security","minutes_today":7},{"num":138,"title":"Dealing with Threats","min":7,"section":"Chapter 28: Essential Security","minutes_today":5}],"total_min":14},{"day":61,"videos":[{"num":138,"title":"Dealing with Threats","min":7,"section":"Chapter 28: Essential Security","minutes_today":2},{"num":139,"title":"Physical Security","min":6,"section":"Chapter 28: Essential Security","minutes_today":6},{"num":140,"title":"Passwords and Authentication","min":7,"section":"Chapter 28: Essential Security","minutes_today":6}],"total_min":14},{"day":62,"videos":[{"num":141,"title":"Multifactor Authentication (MFA)","min":6,"section":"Chapter 28: Essential Security","minutes_today":6},{"num":142,"title":"Malware, Part I","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":7},{"num":143,"title":"Malware, Part II","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":1}],"total_min":14},{"day":63,"videos":[{"num":143,"title":"Malware, Part II","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":6},{"num":144,"title":"Anti-Malware","min":5,"section":"Chapter 29: Securing Endpoints","minutes_today":5},{"num":145,"title":"Social Engineering","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":3}],"total_min":14},{"day":64,"videos":[{"num":145,"title":"Social Engineering","min":7,"section":"Chapter 29: Securing Endpoints","minutes_today":4},{"num":146,"title":"Licensing","min":8,"section":"Chapter 29: Securing Endpoints","minutes_today":8},{"num":147,"title":"Incident Response","min":8,"section":"Chapter 29: Securing Endpoints","minutes_today":2}],"total_min":14},{"day":65,"videos":[{"num":147,"title":"Incident Response","min":8,"section":"Chapter 29: Securing Endpoints","minutes_today":6},{"num":148,"title":"Environmental Controls","min":6,"section":"Chapter 29: Securing Endpoints","minutes_today":6},{"num":149,"title":"Documents You Need to Know","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":2}],"total_min":14},{"day":66,"videos":[{"num":149,"title":"Documents You Need to Know","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":3},{"num":150,"title":"Data You Need to Know","min":6,"section":"Chapter 30: Operational Procedures","minutes_today":6},{"num":151,"title":"Change Management","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":5}],"total_min":14},{"day":67,"videos":[{"num":152,"title":"The Zen of Backup","min":8,"section":"Chapter 30: Operational Procedures","minutes_today":8},{"num":153,"title":"Recycling and Data Destruction","min":7,"section":"Chapter 30: Operational Procedures","minutes_today":6}],"total_min":14},{"day":68,"videos":[{"num":153,"title":"Recycling and Data Destruction","min":7,"section":"Chapter 30: Operational Procedures","minutes_today":1},{"num":154,"title":"Ticketing Systems","min":5,"section":"Chapter 30: Operational Procedures","minutes_today":5}],"total_min":6}];
+const DAYS = [
+  {day:1, ch:'Ch.1', section:'Ch.1 Safety and Professionalism', videos:['Professional Communication, Part I', 'Professional Communication, Part II'], mins:14},
+  {day:2, ch:'Ch.1', section:'Ch.1 Safety and Professionalism', videos:['Dealing with Difficult Customers', 'Physical Safety'], mins:14},
+  {day:3, ch:'Ch.1', section:'Ch.1 Safety and Professionalism', videos:['Common Safety Procedures', 'What\'s an Operating System?'], mins:14},
+  {day:4, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Users and Super Users', 'Why Windows?'], mins:14},
+  {day:5, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Windows 10 and 11', 'Touring the macOS, Part I'], mins:14},
+  {day:6, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring the macOS, Part II', 'Touring the macOS, Part III'], mins:14},
+  {day:7, ch:'Ch.2', section:'Ch.2 Introduction to Computers and Operating Systems', videos:['Touring Linux', 'Power Protection'], mins:14},
+  {day:8, ch:'Ch.7', section:'Ch.7 Power Supplies', videos:['Cooling Your System', 'Boot Order'], mins:14},
+  {day:9, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Understanding Partitioning', 'MBR Partitioning'], mins:14},
+  {day:10, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['GPT Partitioning', 'Understanding File Systems'], mins:14},
+  {day:11, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Popular File Systems', 'Formatting in Action'], mins:14},
+  {day:12, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Dynamic Disks', 'New Installation - First Drive'], mins:14},
+  {day:13, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Hardware RAID', 'Software RAID in Storage Spaces'], mins:14},
+  {day:14, ch:'Ch.9', section:'Ch.9 Implementing Mass Storage', videos:['Encrypting Mass Storage', 'Maintaining Storage Disks'], mins:14},
+  {day:15, ch:'Ch.10', section:'Ch.10 Essential Peripherals', videos:['Understanding USB', 'Webcams and Videoconferencing'], mins:14},
+  {day:16, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Windows 11 Editions and Features', 'Boot from Everything'], mins:14},
+  {day:17, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Installing and Upgrading Windows', 'Post-installation Tasks'], mins:14},
+  {day:18, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Linux Features and Tools', 'Installing and Upgrading Linux'], mins:14},
+  {day:19, ch:'Ch.11', section:'Ch.11 Installing and Upgrading Operating Systems', videos:['Upgrading macOS', 'The Task Manager'], mins:14},
+  {day:20, ch:'Ch.12', section:'Ch.12 Working with Operating Systems', videos:['Windows Settings', 'MMC and Additional Tools'], mins:14},
+  {day:21, ch:'Ch.12', section:'Ch.12 Working with Operating Systems', videos:['What\'s the Registry?', 'macOS Core Tools'], mins:14},
+  {day:22, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['Introduction to Users and Groups', 'Managing Users and Groups'], mins:14},
+  {day:23, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['NTFS Permissions', 'Linux and macOS Permissions'], mins:14},
+  {day:24, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['File Explorer', 'Sharing Resources'], mins:14},
+  {day:25, ch:'Ch.13', section:'Ch.13 Users, Groups, and Permissions', videos:['Security Policies', 'Maintaining Windows'], mins:14},
+  {day:26, ch:'Ch.14', section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Maintaining macOS', 'Maintaining Linux'], mins:14},
+  {day:27, ch:'Ch.14', section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Working with Applications', 'Backing Up Your Data in Windows'], mins:14},
+  {day:28, ch:'Ch.14', section:'Ch.14 Maintaining and Optimizing Operating Systems', videos:['Backing Up Your Data in Linux and macOS', 'Understanding the CLI'], mins:14},
+  {day:29, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Navigating the CLI', 'Working with Folders'], mins:14},
+  {day:30, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Working with Files', 'Working with Drives'], mins:14},
+  {day:31, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Super Copy Commands', 'Command-Line Permissions'], mins:14},
+  {day:32, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Windows Commands', 'Advanced Linux Commands, Part I'], mins:14},
+  {day:33, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Advanced Linux Commands, Part II', 'Introduction to Scripting'], mins:14},
+  {day:34, ch:'Ch.15', section:'Ch.15 Working with the Command-Line Interface', videos:['Interpreted Languages', 'Scripting and the Terminal'], mins:14},
+  {day:35, ch:'Ch.16', section:'Ch.16 Troubleshooting Systems', videos:['Windows Recovery Environment', 'Advanced Windows Startup Options'], mins:14},
+  {day:36, ch:'Ch.16', section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Boot Problems', 'Troubleshooting at the GUI'], mins:14},
+  {day:37, ch:'Ch.16', section:'Ch.16 Troubleshooting Systems', videos:['Troubleshooting Applications', 'Kernel Panic'], mins:14},
+  {day:38, ch:'Ch.17', section:'Ch.17 Display Technologies', videos:['Graphics Cards and Connections', 'Multiple Monitors'], mins:14},
+  {day:39, ch:'Ch.18', section:'Ch.18 Essentials of Networking', videos:['Introduction to Networking', 'Hexadecimal'], mins:14},
+  {day:40, ch:'Ch.19', section:'Ch.19 TCP/IP Basics', videos:['Introduction to TCP/IP', 'Network IDs and Subnet Masks'], mins:14},
+  {day:41, ch:'Ch.19', section:'Ch.19 TCP/IP Basics', videos:['Special IP Addresses', 'Network Address Translation (NAT)'], mins:14},
+  {day:42, ch:'Ch.19', section:'Ch.19 TCP/IP Basics', videos:['Dynamic IP Addressing', 'Working with Connections'], mins:14},
+  {day:43, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with DNS', 'Windows Naming'], mins:14},
+  {day:44, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Working with Workgroups', 'Working with Active Directory'], mins:14},
+  {day:45, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Windows Sharing with macOS and Linux', 'The net Command'], mins:14},
+  {day:46, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Routers', 'Basic Router Configuration'], mins:14},
+  {day:47, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Firewall Configuration', 'Windows Firewall'], mins:14},
+  {day:48, ch:'Ch.20', section:'Ch.20 OS Networking and Troubleshooting', videos:['Port Forwarding', 'Advanced Router Configuration', 'Virtual LANs (VLANs)'], mins:21},
+  {day:49, ch:'Ch.21', section:'Ch.21 Wireless Networking', videos:['Wireless Network Hardware', 'Basic WAP Setup'], mins:14},
+  {day:50, ch:'Ch.21', section:'Ch.21 Wireless Networking', videos:['Wireless Encryption', 'Connecting to a Wi-Fi Network', 'Enterprise Wireless'], mins:21},
+  {day:51, ch:'Ch.21', section:'Ch.21 Wireless Networking', videos:['Beyond Wi-Fi', 'Troubleshooting Wireless Connections'], mins:14},
+  {day:52, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['Telnet and SSH', 'Remote Desktop Connections', 'The World Wide Web'], mins:21},
+  {day:53, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['File Transfer Protocol (FTP)', 'Proxy Servers'], mins:14},
+  {day:54, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['Virtual Private Networks (VPN)', 'Internet of Things (IoT)', 'Troubleshooting Internet Connections'], mins:21},
+  {day:55, ch:'Ch.22', section:'Ch.22 Internet and SOHO Networking', videos:['Browser Security', 'Application Integration'], mins:14},
+  {day:56, ch:'Ch.23', section:'Ch.23 Virtualization, Cloud Computing, and AI', videos:['AI Policies and Procedures', 'Limitations', 'Private vs. Public'], mins:21},
+  {day:57, ch:'Ch.24', section:'Ch.24 Portable Computing', videos:['Laptop Features', 'Laptop Hardware Troubleshooting - The Tools'], mins:14},
+  {day:58, ch:'Ch.24', section:'Ch.24 Portable Computing', videos:['Power Management', 'Touring Android', 'Touring iOS'], mins:21},
+  {day:59, ch:'Ch.26', section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Maintaining Mobile Devices', 'Mobile Devices and E-mail'], mins:14},
+  {day:60, ch:'Ch.26', section:'Ch.26 Maintaining and Securing Mobile Devices', videos:['Mobile Synchronization', 'Mobile Device Security', 'Mobile Security Troubleshooting'], mins:21},
+  {day:61, ch:'Ch.27', section:'Ch.27 Printers and Multifunction Devices', videos:['Installing a Local Printer', 'Sharing Printers'], mins:14},
+  {day:62, ch:'Ch.28', section:'Ch.28 Essential Security Practices', videos:['Threats', 'Dealing with Threats', 'Physical Security'], mins:21},
+  {day:63, ch:'Ch.28', section:'Ch.28 Essential Security Practices', videos:['Passwords and Authentication', 'Multifactor Authentication (MFA)'], mins:14},
+  {day:64, ch:'Ch.29', section:'Ch.29 Securing Endpoint Systems', videos:['Malware, Part I', 'Malware, Part II', 'Anti-Malware'], mins:21},
+  {day:65, ch:'Ch.29', section:'Ch.29 Securing Endpoint Systems', videos:['Social Engineering', 'Licensing'], mins:14},
+  {day:66, ch:'Ch.29', section:'Ch.29 Securing Endpoint Systems', videos:['Incident Response', 'Environmental Controls', 'Documents You Need to Know'], mins:21},
+  {day:67, ch:'Ch.30', section:'Ch.30 Operational Procedures', videos:['Data You Need to Know', 'Change Management'], mins:14},
+  {day:68, ch:'Ch.30', section:'Ch.30 Operational Procedures', videos:['The Zen of Backup', 'Recycling and Data Destruction', 'Ticketing Systems'], mins:21},
+];
 
 const T_PHASES=[{id:'overview',label:'📋 Overview'},{id:'cold',label:'❄️ Cold Retrieval'},{id:'scenario',label:'🎯 Scenarios'},{id:'discussion',label:'💬 Discussion'},{id:'video',label:'📹 Videos'},{id:'sq',label:'✍️ Submissions'},{id:'timed',label:'⏱ Timed Practice'},{id:'guide',label:'📖 Study Guide'},{id:'readiness',label:'📊 Readiness'}];
 const S_PHASES=[{id:'cold',label:'❄️ Cold Retrieval'},{id:'scenario',label:'🎯 Scenarios'},{id:'notes',label:'📝 Notes'},{id:'discussion',label:'💬 Discussion'},{id:'sq',label:'✍️ Submit Q'},{id:'timed',label:'⏱ Timed Practice'},{id:'flash',label:'🃏 Flashcards'},{id:'exam',label:'🎓 Practice Exam'},{id:'guide',label:'📖 Study Guide'}];
@@ -801,7 +1022,11 @@ function addCode(){const c=prompt('Student code:');if(c?.trim()){ST.students.pus
 function genCodes(){ST.students=Array.from({length:20},(_,i)=>`STU-${String(i+1).padStart(3,'0')}`);saveAll();renderOvCodes();toast('20 codes generated','ok');}
 
 // ── START CLASS ──
-function startClass(){tPhase('cold');if(!ST.gc[ST.day]?.cold)genCold();}
+function startClass(){
+  tPhase('cold');
+  if(!ST.gc[ST.day]?.cold) genCold();
+  pushPhaseToStudents('cold');
+}
 
 // ── GENERATE: COLD ──
 async function genCold(){
@@ -925,7 +1150,12 @@ Return JSON: {"pre":["3 pre-video prompts to activate prior knowledge"],"during"
       <div class="disc-prompt"><div class="disc-prompt-text"><strong>${i+1}.</strong> ${p}</div></div>`).join('');
     // Push to student discussion
     renderStudentDisc(disc);
-    toast('Discussion prompts generated','ok');
+    // If scenario phase is currently active, re-render it so discussion appears
+    const curPhase = localStorage.getItem('class_current_phase');
+    if (curPhase === 'scenario') {
+      localStorage.setItem('class_phase_ts', Date.now().toString());
+    }
+    toast('Discussion prompts generated — students see them now','ok');
   }catch(e){document.getElementById('discBody').innerHTML='<div style="color:var(--red);font-size:12px">Failed.</div>';}
 }
 
@@ -1374,9 +1604,733 @@ function studentLogin(){
     document.getElementById(id).value=saved[keys[i]]||'';
   });
   toast(`Welcome, ${code}!`,'ok');
+  startPhasePolling();
 }
 
+
+// ── PHASE PUSH ENGINE ────────────────────────────────────
+const CLASS_PHASES=[
+  {id:'cold',    label:'❄️ Cold Retrieval', color:'#00c8ff'},
+  {id:'scenario',label:'🎯 Scenarios+Notes', color:'#bb44ff'},
+  {id:'sq',      label:'✍️ Create Question', color:'#00f080'},
+  {id:'timed',   label:'⏱ Closing Quiz',    color:'#ff2255'},
+  {id:'guide',   label:'📖 Study Time',      color:'#ffb800'},
+];
+let sLastPhase=null, sPhasePoller=null;
+
+function pushPhaseToStudents(id){
+  localStorage.setItem('class_current_phase',id);
+  localStorage.setItem('class_phase_ts',Date.now()+'');
+  localStorage.setItem('class_day',ST.day+'');
+  renderPhasePushBar();
+  toast('Pushed to students: '+id,'ok');
+}
+
+function endClass(){
+  localStorage.removeItem('class_current_phase');
+  localStorage.removeItem('class_phase_ts');
+  renderPhasePushBar();
+  toast('Class ended','ok');
+}
+
+function renderPhasePushBar(){
+  const bar=document.getElementById('phasePushBar');
+  if(!bar)return;
+  const cur=localStorage.getItem('class_current_phase')||'';
+  bar.innerHTML=CLASS_PHASES.map((p,i)=>`
+    <button onclick="handlePhaseClick('${p.id}')"
+      style="padding:6px 10px;border-radius:6px;border:1.5px solid ${p.id===cur?p.color:'var(--b2)'};
+        background:${p.id===cur?p.color+'22':'transparent'};color:${p.id===cur?p.color:'var(--tx3)'};
+        font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+        cursor:pointer;transition:all .2s;white-space:nowrap">
+      ${p.label}
+    </button>`).join('');
+}
+
+function handlePhaseClick(id){
+  const gc=ST.gc[ST.day]||{};
+  if(id==='cold'&&!gc.cold){ genCold(); setTimeout(()=>pushPhaseToStudents(id),300); }
+  else if(id==='scenario'&&!gc.scenarios){ genScenarios(); setTimeout(()=>pushPhaseToStudents(id),300); }
+  else if(id==='timed'&&!gc.timed){ genTimed(); setTimeout(()=>pushPhaseToStudents(id),300); }
+  else pushPhaseToStudents(id);
+  tPhase(id);
+}
+
+// ── STUDENT POLLING ──────────────────────────────────────
+function startPhasePolling(){
+  if(sPhasePoller)return;
+  sPhasePoller=setInterval(checkPhaseUpdate,2000);
+  checkPhaseUpdate();
+}
+
+function checkPhaseUpdate(){
+  const phase=localStorage.getItem('class_current_phase');
+  const day=parseInt(localStorage.getItem('class_day')||'0');
+  if(day&&day!==ST.day)loadDay(day);
+
+  // Check for live disc question updates even within the same phase
+  const liveTs = localStorage.getItem('live_disc_ts') || '0';
+  if (phase === 'scenario' && phase === sLastPhase && liveTs !== sLastLiveTs) {
+    sLastLiveTs = liveTs;
+    renderStudentPhase('scenario'); // re-render to show new questions
+    return;
+  }
+
+  if(phase===sLastPhase)return;
+  sLastPhase=phase;
+  if(!phase){showStudentWaiting();return;}
+  renderStudentPhase(phase);
+}
+let sLastLiveTs = '0';
+
+function showStudentWaiting(){
+  document.getElementById('sWaiting').style.display='block';
+  document.getElementById('sPhaseContent').style.display='none';
+  document.getElementById('sPhaseComplete').style.display='none';
+}
+
+function renderStudentPhase(phase){
+  const gc=ST.gc[ST.day]||{};
+  document.getElementById('sWaiting').style.display='none';
+  document.getElementById('sPhaseComplete').style.display='none';
+  const content=document.getElementById('sPhaseContent');
+  content.style.display='block';
+  updatePhaseBar(phase);
+  if(phase==='cold') content.innerHTML=gc.cold?buildColdHTML(gc.cold):buildWaitCard('❄️','Generating warm-up questions…','var(--acc)');
+  else if(phase==='scenario') content.innerHTML=buildScenariosAndNotesHTML(gc);
+  else if(phase==='sq') content.innerHTML=buildQuestionCreatorHTML();
+  else if(phase==='timed') content.innerHTML=gc.timed?buildTimedHTML(gc.timed):buildWaitCard('⏱','Preparing closing quiz…','var(--red)');
+  else if(phase==='guide') content.innerHTML=buildStudyTimeHTML();
+  if(!gc[phase]&&(phase==='cold'||phase==='timed')) setTimeout(()=>{if(ST.gc[ST.day]?.[phase])renderStudentPhase(phase);},3000);
+}
+
+function buildWaitCard(icon,msg,color){
+  return '<div style="text-align:center;padding:48px 20px"><div style="font-size:56px;margin-bottom:14px">'+icon+'</div><div style="font-family:var(--display);font-size:20px;font-weight:800;color:'+color+';text-transform:uppercase">'+msg+'</div><div style="margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--tx3)">⏳ Loading…</div></div>';
+}
+
+function buildColdHTML(qs){
+  if(!qs||!qs.length)return buildWaitCard('❄️','Generating questions…','var(--acc)');
+  return `<div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:12px;padding:14px 18px;margin-bottom:18px">
+    <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--acc);text-transform:uppercase;margin-bottom:3px">❄️ Cold Retrieval</div>
+    <div style="font-size:12px;color:var(--tx2)">5 warm-up questions · <strong>Not graded</strong> · just wakes your brain up</div>
+  </div>${buildQList(qs,'cold')}`;
+}
+
+function buildScenariosAndNotesHTML(gc){
+  const tv = localStorage.getItem('today_video');
+  let chTag = '', videoTitle = '', label = "today's chapter";
+  try { const v = JSON.parse(tv); chTag = v.ch; videoTitle = v.video; label = v.ch + ' — ' + v.video; } catch(e){}
+
+  // Load saved notes for this day/student
+  const noteKey = 'n_' + ST.day + '_' + (ST.code || 'STU');
+  let saved = {};
+  try { saved = (JSON.parse(localStorage.getItem('st_notes') || '{}'))[noteKey] || {}; } catch(e){}
+
+  // Load saved discussion responses
+  const discKey = 'disc_' + ST.day + '_' + (ST.code || 'STU');
+  let savedDisc = {};
+  try { savedDisc = (ST.ans && ST.ans[discKey]) || {}; } catch(e){}
+
+  // ── SCENARIO QUESTIONS ──
+  const scenHTML = gc.scenarios && gc.scenarios.length
+    ? `<div style="background:var(--pur-d);border:1px solid var(--pur);border-radius:12px;padding:14px 18px;margin-bottom:14px">
+        <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--pur);text-transform:uppercase;margin-bottom:3px">🎯 Scenario Questions</div>
+        <div style="font-size:12px;color:var(--tx2)">Real-world IT scenarios based on today's video. Think about what a technician would actually do.</div>
+       </div>${buildQList(gc.scenarios,'scen')}`
+    : `<div style="background:var(--pur-d);border:1px solid var(--pur);border-radius:12px;padding:14px 18px;margin-bottom:14px;text-align:center;color:var(--pur)">🎯 Loading scenario questions…</div>`;
+
+  // ── DISCUSSION QUESTIONS (based on today's video) ──
+  // Use teacher's live-typed questions first; fall back to AI-generated disc
+  const liveQs = JSON.parse(localStorage.getItem('live_disc_questions') || '[]');
+  const discPrompts = liveQs.length > 0
+    ? liveQs
+    : (gc.disc ? [...(gc.disc.post||[]),...(gc.disc.pre||[])].slice(0,3) : []);
+  const discHTML = discPrompts.length ? `
+    <div style="background:var(--amb-d);border:1.5px solid var(--amb);border-radius:12px;overflow:hidden;margin-top:16px">
+      <div style="padding:13px 18px;border-bottom:1px solid rgba(255,184,0,.2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-family:var(--display);font-size:18px;font-weight:800;color:var(--amb);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">💬 Discussion Questions</div>
+          <div style="font-size:11px;color:var(--tx2)">Based on today's video · <strong style="color:var(--tx)">${videoTitle||label}</strong> · Answer each prompt</div>
+        </div>
+        <span id="discGradeBadge" style="font-family:var(--mono);font-size:10px;background:var(--s3);border:1px solid var(--b2);color:var(--tx3);padding:3px 10px;border-radius:20px">0/${discPrompts.length} answered</span>
+      </div>
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:12px">
+        ${discPrompts.map((p,i) => `
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;overflow:hidden">
+            <div style="padding:11px 14px;font-size:13px;color:var(--tx);line-height:1.65"><strong style="color:var(--amb)">${i+1}.</strong> ${p}</div>
+            <div style="padding:0 12px 12px">
+              <textarea id="discResp${i}" placeholder="Your response…"
+                oninput="autoSaveDisc(${i},this.value,${discPrompts.length})"
+                style="width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:6px;padding:8px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;line-height:1.6;min-height:56px;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box"
+                onfocus="this.style.borderColor='var(--amb)'" onblur="this.style.borderColor='var(--b1)'">${savedDisc[i]||''}</textarea>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  // ── CORNELL NOTES (inline, auto-graded on completion) ──
+  const notesHTML = `
+    <div style="background:var(--grn-d);border:1.5px solid var(--grn);border-radius:12px;overflow:hidden;margin-top:16px">
+      <div style="padding:13px 18px;border-bottom:1px solid rgba(0,240,128,.2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-family:var(--display);font-size:18px;font-weight:800;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">📝 Cornell Notes — ${chTag||'Today'}</div>
+          <div style="font-size:11px;color:var(--tx2)">Take notes while you watch · <strong style="color:var(--tx)">${videoTitle||label}</strong> · Auto-saved &amp; graded on completion</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="notesGradeBadge" style="font-family:var(--mono);font-size:10px;background:var(--s3);border:1px solid var(--b2);color:var(--tx3);padding:3px 10px;border-radius:20px">0/4 sections</span>
+          <span id="inlineNotesSavedMsg" style="font-family:var(--mono);font-size:9px;color:var(--grn);opacity:0;transition:opacity .3s;letter-spacing:.5px">✓ SAVED</span>
+        </div>
+      </div>
+      <div style="padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">🔑 Key Terms &amp; Definitions</div>
+          <textarea id="inlineNTerms" placeholder="List key terms and their definitions from today's video…"
+            oninput="autoSaveInlineNotes()"
+            style="width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;line-height:1.7;min-height:80px;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--grn)'" onblur="this.style.borderColor='var(--b2)'">${saved.terms||''}</textarea>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">⚙️ How It Works</div>
+          <textarea id="inlineNHow" placeholder="Explain the main concept in your own words…"
+            oninput="autoSaveInlineNotes()"
+            style="width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;line-height:1.7;min-height:80px;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--grn)'" onblur="this.style.borderColor='var(--b2)'">${saved.how||''}</textarea>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">🌐 Real-World Connection</div>
+          <textarea id="inlineNReal" placeholder="How does this apply in a real IT job or scenario?"
+            oninput="autoSaveInlineNotes()"
+            style="width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;line-height:1.7;min-height:64px;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--grn)'" onblur="this.style.borderColor='var(--b2)'">${saved.real||''}</textarea>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">⚠️ Exam Traps &amp; Common Mistakes</div>
+          <textarea id="inlineNTraps" placeholder="What mistakes do people make on the exam about this topic?"
+            oninput="autoSaveInlineNotes()"
+            style="width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;color:var(--tx);font-family:var(--sans);font-size:12px;line-height:1.7;min-height:64px;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--grn)'" onblur="this.style.borderColor='var(--b2)'">${saved.traps||''}</textarea>
+        </div>
+      </div>
+    </div>`;
+
+  // Restore saved disc badge counts on render
+  setTimeout(() => {
+    updateDiscGrade(discPrompts.length);
+    updateNotesGrade();
+  }, 100);
+
+  return scenHTML + discHTML + notesHTML;
+}
+
+// ── AUTO-SAVE + AUTO-GRADE DISCUSSION ──────────────────
+let _discSaveTimer = null;
+function autoSaveDisc(idx, val, total) {
+  // Save to ldisc_ key (live disc) — teacher can see responses in real time
+  const liveKey = 'ldisc_' + ST.day + '_' + (ST.code || 'STU');
+  const discKey  = 'disc_'  + ST.day + '_' + (ST.code || 'STU');
+  if (!ST.ans) ST.ans = {};
+  if (!ST.ans[liveKey]) ST.ans[liveKey] = {};
+  if (!ST.ans[discKey]) ST.ans[discKey] = {};
+  ST.ans[liveKey][idx] = val;
+  ST.ans[discKey][idx] = val;
+  saveAll();
+  updateDiscGrade(total);
+}
+
+function updateDiscGrade(total) {
+  const discKey = 'disc_' + ST.day + '_' + (ST.code || 'STU');
+  const saved = (ST.ans && ST.ans[discKey]) || {};
+  // Count responses with at least 15 characters
+  const MIN_CHARS = 15;
+  const answered = Object.values(saved).filter(v => v && v.trim().length >= MIN_CHARS).length;
+  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+  const badge = document.getElementById('discGradeBadge');
+  if (!badge) return;
+  const color = pct === 100 ? 'var(--grn)' : pct >= 50 ? 'var(--amb)' : 'var(--tx3)';
+  badge.textContent = `${answered}/${total} answered`;
+  badge.style.color = color;
+  badge.style.borderColor = color;
+  badge.style.background = pct === 100 ? 'var(--grn-d)' : 'var(--s3)';
+  // Save grade to scores
+  if (ST.code) {
+    const scoreKey = `disc_${ST.day}_${ST.code}`;
+    if (!ST.scores) ST.scores = {};
+    ST.scores[scoreKey] = { pct, answered, total, ts: Date.now() };
+    saveAll();
+  }
+}
+
+// ── AUTO-SAVE + AUTO-GRADE NOTES ───────────────────────
+let _notesSaveTimer = null;
+function autoSaveInlineNotes() {
+  clearTimeout(_notesSaveTimer);
+  _notesSaveTimer = setTimeout(() => {
+    const noteKey = 'n_' + ST.day + '_' + (ST.code || 'STU');
+    const terms = document.getElementById('inlineNTerms')?.value || '';
+    const how   = document.getElementById('inlineNHow')?.value   || '';
+    const real  = document.getElementById('inlineNReal')?.value  || '';
+    const traps = document.getElementById('inlineNTraps')?.value || '';
+
+    // Save to ST.notes — same key the Notes tool reads
+    if (!ST.notes) ST.notes = {};
+    ST.notes[noteKey] = { terms, how, real, traps, q: ST.notes[noteKey]?.q || '' };
+    localStorage.setItem('st_notes', JSON.stringify(ST.notes));
+    saveAll();
+
+    updateNotesGrade();
+
+    // Show saved flash
+    const msg = document.getElementById('inlineNotesSavedMsg');
+    if (msg) { msg.style.opacity = '1'; setTimeout(() => msg.style.opacity = '0', 1500); }
+  }, 800);
+}
+
+function updateNotesGrade() {
+  const MIN_CHARS = 20;
+  const fields = [
+    document.getElementById('inlineNTerms')?.value || '',
+    document.getElementById('inlineNHow')?.value   || '',
+    document.getElementById('inlineNReal')?.value  || '',
+    document.getElementById('inlineNTraps')?.value || '',
+  ];
+  const completed = fields.filter(f => f.trim().length >= MIN_CHARS).length;
+  const total = 4;
+  const pct = Math.round(completed / total * 100);
+  const badge = document.getElementById('notesGradeBadge');
+  if (badge) {
+    const color = pct === 100 ? 'var(--grn)' : pct >= 50 ? 'var(--amb)' : 'var(--tx3)';
+    badge.textContent = `${completed}/${total} sections`;
+    badge.style.color = color;
+    badge.style.borderColor = color;
+    badge.style.background = pct === 100 ? 'var(--grn-d)' : 'var(--s3)';
+  }
+  // Save notes grade to scores
+  if (ST.code) {
+    const scoreKey = `notes_${ST.day}_${ST.code}`;
+    if (!ST.scores) ST.scores = {};
+    ST.scores[scoreKey] = { pct, completed, total, ts: Date.now() };
+    saveAll();
+    // Award PBIS for completing all 4 sections
+    if (pct === 100 && !ST.scores[scoreKey + '_awarded']) {
+      ST.scores[scoreKey + '_awarded'] = true;
+      saveAll();
+      if (typeof Platform !== 'undefined' && Platform.awardPBIS) {
+        Platform.awardPBIS(ST.code, 3, 'Completed Cornell notes');
+      }
+    }
+  }
+}
+
+function buildQuestionCreatorHTML(){
+  return `<div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:12px;padding:14px 18px;margin-bottom:18px">
+    <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--grn);text-transform:uppercase;margin-bottom:3px">✍️ Create a Question</div>
+    <div style="font-size:12px;color:var(--tx2)">Write one multiple-choice question from today's lesson. Be specific — use CompTIA style.</div>
+  </div>
+  <div style="background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:20px">
+    <input id="sqQ2" placeholder="Your question…" style="width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:10px 14px;color:var(--tx);font-size:13px;outline:none;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <input id="sqA2" placeholder="A — Option A" style="background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:12px;outline:none">
+      <input id="sqB2" placeholder="B — Option B" style="background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:12px;outline:none">
+      <input id="sqC2" placeholder="C — Option C" style="background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:12px;outline:none">
+      <input id="sqD2" placeholder="D — Option D" style="background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:12px;outline:none">
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;color:var(--tx3);font-family:var(--mono)">Correct:</span>
+      <select id="sqCorrect2" style="background:var(--s3);border:1px solid var(--b1);border-radius:6px;padding:7px 12px;color:var(--tx);font-size:13px;font-family:var(--mono);font-weight:700;outline:none">
+        <option>A</option><option>B</option><option>C</option><option>D</option>
+      </select>
+      <button onclick="submitSQ2()" style="margin-left:auto;background:var(--grn);color:var(--bg);border:none;border-radius:6px;padding:10px 24px;font-family:var(--display);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer">Submit ✓</button>
+    </div>
+    <div id="sqSubmitMsg" style="display:none;margin-top:12px;padding:10px 14px;background:var(--grn-d);border:1px solid var(--grn);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--grn)"></div>
+  </div>`;
+}
+
+function buildTimedHTML(qs){
+  if(!qs||!qs.length)return buildWaitCard('⏱','Generating closing quiz…','var(--red)');
+  return `<div style="background:var(--red-d);border:1px solid var(--red);border-radius:12px;padding:14px 18px;margin-bottom:18px">
+    <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--red);text-transform:uppercase;margin-bottom:3px">⏱ Closing Quiz — GRADED</div>
+    <div style="font-size:12px;color:var(--tx2)">5 questions · Score <strong>80%+</strong> for PBIS points · Read each question carefully</div>
+  </div>
+  ${buildQList(qs,'timed')}
+  <div id="timedSubmitArea" style="margin-top:16px;text-align:center">
+    <button onclick="submitTimedFromPhase()" style="background:var(--red);color:var(--bg);border:none;border-radius:30px;padding:14px 40px;font-family:var(--display);font-size:16px;font-weight:800;text-transform:uppercase;cursor:pointer">Submit Quiz →</button>
+  </div>
+  <div id="timedResultArea" style="display:none;margin-top:20px;text-align:center"></div>`;
+}
+
+function buildStudyTimeHTML(){
+  const tv=localStorage.getItem('today_video');
+  let ch=''; try{const v=JSON.parse(tv);ch=v.ch;}catch(e){}
+  return `<div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:12px;padding:14px 18px;margin-bottom:18px">
+    <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--amb);text-transform:uppercase;margin-bottom:3px">📖 Study Time</div>
+    <div style="font-size:12px;color:var(--tx2)">Class is winding down. Review your notes, drill flashcards, or open the chapter study guide.</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <a href="pacing-review.html" target="_blank" style="display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px 18px;text-decoration:none">
+      <span style="font-size:28px">📖</span>
+      <div><div style="font-family:var(--display);font-size:14px;font-weight:800;color:var(--tx);text-transform:uppercase">${ch} Chapter Study Guide</div>
+      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">Key concepts · vocab · 5 practice Qs · exam traps</div></div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--acc)">Open →</div>
+    </a>
+    <a href="student-command-center.html" target="_blank" style="display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px 18px;text-decoration:none">
+      <span style="font-size:28px">🎯</span>
+      <div><div style="font-family:var(--display);font-size:14px;font-weight:800;color:var(--tx);text-transform:uppercase">Study Tonight Plan</div>
+      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">Personalized plan based on your quiz history</div></div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--pur)">Open →</div>
+    </a>
+    <a href="comptia-notes-quiz.html" target="_blank" style="display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px 18px;text-decoration:none">
+      <span style="font-size:28px">📝</span>
+      <div><div style="font-family:var(--display);font-size:14px;font-weight:800;color:var(--tx);text-transform:uppercase">Cornell Notes</div>
+      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">Finish or review today's notes</div></div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--grn)">Open →</div>
+    </a>
+  </div>`;
+}
+
+function buildQList(qs,prefix){
+  return (qs||[]).map((q,i)=>`
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px;margin-bottom:10px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:8px">Question ${i+1}</div>
+      <div style="font-size:14px;font-weight:500;color:var(--tx);line-height:1.7;margin-bottom:12px">${q.q||q.question||q}</div>
+      ${q.opts?`<div style="display:flex;flex-direction:column;gap:6px">
+        ${['A','B','C','D'].map(l=>`
+          <div onclick="pickPhaseAns('${prefix}',${i},'${l}','${q.answer||'A'}')"
+            id="${prefix}q${i}opt${l}"
+            style="display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:8px;border:1px solid var(--b1);cursor:pointer;background:var(--s3);transition:all .15s;font-size:13px;color:var(--tx2)">
+            <span style="font-family:var(--mono);font-size:11px;font-weight:700;min-width:16px;color:var(--tx3)">${l}</span>
+            ${q.opts[l]||''}
+          </div>`).join('')}
+      </div>`:''}
+    </div>`).join('');
+}
+
+function pickPhaseAns(prefix,qIdx,letter,answer){
+  ['A','B','C','D'].forEach(l=>{
+    const el=document.getElementById(prefix+'q'+qIdx+'opt'+l);
+    if(!el)return;
+    if(el.dataset.locked)return;
+    el.dataset.locked='1';
+    if(l===answer){el.style.borderColor='var(--grn)';el.style.background='var(--grn-d)';el.style.color='var(--tx)';}
+    else if(l===letter&&l!==answer){el.style.borderColor='var(--red)';el.style.background='var(--red-d)';}
+    else{el.style.opacity='.4';}
+  });
+}
+
+function submitSQ2(){
+  const q=document.getElementById('sqQ2')?.value.trim();
+  const a=document.getElementById('sqA2')?.value.trim();
+  const b=document.getElementById('sqB2')?.value.trim();
+  const correct=document.getElementById('sqCorrect2')?.value||'A';
+  if(!q||!a||!b){toast('Fill in the question and at least 2 options','err');return;}
+  if(!ST.bank)ST.bank=[];
+  ST.bank.push({q,opts:{A:a,B:document.getElementById('sqB2').value,C:document.getElementById('sqC2').value,D:document.getElementById('sqD2').value},answer:correct,code:ST.code,day:ST.day});
+  localStorage.setItem('st_bank',JSON.stringify(ST.bank));
+  const msg=document.getElementById('sqSubmitMsg');
+  if(msg){msg.textContent='✓ Question submitted! It may appear on a future cold retrieval.';msg.style.display='block';}
+  ['sqQ2','sqA2','sqB2','sqC2','sqD2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  toast('Question submitted!','ok');
+}
+
+function submitTimedFromPhase(){
+  const gc=ST.gc[ST.day];
+  if(!gc?.timed)return;
+  const qs=gc.timed;
+  let correct=0;
+  qs.forEach((q,i)=>{
+    const ans=q.answer||'A';
+    const el=document.getElementById('timedq'+i+'opt'+ans);
+    if(el&&el.dataset.locked&&el.style.borderColor.includes('0,240,128'))correct++;
+    // Simpler: count correct answers where the green-bordered option was chosen
+  });
+  // Re-count by checking which option was selected vs correct
+  correct=0;
+  qs.forEach((q,i)=>{
+    ['A','B','C','D'].forEach(l=>{
+      const el=document.getElementById('timedq'+i+'opt'+l);
+      if(el&&el.dataset.locked&&l===q.answer&&el.style.background.includes('grn'))correct++;
+    });
+  });
+  const pct=Math.round(correct/qs.length*100);
+  const submitArea=document.getElementById('timedSubmitArea');
+  const result=document.getElementById('timedResultArea');
+  if(submitArea)submitArea.style.display='none';
+  if(result){
+    result.style.display='block';
+    const color=pct>=80?'var(--grn)':pct>=60?'var(--amb)':'var(--red)';
+    result.innerHTML=`<div style="font-family:var(--display);font-size:64px;font-weight:900;color:${color};line-height:1">${pct}%</div>
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;text-transform:uppercase;color:var(--tx);margin:8px 0">${correct}/${qs.length} correct</div>
+      ${pct>=80?'<div style="color:var(--grn);font-size:13px">🏆 +5 PBIS points awarded!</div>':''}
+      <div style="color:var(--tx2);font-size:12px;margin-top:8px">${pct>=80?'Outstanding work!':pct>=60?'Good effort — review the ones you missed.':'Keep studying.'}</div>`;
+    if(pct>=80&&typeof Platform!=='undefined'&&Platform.awardPBIS)Platform.awardPBIS(ST.code,5,'Scored 80%+ on closing quiz');
+  }
+  toast(pct>=80?pct+'% — PBIS points earned! 🏆':pct+'% — '+correct+'/'+qs.length+' correct',pct>=60?'ok':'err');
+}
+
+
+
+// ── LIVE DISCUSSION — TEACHER TYPES, STUDENTS SEE INSTANTLY ──
+let _liveDiscTimer = null;
+
+function pushLiveDisc() {
+  // Debounce — push 600ms after teacher stops typing
+  clearTimeout(_liveDiscTimer);
+  _liveDiscTimer = setTimeout(() => {
+    const q1 = document.getElementById('liveQ1')?.value.trim() || '';
+    const q2 = document.getElementById('liveQ2')?.value.trim() || '';
+    const q3 = document.getElementById('liveQ3')?.value.trim() || '';
+    const questions = [q1, q2, q3].filter(q => q.length > 0);
+
+    // Write to localStorage — students poll this
+    localStorage.setItem('live_disc_questions', JSON.stringify(questions));
+    localStorage.setItem('live_disc_ts', Date.now().toString());
+    localStorage.setItem('live_disc_day', ST.day.toString());
+
+    // Save to gc so it persists across phase pushes
+    if (!ST.gc[ST.day]) ST.gc[ST.day] = {};
+    ST.gc[ST.day].liveDisc = questions;
+    saveAll();
+
+    // Update status icons
+    [q1,q2,q3].forEach((q,i) => {
+      const el = document.getElementById('liveQ' + (i+1) + 'status');
+      if (el) el.textContent = q.length > 5 ? '📡' : '';
+    });
+
+    // Confirm message
+    const msg = document.getElementById('liveDiscPushedMsg');
+    if (msg) {
+      msg.textContent = questions.length
+        ? '✓ ' + questions.length + ' question' + (questions.length>1?'s':'') + ' live on student screens'
+        : 'Questions cleared';
+      setTimeout(() => { if(msg) msg.textContent = ''; }, 3000);
+    }
+
+    // Refresh response wall if visible
+    if (document.getElementById('liveDiscWall')?.style.display !== 'none') {
+      renderLiveWall();
+    }
+  }, 600);
+}
+
+function clearLiveDisc() {
+  ['liveQ1','liveQ2','liveQ3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  localStorage.removeItem('live_disc_questions');
+  localStorage.removeItem('live_disc_ts');
+  if (!ST.gc[ST.day]) ST.gc[ST.day] = {};
+  ST.gc[ST.day].liveDisc = [];
+  saveAll();
+  ['liveQ1status','liveQ2status','liveQ3status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+  const msg = document.getElementById('liveDiscPushedMsg');
+  if (msg) msg.textContent = 'Questions cleared from student screens';
+  setTimeout(() => { const m = document.getElementById('liveDiscPushedMsg'); if(m) m.textContent=''; }, 2500);
+}
+
+function toggleLiveWall() {
+  const wall = document.getElementById('liveDiscWall');
+  if (!wall) return;
+  const showing = wall.style.display !== 'none';
+  wall.style.display = showing ? 'none' : 'block';
+  if (!showing) renderLiveWall();
+}
+
+function renderLiveWall() {
+  const questions = JSON.parse(localStorage.getItem('live_disc_questions') || '[]');
+  if (!questions.length) return;
+
+  // Collect all student responses from ST.ans
+  const allResponses = [];
+  Object.entries(ST.ans || {}).forEach(([key, val]) => {
+    if (key.startsWith('ldisc_' + ST.day + '_')) {
+      const code = key.replace('ldisc_' + ST.day + '_', '');
+      Object.entries(val).forEach(([qi, resp]) => {
+        if (resp && resp.trim()) {
+          allResponses.push({ code, qi: parseInt(qi), resp, q: questions[parseInt(qi)] });
+        }
+      });
+    }
+  });
+
+  const countEl = document.getElementById('liveDiscCount');
+  const respEl  = document.getElementById('liveDiscResponses');
+  const uniqueStudents = new Set(allResponses.map(r => r.code)).size;
+  if (countEl) countEl.textContent = uniqueStudents + ' student' + (uniqueStudents!==1?'s':'') + ' responded';
+
+  if (!respEl) return;
+  if (!allResponses.length) {
+    respEl.innerHTML = '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No responses yet.</div>';
+    return;
+  }
+
+  // Group by question
+  const byQ = {};
+  allResponses.forEach(r => {
+    if (!byQ[r.qi]) byQ[r.qi] = [];
+    byQ[r.qi].push(r);
+  });
+
+  respEl.innerHTML = Object.entries(byQ).map(([qi, resps]) => `
+    <div style="margin-bottom:10px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--amb);letter-spacing:.5px;margin-bottom:5px">
+        Q${parseInt(qi)+1}: ${questions[parseInt(qi)]?.substring(0,60)||''}…
+      </div>
+      ${resps.map(r => `
+        <div style="background:var(--s2);border-left:2px solid var(--amb);padding:6px 10px;border-radius:0 6px 6px 0;margin-bottom:4px;font-size:11px;color:var(--tx2)">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-right:6px">${r.code}</span>${r.resp}
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+// Poll for new responses every 5 seconds when wall is visible
+setInterval(() => {
+  if (document.getElementById('liveDiscWall')?.style.display !== 'none') {
+    renderLiveWall();
+  }
+}, 5000);
+
+
 // ── TOAST ──
+
+// ── DAILY ROUTINE MODE ──────────────────────────────────
+const ROUTINE_PHASES = [
+  {
+    num: '1',
+    name: 'Cold Retrieval',
+    desc: 'Open the Classroom Platform and answer 5 warm-up questions from previous lessons. This is NOT graded — it helps your brain remember what you learned before.',
+    action: 'Go to Classroom →',
+    href: 'comptia-classroom-v2.html',
+    color: 'var(--acc)',
+  },
+  {
+    num: '2',
+    name: 'Watch Videos',
+    desc: "Open Udemy and watch today's assigned videos. Take Cornell notes while you watch — write down key terms and concepts as you hear them.",
+    action: 'Open Udemy →',
+    href: 'https://www.udemy.com/course/total-comptia-a-certification/learn/',
+    color: 'var(--pur)',
+  },
+  {
+    num: '3',
+    name: 'Take Notes',
+    desc: 'Open the Notes tool and fill in your Cornell notes for today's chapter. Complete all 5 sections — Overview, Key Terms, How It Works, Real-World, Exam Traps.',
+    action: 'Open Notes →',
+    href: 'comptia-notes-quiz.html',
+    color: 'var(--grn)',
+  },
+  {
+    num: '4',
+    name: 'Submit a Question',
+    desc: 'Write one question based on what you learned today. It gets formatted to CompTIA style and may appear on a future cold retrieval quiz for the whole class.',
+    action: 'Back to Classroom →',
+    href: 'comptia-classroom-v2.html',
+    color: 'var(--amb)',
+  },
+  {
+    num: '5',
+    name: 'Closing Quiz',
+    desc: '5 questions on today's content. This IS graded. Score 80% or higher to earn PBIS points. Read each question carefully and look for qualifier words.',
+    action: 'Take the Quiz →',
+    href: 'comptia-classroom-v2.html',
+    color: 'var(--red)',
+  },
+];
+
+let routineStep = 0;
+
+function startRoutine() {
+  routineStep = 0;
+  document.getElementById('routineOverlay').classList.add('active');
+  renderRoutineStep();
+}
+
+function renderRoutineStep() {
+  const phase = ROUTINE_PHASES[routineStep];
+  const total = ROUTINE_PHASES.length;
+
+  document.getElementById('rPhaseLabel').textContent = `Phase ${routineStep+1} of ${total}`;
+  document.getElementById('rPhaseNum').textContent   = phase.num;
+  document.getElementById('rPhaseNum').style.color   = phase.color;
+  document.getElementById('rPhaseName').textContent  = phase.name;
+  document.getElementById('rPhaseDesc').textContent  = phase.desc;
+
+  const btn = document.getElementById('rActionBtn');
+  btn.textContent = phase.action;
+  btn.href = phase.href;
+  btn.style.background = phase.color;
+  btn.style.color = phase.color === 'var(--amb)' || phase.color === 'var(--grn)' ? 'var(--bg)' : 'var(--bg)';
+
+  // Progress dots
+  document.getElementById('rProgress').innerHTML = ROUTINE_PHASES.map((_,i) =>
+    `<div class="rp-dot ${i < routineStep ? 'done' : i === routineStep ? 'active' : ''}"></div>`
+  ).join('');
+
+  // Nav buttons
+  document.getElementById('rPrevBtn').style.display = routineStep === 0 ? 'none' : '';
+  document.getElementById('rNextBtn').textContent = routineStep === total-1 ? '✓ Done' : 'Next Phase →';
+}
+
+function nextRoutineStep() {
+  if (routineStep < ROUTINE_PHASES.length - 1) {
+    routineStep++;
+    renderRoutineStep();
+  } else {
+    exitRoutine();
+  }
+}
+
+function prevRoutineStep() {
+  if (routineStep > 0) { routineStep--; renderRoutineStep(); }
+}
+
+function exitRoutine() {
+  document.getElementById('routineOverlay').classList.remove('active');
+}
+
+
+
+// ── PHASE INSTRUCTION BAR ──────────────────────────────
+const PHASE_INSTRUCTIONS = {
+  'cold':       {icon:'❄️',  title:'Cold Retrieval — Answer the 5 warm-up questions', desc:'These are from previous lessons. Not graded — just wake your brain up.', step:'Step 1 of 5'},
+  'scenario':   {icon:'🎯',  title:'Scenario Questions — Read carefully and answer', desc:'Real-world IT scenarios. Think through what a technician would actually do.', step:'Step 2 of 5'},
+  'notes':      {icon:'📝',  title:'Take Notes — Open the Notes tool in a new tab', desc:'Fill in all 5 Cornell note sections while watching today\'s videos.', step:'Step 3 of 5'},
+  'discussion': {icon:'💬',  title:'Discussion — Share your answer with the class', desc:'Type your response and be ready to discuss with your classmates.', step:'Step 3 of 5'},
+  'video':      {icon:'▶️',  title:'Watch Today\'s Videos — Open Udemy', desc:'Take notes while you watch. Pause when you need to write something down.', step:'Step 3 of 5'},
+  'sq':         {icon:'✍️',  title:'Submit a Question — Write one question from today', desc:'Your question may appear on a future cold retrieval quiz for the whole class.', step:'Step 4 of 5'},
+  'timed':      {icon:'⏱',  title:'Closing Quiz — 5 GRADED questions · Score 80%+ for PBIS points', desc:'Read each question carefully. Look for qualifier words: BEST, FIRST, MOST, NEXT.', step:'Step 5 of 5 · GRADED'},
+  'flash':      {icon:'🃏',  title:'Flashcard Drill — Review your question bank', desc:'Go through each card and mark whether you got it right or wrong.', step:'Extra Practice'},
+  'guide':      {icon:'📖',  title:'Study Guide — Review today\'s key concepts', desc:'Read through the summary and take notes on anything you missed.', step:'Extra Practice'},
+};
+
+function updatePhaseBar(phase) {
+  const info = PHASE_INSTRUCTIONS[phase];
+  if (!info) return;
+  const bar = document.getElementById('phaseInstructionBar');
+  if (!bar) return;
+  
+  // Color-code by phase urgency
+  const colors = {
+    timed: 'var(--red)', cold: 'var(--acc)', scenario: 'var(--pur)',
+    notes: 'var(--grn)', discussion: 'var(--amb)', sq: 'var(--grn)',
+    video: 'var(--pur)', flash: 'var(--acc)', guide: 'var(--acc)'
+  };
+  const color = colors[phase] || 'var(--acc)';
+  
+  bar.style.background = color.replace(')', '-d)').replace('var(', 'var(');
+  bar.style.borderBottomColor = color;
+  
+  document.getElementById('phaseBarIcon').textContent  = info.icon;
+  document.getElementById('phaseBarTitle').textContent = info.title;
+  document.getElementById('phaseBarTitle').style.color = color;
+  document.getElementById('phaseBarDesc').textContent  = info.desc;
+  document.getElementById('phaseBarStep').textContent  = info.step;
+}
+
+
 function toast(msg,type=''){
   const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');
   setTimeout(()=>t.className='toast',3000);

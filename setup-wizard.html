@@ -640,7 +640,11 @@ function handleRequest(e) {
     if (p.action === 'ping') {
       result = { ok: true, message: 'Connected!' };
     }
-    else if (p.action === 'save_score') {
+    else if (p.action === 'save_login') {
+      getOrCreate(ss,'Logins').appendRow([new Date(),p.code,p.tool,p.date,p.time]);
+      result = { ok: true };
+    }
+        else if (p.action === 'save_score') {
       getOrCreate(ss,'Scores').appendRow([new Date(),p.code,p.day,p.type,p.score,p.pct]);
       result = { ok: true };
     }
@@ -670,6 +674,19 @@ function handleRequest(e) {
     else if (p.action === 'save_assessment') {
       getOrCreate(ss,'Assessments').appendRow([new Date(),p.code,p.day,p.confidence,p.confusing,p.clicked]);
       result = { ok: true };
+    }
+    else if (p.action === 'save_grade') {
+      const s = getOrCreate(ss,'Grades');
+      const data = s.getDataRange().getValues();
+      const i = data.findIndex(r=>r[1]===p.code);
+      const row = [new Date(),p.code,Number(p.notes_pct||0),Number(p.disc_pct||0),Number(p.test_pct||0),Number(p.final_pct||0),p.letter||''];
+      if (i > 0) s.getRange(i+1,1,1,row.length).setValues([row]);
+      else s.appendRow(row);
+      result = { ok: true };
+    }
+    else if (p.action === 'get_grades') {
+      const data = getOrCreate(ss,'Grades').getDataRange().getValues().slice(1);
+      result = { ok: true, grades: data };
     }
     else if (p.action === 'get_class_summary') {
       const scores = getOrCreate(ss,'Scores').getDataRange().getValues().slice(1);
@@ -703,6 +720,7 @@ function getOrCreate(ss, name) {
       Notes:       ['Timestamp','Code','Chapter','Notes'],
       PBIS:        ['Timestamp','Code','Reason','Points','Auto'],
       Assessments: ['Timestamp','Code','Day','Confidence','Confusing','Clicked'],
+      Grades:      ['Timestamp','Code','Notes+Quizzes %','Discussion %','Tests %','Final Grade %','Letter'],
     };
     if (h[name]) {
       s.getRange(1,1,1,h[name].length).setValues([h[name]]).setFontWeight('bold');
