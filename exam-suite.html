@@ -269,7 +269,7 @@ nav::-webkit-scrollbar{height:2px}
   <div class="tab active" onclick="switchTab('exam')">🎓 Exam Simulator</div>
   <div class="tab" onclick="switchTab('micro')">⚡ Micro-Lessons</div>
   <div class="tab teacher-only" id="tab-parent-btn" onclick="switchTab('parent')">✉️ Parent Comms</div>
-  <div class="tab teacher-only" id="tab-sub-btn" onclick="switchTab('sub')">🔄 Sub Mode</div>
+  <div class="tab teacher-only" id="tab-sub-btn" onclick="switchTab('sub');initSubTab()">🔄 Sub Mode</div>
   <div class="tab teacher-only" id="tab-calendar-btn" onclick="switchTab('calendar')">📅 Calendar</div>
   <div class="tab teacher-only" onclick="switchTab('attend')">📋 Attendance Log</div>
   <div class="tab" onclick="switchTab('assess')">💭 Self-Assessment</div>
@@ -459,84 +459,122 @@ nav::-webkit-scrollbar{height:2px}
      4. SUBSTITUTE TEACHER MODE
 ═══════════════════════════════════ -->
 <div class="panel" id="tab-sub">
+
+  <!-- HERO -->
   <div class="sub-hero">
-    <div class="sub-title">Substitute Teacher Guide</div>
-    <div class="sub-date" id="subDate">Today's date loading…</div>
-    <div style="font-size:13px;color:var(--tx2);max-width:500px;margin:0 auto;line-height:1.7">
-      Everything is already set up. Follow these steps in order. All tools open automatically — just click the buttons below each step.
+    <div class="sub-title">🔑 One-Click Sub Plan</div>
+    <div class="sub-date" id="subDate"></div>
+    <div style="font-size:13px;color:var(--tx2);max-width:540px;margin:0 auto;line-height:1.7">
+      Generate a complete substitute lesson plan in seconds. The sub needs zero IT knowledge — everything is step-by-step with direct links.
     </div>
   </div>
 
-  <div class="card">
+  <!-- TEACHER CONFIG CARD -->
+  <div class="card teacher-only" style="border-color:var(--acc);margin-bottom:16px">
     <div class="card-hdr">
-      <h2>📋 Today's Class Plan</h2>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--tx2)">Day:</span>
-        <input type="number" id="subDay" min="1" max="68" value="1" style="width:55px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:5px 8px;color:var(--tx);font-family:var(--mono);font-size:12px;outline:none;text-align:center" onchange="loadSubDay()">
-      </div>
+      <h2>⚙️ Configure Sub Plan</h2>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Takes 15 seconds to generate</span>
     </div>
     <div class="card-body">
-      <div id="subDayInfo" style="padding:10px;background:var(--s2);border-radius:var(--r);margin-bottom:16px;font-size:12px;color:var(--tx2);line-height:1.7"></div>
-      <div class="sub-steps">
-        <div class="sub-step">
-          <div class="ss-num">1</div>
-          <div class="ss-content">
-            <div class="ss-title">Cold Retrieval (5 questions)</div>
-            <div class="ss-desc">Students open the classroom platform and complete 5 review questions from yesterday's lesson. They work independently and submit — it auto-grades. <strong>You don't need to do anything</strong> except make sure everyone is logged in.</div>
-            <div class="ss-time">⏱ 8–10 minutes</div>
-            <div class="ss-action"><button class="btn btn-acc btn-sm" onclick="window.open('comptia-classroom-v2.html','_blank')">Open Classroom Platform →</button></div>
-          </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Today's Objective</div>
+          <input id="subObjInput" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-size:13px;outline:none;font-family:var(--sans)" placeholder="Auto-loads from classroom (e.g. 2.1)">
+          <div style="font-size:10px;color:var(--tx3);margin-top:4px;font-family:var(--mono)">Leave blank to auto-detect from classroom</div>
         </div>
-        <div class="sub-step">
-          <div class="ss-num">2</div>
-          <div class="ss-content">
-            <div class="ss-title">Watch Today's Videos</div>
-            <div class="ss-desc">Have students open Udemy and watch today's assigned videos. The classroom platform shows the video titles and links for today's day. Students take notes using the Notes tool.</div>
-            <div class="ss-time">⏱ <span id="subVideoTime">14</span> minutes of video</div>
-            <div class="ss-action">
-              <button class="btn btn-ghost btn-sm" onclick="window.open('https://www.udemy.com/course/total-comptia-a-certification/learn/','_blank')">Open Udemy →</button>
-              <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="window.open('comptia-notes-quiz.html','_blank')">Open Notes Tool →</button>
-            </div>
-          </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Class Period / Period Name</div>
+          <input id="subPeriodInput" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-size:13px;outline:none;font-family:var(--sans)" placeholder="e.g. Period 3 · CompTIA A+">
         </div>
-        <div class="sub-step">
-          <div class="ss-num">3</div>
-          <div class="ss-content">
-            <div class="ss-title">Student Question Submission</div>
-            <div class="ss-desc">After videos, each student writes one question from what they learned in the notes tool. They submit it — it auto-formats to CompTIA style. Takes 5 minutes max.</div>
-            <div class="ss-time">⏱ 5 minutes</div>
-          </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Number of Students</div>
+          <input id="subStudentCount" type="number" value="18" min="1" max="36" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-size:13px;outline:none">
         </div>
-        <div class="sub-step">
-          <div class="ss-num">4</div>
-          <div class="ss-content">
-            <div class="ss-title">Closing Quiz (5 questions)</div>
-            <div class="ss-desc">Students return to the classroom platform for the timed practice — 5 questions, auto-graded. This IS graded. They have until the end of class.</div>
-            <div class="ss-time">⏱ 10 minutes · Graded</div>
-            <div class="ss-action"><button class="btn btn-acc btn-sm" onclick="window.open('comptia-classroom-v2.html','_blank')">Open Classroom Platform →</button></div>
-          </div>
-        </div>
-        <div class="sub-step">
-          <div class="ss-num">5</div>
-          <div class="ss-content">
-            <div class="ss-title">If students finish early</div>
-            <div class="ss-desc">Direct students to the Student Command Center — they can review flashcards, work on Cornell notes, or take a practice exam. All self-directed.</div>
-            <div class="ss-action"><button class="btn btn-ghost btn-sm" onclick="window.open('student-command-center.html','_blank')">Student Command Center →</button></div>
-          </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Class Length (minutes)</div>
+          <input id="subClassLength" type="number" value="55" min="30" max="90" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--tx);font-size:13px;outline:none">
         </div>
       </div>
 
-      <div style="margin-top:16px;padding:14px;background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r)">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--amb);letter-spacing:1px;margin-bottom:6px">EMERGENCY CONTACTS</div>
-        <div id="subContacts" style="font-size:12px;color:var(--tx2);line-height:1.8">
-          Teacher: <em>Update this in the settings</em><br>
-          Department: <em>Update this in the settings</em><br>
-          Tech support: <em>Update this in the settings</em>
-        </div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="editSubContacts()">Edit Contacts</button>
+      <!-- Emergency contacts -->
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Emergency Contacts (printed on sub plan)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <input id="subContactTeacher" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:12px;outline:none;font-family:var(--sans)" placeholder="Your cell / email">
+        <input id="subContactDept" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:12px;outline:none;font-family:var(--sans)" placeholder="Department head">
+        <input id="subContactTech" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:12px;outline:none;font-family:var(--sans)" placeholder="Tech support / IT">
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-acc" onclick="generateSubPlan()">
+          ⚡ Generate Sub Plan
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="printSubPlan()" id="printSubBtn" style="display:none">
+          🖨️ Print / Save PDF
+        </button>
+        <div id="subGenStatus" style="font-family:var(--mono);font-size:10px;color:var(--tx3);display:flex;align-items:center;gap:6px"></div>
       </div>
     </div>
   </div>
+
+  <!-- GENERATED PLAN DISPLAY -->
+  <div id="subPlanDisplay" style="display:none">
+
+    <!-- Print-ready card -->
+    <div class="card" id="subPrintCard">
+      <div class="card-hdr" style="background:linear-gradient(135deg,rgba(79,158,255,.08),rgba(61,214,140,.04));border-bottom-color:var(--acc)">
+        <div>
+          <h2 style="font-size:20px" id="subPlanTitle">Substitute Teacher Guide</h2>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:3px" id="subPlanMeta"></div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3)" id="subPlanDate"></div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--acc);margin-top:2px" id="subPlanObj"></div>
+        </div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Sub intro message -->
+        <div id="subIntroBox" style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:14px 16px;margin-bottom:20px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:1px;margin-bottom:6px">👋 MESSAGE TO SUBSTITUTE</div>
+          <div id="subIntroText" style="font-size:13px;color:var(--tx);line-height:1.8"></div>
+        </div>
+
+        <!-- Classroom URL -->
+        <div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+          <div style="font-size:24px">💻</div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1px;margin-bottom:3px">STUDENT PLATFORM URL — write this on the board</div>
+            <div id="subPlatformUrl" style="font-family:var(--mono);font-size:13px;color:var(--tx);word-break:break-all"></div>
+          </div>
+        </div>
+
+        <!-- Step-by-step plan -->
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Step-by-Step Class Plan</div>
+        <div id="subStepsList"></div>
+
+        <!-- What to expect from students -->
+        <div id="subExpectBox" style="background:var(--pur-d);border:1px solid var(--pur);border-radius:var(--r);padding:14px 16px;margin-top:16px;margin-bottom:16px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--pur);letter-spacing:1px;margin-bottom:6px">📋 WHAT TO EXPECT</div>
+          <div id="subExpectText" style="font-size:12px;color:var(--tx);line-height:1.8"></div>
+        </div>
+
+        <!-- If students finish early -->
+        <div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:14px 16px;margin-bottom:16px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--amb);letter-spacing:1px;margin-bottom:6px">⏰ IF STUDENTS FINISH EARLY</div>
+          <div id="subFinishEarlyText" style="font-size:12px;color:var(--tx);line-height:1.8"></div>
+        </div>
+
+        <!-- Emergency contacts -->
+        <div style="background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:14px 16px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:1px;margin-bottom:8px">📞 EMERGENCY CONTACTS</div>
+          <div id="subContactsDisplay" style="font-size:13px;color:var(--tx);line-height:2;font-family:var(--mono)"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ═══════════════════════════════════
@@ -886,6 +924,183 @@ let calMonth = 0;
 // ══════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+// SUB PLAN GENERATOR
+// ════════════════════════════════════════════════════
+
+const OBJECTIVES_SUB = {
+  '1.1':'Mobile Device Hardware','1.2':'Mobile Connectivity','1.3':'Mobile Networks',
+  '2.1':'TCP/UDP Ports & Protocols','2.2':'Wireless Networking','2.3':'Network Hosts',
+  '2.4':'Network Configuration','2.5':'Network Hardware','2.6':'SOHO Networks',
+  '2.7':'Internet Connection Types','2.8':'Networking Tools',
+  '3.1':'Display Components','3.2':'Cable Types','3.3':'RAM','3.4':'Storage Devices',
+  '3.5':'Motherboards & CPUs','3.6':'Power Supplies','3.7':'Printers','3.8':'Printer Maintenance',
+  '4.1':'Virtualization','4.2':'Cloud Computing',
+  '5.1':'Motherboard Troubleshooting','5.2':'Drive & RAID Troubleshooting',
+  '5.3':'Display Troubleshooting','5.4':'Mobile Device Troubleshooting',
+  '5.5':'Network Troubleshooting','5.6':'Printer Troubleshooting',
+  'C1.1':'OS Types','C1.2':'OS Installation','C1.3':'Windows Editions',
+  'C1.4':'Windows Tools','C1.5':'Command-Line Tools','C1.6':'Windows Settings',
+  'C1.7':'Windows Networking','C1.8':'macOS','C1.9':'Linux',
+  'C1.10':'App Installation','C1.11':'Cloud Apps',
+  'C2.1':'Security Measures','C2.2':'Windows Security','C2.3':'Wireless Security',
+  'C2.4':'Malware','C2.5':'Social Engineering','C2.6':'Malware Removal',
+  'C2.7':'Workstation Hardening','C2.8':'Mobile Security','C2.9':'Data Destruction',
+  'C2.10':'SOHO Network Security','C2.11':'Browser Security',
+  'C3.1':'Windows Troubleshooting','C3.2':'Mobile App Issues',
+  'C3.3':'Mobile Security Issues','C3.4':'PC Security Issues',
+  'C4.1':'Documentation','C4.2':'Change Management','C4.3':'Backup & Recovery',
+  'C4.4':'Safety Procedures','C4.5':'Environmental Controls','C4.6':'Privacy & Policy',
+  'C4.7':'Communication & Professionalism','C4.8':'Scripting','C4.9':'Remote Access',
+  'C4.10':'AI Concepts',
+};
+
+async function generateSubPlan() {
+  const apiKey = localStorage.getItem('PLATFORM_API_KEY');
+  if (!apiKey) { alert('API key required. Add it in the Setup Wizard first.'); return; }
+
+  let objId = document.getElementById('subObjInput') ? document.getElementById('subObjInput').value.trim() : '';
+  if (!objId) {
+    try { const o = JSON.parse(localStorage.getItem('class_objective')||'{}'); objId = o.id||''; } catch(e){}
+  }
+
+  const period       = (document.getElementById('subPeriodInput') ? document.getElementById('subPeriodInput').value.trim() : '') || 'CompTIA A+ Class';
+  const studentCount = document.getElementById('subStudentCount') ? document.getElementById('subStudentCount').value : '18';
+  const classLength  = document.getElementById('subClassLength')  ? document.getElementById('subClassLength').value  : '55';
+  const cT = document.getElementById('subContactTeacher') ? document.getElementById('subContactTeacher').value.trim() : '';
+  const cD = document.getElementById('subContactDept')    ? document.getElementById('subContactDept').value.trim()    : '';
+  const cTech = document.getElementById('subContactTech') ? document.getElementById('subContactTech').value.trim()    : '';
+
+  const objName = (objId && OBJECTIVES_SUB[objId]) ? 'Objective '+objId+': '+OBJECTIVES_SUB[objId] : 'General Review';
+  localStorage.setItem('sub_contacts', JSON.stringify({teacher:cT,dept:cD,tech:cTech}));
+
+  const statusEl = document.getElementById('subGenStatus');
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--acc)">⏳ Generating…</span>';
+
+  const platformUrl = window.location.origin + window.location.pathname.replace('exam-suite.html','classroom.html');
+  const today = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  const prompt = 'You are writing a substitute teacher guide for a CompTIA A+ CTE high school class.\n\nClass: '+period+'\nDate: '+today+'\nStudents: '+studentCount+'\nClass length: '+classLength+' minutes\nTopic: '+objName+'\nPlatform URL: '+platformUrl+'\n\nThe sub has NO IT knowledge. Write in plain friendly language. Students use Chromebooks. They know their login codes (format STU-001).\n\nReturn ONLY valid JSON:\n{"intro":"2-3 warm reassuring sentences for the sub","steps":[{"num":1,"title":"Step title","time":"X minutes","instruction":"What the sub says/does — be specific","student_action":"What students do","tip":"One practical tip"},{"num":2,"title":"","time":"","instruction":"","student_action":"","tip":""},{"num":3,"title":"","time":"","instruction":"","student_action":"","tip":""},{"num":4,"title":"","time":"","instruction":"","student_action":"","tip":""},{"num":5,"title":"","time":"","instruction":"","student_action":"","tip":""}],"what_to_expect":"Bullet points separated by newline. Normal things to expect from students.","if_finish_early":"2-3 things students can do self-directed.","behavior_note":"One sentence on expectations."}';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1800,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || '{}';
+    const plan = JSON.parse(text.replace(/```json\n?|```/g,'').trim());
+    renderSubPlan(plan,{objId,objName,period,studentCount,classLength,platformUrl,today,contactTeacher:cT,contactDept:cD,contactTech:cTech});
+    if(statusEl) statusEl.innerHTML = '<span style="color:var(--grn)">✓ Plan generated</span>';
+    setTimeout(()=>{if(statusEl)statusEl.innerHTML='';},3000);
+  } catch(e) {
+    if(statusEl) statusEl.innerHTML = '<span style="color:var(--red)">✗ '+e.message+'</span>';
+  }
+}
+
+function renderSubPlan(plan, cfg) {
+  document.getElementById('subPlanDisplay').style.display='block';
+  document.getElementById('printSubBtn').style.display='inline-flex';
+  document.getElementById('subPlanTitle').textContent = 'Sub Guide — '+cfg.period;
+  document.getElementById('subPlanMeta').textContent  = cfg.studentCount+' students · '+cfg.classLength+' minutes';
+  document.getElementById('subPlanDate').textContent  = cfg.today;
+  document.getElementById('subPlanObj').textContent   = cfg.objName;
+  document.getElementById('subPlatformUrl').textContent = cfg.platformUrl;
+  document.getElementById('subIntroText').textContent = plan.intro||'';
+
+  const stepsList = document.getElementById('subStepsList');
+  stepsList.innerHTML = (plan.steps||[]).map(s =>
+    '<div class="sub-step" style="margin-bottom:14px">'+
+      '<div class="ss-num">'+s.num+'</div>'+
+      '<div class="ss-content">'+
+        '<div class="ss-title">'+s.title+'</div>'+
+        '<div class="ss-time">⏱ '+s.time+'</div>'+
+        '<div style="margin-top:6px"><div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:3px">WHAT YOU DO:</div><div class="ss-desc">'+s.instruction+'</div></div>'+
+        '<div style="margin-top:8px"><div style="font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:.8px;margin-bottom:3px">WHAT STUDENTS DO:</div><div class="ss-desc" style="color:var(--tx)">'+s.student_action+'</div></div>'+
+        (s.tip?'<div style="background:var(--s3);border-radius:6px;padding:6px 10px;margin-top:8px;font-size:11px;color:var(--tx3)"><strong>💡 Tip:</strong> '+s.tip+'</div>':'')+
+      '</div>'+
+    '</div>'
+  ).join('');
+
+  document.getElementById('subExpectText').innerHTML = (plan.what_to_expect||'')
+    .split('\n').filter(Boolean).map(l=>'• '+l.replace(/^•\s*/,'')).join('<br>');
+  document.getElementById('subFinishEarlyText').textContent = plan.if_finish_early||'Direct students to their Student Dashboard to review past objectives.';
+  document.getElementById('subContactsDisplay').innerHTML = [
+    'Teacher: '+(cfg.contactTeacher||'<em style="color:var(--tx3)">Not set</em>'),
+    'Dept Head: '+(cfg.contactDept||'<em style="color:var(--tx3)">Not set</em>'),
+    'Tech Support: '+(cfg.contactTech||'<em style="color:var(--tx3)">Not set</em>'),
+  ].join('<br>');
+
+  document.getElementById('subPlanDisplay').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function printSubPlan() {
+  const card = document.getElementById('subPrintCard');
+  if (!card) { alert('Generate a plan first'); return; }
+  const title = document.getElementById('subPlanTitle')?.textContent || 'Sub Plan';
+  const date  = document.getElementById('subPlanDate')?.textContent  || '';
+  const obj   = document.getElementById('subPlanObj')?.textContent   || '';
+  const url   = document.getElementById('subPlatformUrl')?.textContent || '';
+  const intro = document.getElementById('subIntroText')?.textContent  || '';
+  const steps = document.getElementById('subStepsList')?.innerHTML    || '';
+  const expect= document.getElementById('subExpectText')?.innerHTML   || '';
+  const early = document.getElementById('subFinishEarlyText')?.textContent || '';
+  const contacts = document.getElementById('subContactsDisplay')?.innerHTML || '';
+
+  const w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>'+title+'</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    'body{font-family:Georgia,serif;color:#111;padding:32px;max-width:800px;margin:0 auto;line-height:1.7;font-size:14px}'+
+    'h1{font-size:24px;font-weight:bold;margin-bottom:6px}'+
+    '.meta{font-size:12px;color:#666;margin-bottom:24px;font-family:monospace}'+
+    '.section{margin-bottom:20px;padding:14px 16px;border-radius:6px}'+
+    '.green{background:#f0faf4;border:1px solid #3dd68c}'+
+    '.blue{background:#eff6ff;border:1px solid #3b82f6}'+
+    '.purple{background:#faf5ff;border:1px solid #a855f7}'+
+    '.amber{background:#fffbeb;border:1px solid #f59e0b}'+
+    '.red{background:#fff5f5;border:1px solid #ef4444}'+
+    '.lbl{font-family:monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}'+
+    '.step{display:flex;gap:14px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid #eee}'+
+    '.num{width:28px;height:28px;background:#3b82f6;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0;margin-top:2px}'+
+    '.stitle{font-weight:bold;font-size:15px;margin-bottom:4px}'+
+    '.stime{font-size:11px;color:#888;font-family:monospace;margin-bottom:8px}'+
+    '.url-box{background:#eff6ff;border:2px solid #3b82f6;border-radius:6px;padding:14px 18px;margin:20px 0}'+
+    '.url-lbl{font-family:monospace;font-size:10px;color:#3b82f6;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}'+
+    '.url-text{font-family:monospace;font-size:15px;font-weight:bold;word-break:break-all}'+
+    '@media print{body{padding:16px}}'+
+  '</style></head><body>'+
+  '<h1>'+title+'</h1>'+
+  '<div class="meta">'+date+' &nbsp;·&nbsp; '+obj+'</div>'+
+  '<div class="section green"><div class="lbl" style="color:#15803d">👋 Message to Substitute</div>'+intro+'</div>'+
+  '<div class="url-box"><div class="url-lbl">💻 Student Platform URL — Write this on the board</div><div class="url-text">'+url+'</div></div>'+
+  '<div class="lbl" style="margin-bottom:12px">Step-by-Step Class Plan</div>'+
+  steps+
+  '<div class="section purple"><div class="lbl" style="color:#7c3aed">📋 What to Expect</div>'+expect+'</div>'+
+  '<div class="section amber"><div class="lbl" style="color:#b45309">⏰ If Students Finish Early</div>'+early+'</div>'+
+  '<div class="section red"><div class="lbl" style="color:#dc2626">📞 Emergency Contacts</div>'+contacts+'</div>'+
+  '<script>window.onload=function(){window.print()}<\/script>'+
+  '</body></html>');
+  w.document.close();
+}
+
+// Auto-load saved contacts and objective on tab switch
+function initSubTab() {
+  try {
+    const c = JSON.parse(localStorage.getItem('sub_contacts')||'{}');
+    if(c.teacher && document.getElementById('subContactTeacher')) document.getElementById('subContactTeacher').value=c.teacher;
+    if(c.dept    && document.getElementById('subContactDept'))    document.getElementById('subContactDept').value=c.dept;
+    if(c.tech    && document.getElementById('subContactTech'))    document.getElementById('subContactTech').value=c.tech;
+  } catch(e){}
+  try {
+    const o = JSON.parse(localStorage.getItem('class_objective')||'{}');
+    const inp = document.getElementById('subObjInput');
+    if(o.id && inp && !inp.value) inp.value = o.id;
+  } catch(e){}
+  const dateEl = document.getElementById('subDate');
+  if(dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
 function init(){
   if(typeof Platform!=="undefined") Platform.guardPage();
   buildDomainPreview();

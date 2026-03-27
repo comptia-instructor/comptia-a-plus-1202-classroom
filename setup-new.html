@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Setup Wizard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090d;--s1:#0e1018;--s2:#13151f;--s3:#1a1d2a;--b1:#252836;--b2:#2e3245;--tx:#e8eaf0;--tx2:#9096b0;--tx3:#5a607a;--acc:#4f9eff;--acc-d:rgba(79,158,255,.08);--grn:#3dd68c;--grn-d:rgba(61,214,140,.08);--red:#ff4560;--red-d:rgba(255,69,96,.08);--amb:#ffb830;--amb-d:rgba(255,184,48,.08);--pur:#a855f7;--pur-d:rgba(168,85,247,.08);--gold:#ffd700;--r:8px;--rl:12px;--rxl:20px;--mono:'Space Mono',monospace;--display:'Syne',sans-serif;--sans:'Inter',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100vh}
+</style>
+</head>
+<body>
+
+<!-- PIN GATE OVERLAY -->
+<div id="pinGateOverlay" style="display:none;position:fixed;inset:0;background:#08090d;z-index:99999;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;font-family:sans-serif">
+  <div style="font-size:52px">🔑</div>
+  <div style="color:#e8eaf0;font-size:24px;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-family:'Syne',sans-serif">Teacher Access Required</div>
+  <div style="color:#5a607a;font-size:13px;max-width:300px;line-height:1.7">Enter your teacher PIN to access the setup wizard.</div>
+  <input id="gatePinInput" type="password" maxlength="8" placeholder="PIN"
+    style="background:#0e1018;border:1.5px solid #252836;border-radius:8px;padding:12px 20px;color:#e8eaf0;font-family:'Space Mono',monospace;font-size:22px;letter-spacing:6px;text-align:center;outline:none;width:180px">
+  <button onclick="checkGatePin()"
+    style="background:#4f9eff;color:#08090d;border:none;border-radius:8px;padding:10px 28px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-transform:uppercase;cursor:pointer">
+    Unlock
+  </button>
+  <div id="gatePinErr" style="color:#ff4560;font-size:11px;height:16px;font-family:'Space Mono',monospace"></div>
+  <a href="hub-new.html" style="color:#5a607a;font-size:11px;text-decoration:underline;margin-top:4px">← Back to Hub</a>
+</div>
+
+<script>
+(function() {
+  var isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+  if (!isTeacher) {
+    var overlay = document.getElementById('pinGateOverlay');
+    if (overlay) {
+      overlay.style.display = 'flex';
+      setTimeout(function() { var el=document.getElementById('gatePinInput'); if(el)el.focus(); }, 100);
+    }
+  }
+})();
+function checkGatePin() {
+  var entered = document.getElementById('gatePinInput').value.trim();
+  var savedPin = localStorage.getItem('teacher_pin') || '1529';
+  if (entered === savedPin) {
+    localStorage.setItem('teacher_unlocked','true');
+    document.getElementById('pinGateOverlay').style.display = 'none';
+  } else {
+    document.getElementById('gatePinInput').value = '';
+    document.getElementById('gatePinErr').textContent = 'Incorrect PIN.';
+    setTimeout(function(){ document.getElementById('gatePinErr').textContent=''; }, 2000);
+  }
+}
+document.getElementById('gatePinInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkGatePin();
+});
+</script>
+
+<style>
+.hdr{display:flex;align-items:center;gap:12px;padding:0 24px;height:52px;background:var(--s1);border-bottom:1px solid var(--b1)}
+.hdr-logo{font-family:var(--display);font-size:18px;font-weight:800;color:var(--acc)}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.page-title{font-family:var(--display);font-size:32px;font-weight:900;letter-spacing:-1px;color:var(--tx);margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--tx2);margin-bottom:32px;line-height:1.7}
+
+.step{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);margin-bottom:16px;overflow:hidden;transition:all .2s}
+.step.complete{border-color:var(--grn)}
+.step-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none}
+.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;border:1.5px solid var(--b2);color:var(--tx3)}
+.step.complete .step-num{background:var(--grn-d);border-color:var(--grn);color:var(--grn)}
+.step-header-info{flex:1}
+.step-title{font-family:var(--display);font-size:15px;font-weight:700;color:var(--tx)}
+.step-sub{font-size:12px;color:var(--tx3);margin-top:2px}
+.step-status{font-family:var(--mono);font-size:9px}
+.step-body{padding:20px;border-top:1px solid var(--b1);display:none}
+.step.open .step-body{display:block}
+
+.field-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.field-input{width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:var(--r);padding:11px 14px;color:var(--tx);font-size:13px;outline:none;transition:border-color .2s;font-family:var(--sans)}
+.field-input:focus{border-color:var(--acc)}
+.field-input.mono-input{font-family:var(--mono);font-size:12px;letter-spacing:1px}
+.field-desc{font-size:11px;color:var(--tx3);margin-top:6px;line-height:1.6}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;text-decoration:none}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-grn{background:var(--grn);color:var(--bg)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{background:var(--s3);color:var(--tx)}
+.btn-red{background:var(--red);color:#fff}
+.btn-sm{padding:6px 14px;font-size:10px}
+
+.test-result{padding:10px 14px;border-radius:var(--r);font-family:var(--mono);font-size:11px;margin-top:10px;line-height:1.6}
+.test-result.ok{background:var(--grn-d);border:1px solid var(--grn);color:var(--grn)}
+.test-result.err{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.test-result.info{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc)}
+
+.codes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;margin-top:10px}
+.code-chip{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:10px;color:var(--tx2);text-align:center}
+
+.script-box{background:#0a0c0a;border:1px solid var(--b2);border-radius:var(--r);padding:14px;font-family:var(--mono);font-size:10px;color:#9ab8a0;line-height:1.7;max-height:200px;overflow-y:auto;margin-top:10px;white-space:pre-wrap;position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;padding:3px 8px;font-family:var(--mono);font-size:9px;color:var(--tx3);cursor:pointer;transition:all .15s}
+.copy-btn:hover{border-color:var(--acc);color:var(--acc)}
+
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:var(--r);font-family:var(--mono);font-size:11px;animation:toastIn .2s;max-width:300px}
+.toast.ok{background:var(--grn-d);border:1px solid var(--grn);color:var(--grn)}
+.toast.err{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.toast.info{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc)}
+@keyframes toastIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+</style>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<header class="hdr">
+  <a href="hub-new.html" style="text-decoration:none;font-family:var(--display);font-size:18px;font-weight:800;color:var(--acc)">A+</a>
+  <div style="width:1px;height:18px;background:var(--b2)"></div>
+  <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx)">Setup Wizard</div>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    <a href="hub-new.html" class="btn btn-ghost btn-sm">← Back to Hub</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="page-title">Platform Setup</div>
+  <div class="page-sub">Configure your classroom platform. Each step saves automatically to your browser — nothing is stored on GitHub.</div>
+
+  <!-- STEP 1: API KEY -->
+  <div class="step open" id="step1">
+    <div class="step-header" onclick="toggleStep('step1')">
+      <div class="step-num">1</div>
+      <div class="step-header-info">
+        <div class="step-title">Anthropic API Key</div>
+        <div class="step-sub">Powers AI lesson generation, lab scenarios, and quiz creation</div>
+      </div>
+      <div class="step-status" id="s1status" style="color:var(--tx3)">Not configured</div>
+    </div>
+    <div class="step-body">
+      <div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--tx);line-height:1.7">
+        <strong>How to get your API key:</strong><br>
+        1. Go to <strong>console.anthropic.com</strong> → Sign Up (use personal Gmail)<br>
+        2. Click <strong>Billing</strong> → Add $20 in credits<br>
+        3. Click <strong>Settings → Limits</strong> → set monthly limit to $20<br>
+        4. Click <strong>API Keys</strong> → Create Key → name it "CompTIA Classroom"<br>
+        5. Copy the key (starts with <code style="color:var(--acc)">sk-ant-</code>) and paste below<br>
+        <div style="margin-top:6px;color:var(--tx3)">Estimated cost: ~$3–8 per semester for both classes combined.</div>
+      </div>
+      <div class="field-label">Your API Key</div>
+      <input id="apiKeyInput" class="field-input mono-input" type="password" placeholder="sk-ant-api03-…" oninput="validateApiKey(this.value)">
+      <div class="field-desc">Stored only in your browser. Never written to GitHub. Never visible to students.</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-acc btn-sm" onclick="saveApiKey()">Save API Key</button>
+        <button class="btn btn-ghost btn-sm" onclick="testApiKey()">⚡ Test Connection</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearApiKey()" style="color:var(--red);border-color:var(--red)">Clear Key</button>
+      </div>
+      <div id="apiTestResult"></div>
+    </div>
+  </div>
+
+  <!-- STEP 2: TEACHER PIN -->
+  <div class="step" id="step2">
+    <div class="step-header" onclick="toggleStep('step2')">
+      <div class="step-num">2</div>
+      <div class="step-header-info">
+        <div class="step-title">Teacher PIN</div>
+        <div class="step-sub">Protects teacher mode, setup wizard, and all teacher tools</div>
+      </div>
+      <div class="step-status" id="s2status" style="color:var(--tx3)">Not set</div>
+    </div>
+    <div class="step-body">
+      <div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--tx);line-height:1.6">
+        ⚠️ Change your PIN from the default before sharing this platform with students.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <div class="field-label">New PIN (4-8 digits)</div>
+          <input id="newPinInput" class="field-input mono-input" type="password" maxlength="8" placeholder="New PIN">
+        </div>
+        <div>
+          <div class="field-label">Confirm PIN</div>
+          <input id="confirmPinInput" class="field-input mono-input" type="password" maxlength="8" placeholder="Repeat PIN">
+        </div>
+      </div>
+      <button class="btn btn-acc btn-sm" onclick="savePin()">Save PIN</button>
+      <div id="pinSaveResult"></div>
+    </div>
+  </div>
+
+  <!-- STEP 3: STUDENT CODES -->
+  <div class="step" id="step3">
+    <div class="step-header" onclick="toggleStep('step3')">
+      <div class="step-num">3</div>
+      <div class="step-header-info">
+        <div class="step-title">Student Codes</div>
+        <div class="step-sub">Generate anonymous codes for your class — no real names stored</div>
+      </div>
+      <div class="step-status" id="s3status" style="color:var(--tx3)">Not generated</div>
+    </div>
+    <div class="step-body">
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div class="field-label">Number of students</div>
+          <input id="numStudents" class="field-input" type="number" value="18" min="1" max="36" style="width:120px">
+        </div>
+        <div style="flex:1">
+          <div class="field-label">Class prefix</div>
+          <input id="codePrefix" class="field-input mono-input" value="STU" maxlength="4" style="width:100px" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <button class="btn btn-acc" onclick="generateCodes()">Generate Codes</button>
+      </div>
+      <div id="codesOutput">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">Click Generate Codes to create your class list.</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap" id="codesActions" style="display:none">
+        <button class="btn btn-ghost btn-sm" onclick="copyCodes()">📋 Copy All Codes</button>
+        <button class="btn btn-ghost btn-sm" onclick="printCodes()">🖨️ Print Codes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: GOOGLE SHEETS -->
+  <div class="step" id="step4">
+    <div class="step-header" onclick="toggleStep('step4')">
+      <div class="step-num">4</div>
+      <div class="step-header-info">
+        <div class="step-title">Google Sheets Sync</div>
+        <div class="step-sub">Auto-sync grades, quiz scores, and login data to a spreadsheet</div>
+      </div>
+      <div class="step-status" id="s4status" style="color:var(--tx3)">Not configured</div>
+    </div>
+    <div class="step-body">
+      <div style="font-size:12px;color:var(--tx2);line-height:1.8;margin-bottom:14px">
+        <strong>Setup steps:</strong><br>
+        1. Open your Google Sheet → <strong>Extensions → Apps Script</strong><br>
+        2. Delete all existing code, paste the script below<br>
+        3. Click <strong>Deploy → New Deployment → Web App</strong><br>
+        4. Set "Execute as: Me" and "Who has access: Anyone"<br>
+        5. Copy the deployment URL and paste below
+      </div>
+      
+      <div style="position:relative">
+        <div class="field-label">Apps Script (copy entire script)</div>
+        <div class="script-box" id="appsScriptBox">function doGet(e){return handleRequest(e);}
+function doPost(e){return handleRequest(e);}
+function handleRequest(e){
+  const p=e.parameter;
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  try{
+    let result={};
+    if(p.action==='ping'){result={ok:true,message:'Connected!'};}
+    else if(p.action==='save_login'){getOrCreate(ss,'Logins').appendRow([new Date(),p.code,p.tool,p.date,p.time]);result={ok:true};}
+    else if(p.action==='save_score'){getOrCreate(ss,'Scores').appendRow([new Date(),p.code,p.obj,p.type,p.score,p.pct]);result={ok:true};}
+    else if(p.action==='save_grade'){
+      const s=getOrCreate(ss,'Grades');
+      const data=s.getDataRange().getValues();
+      const i=data.findIndex(r=>r[1]===p.code);
+      const row=[new Date(),p.code,Number(p.notes_pct||0),Number(p.disc_pct||0),Number(p.test_pct||0),Number(p.final_pct||0),p.letter||''];
+      if(i>0)s.getRange(i+1,1,1,row.length).setValues([row]);
+      else s.appendRow(row);
+      result={ok:true};
+    }
+    else if(p.action==='get_class_summary'){
+      const scores=getOrCreate(ss,'Scores').getDataRange().getValues().slice(1);
+      const codes=[...new Set(scores.map(r=>r[1]).filter(Boolean))];
+      const summary=codes.map(code=>{
+        const s=scores.filter(r=>r[1]===code);
+        const t=s.filter(r=>r[3]==='quiz').map(r=>Number(r[5]));
+        const avg=t.length?Math.round(t.reduce((a,b)=>a+b,0)/t.length):0;
+        return{code,avg,sessions:s.length};
+      });
+      result={ok:true,summary};
+    }
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  }catch(err){return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.message})).setMimeType(ContentService.MimeType.JSON);}
+}
+function getOrCreate(ss,name){
+  let s=ss.getSheetByName(name);
+  if(!s){
+    s=ss.insertSheet(name);
+    const h={Scores:['Timestamp','Code','Objective','Type','Score','Pct'],Logins:['Timestamp','Code','Tool','Date','Time'],Grades:['Timestamp','Code','Notes+Quizzes %','Discussion %','Tests %','Final Grade %','Letter']};
+    if(h[name]){s.getRange(1,1,1,h[name].length).setValues([h[name]]).setFontWeight('bold');s.setFrozenRows(1);}
+  }
+  return s;
+}</div>
+        <button class="copy-btn" onclick="copyScript()">Copy</button>
+      </div>
+      
+      <div style="margin-top:14px">
+        <div class="field-label">Deployment URL</div>
+        <input id="sheetsUrlInput" class="field-input mono-input" placeholder="https://script.google.com/macros/s/…/exec">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-acc btn-sm" onclick="saveSheetsUrl()">Save URL</button>
+        <button class="btn btn-ghost btn-sm" onclick="testSheets()">⚡ Test Connection</button>
+      </div>
+      <div id="sheetsTestResult"></div>
+    </div>
+  </div>
+
+  <!-- STEP 5: PLATFORM SUMMARY -->
+  <div class="step" id="step5">
+    <div class="step-header" onclick="toggleStep('step5')">
+      <div class="step-num">5</div>
+      <div class="step-header-info">
+        <div class="step-title">Platform Summary</div>
+        <div class="step-sub">Review your configuration and launch</div>
+      </div>
+      <div class="step-status" style="color:var(--grn)">Always available</div>
+    </div>
+    <div class="step-body" id="summaryBody"></div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── INIT ──────────────────────────────────────────────────
+function init() {
+  if (!localStorage.getItem('teacher_pin')) localStorage.setItem('teacher_pin','1529');
+  checkStatuses();
+  buildSummary();
+  
+  // Pre-fill existing values
+  const existingKey = localStorage.getItem('PLATFORM_API_KEY');
+  if (existingKey) {
+    document.getElementById('apiKeyInput').value = existingKey;
+    document.getElementById('apiKeyInput').type = 'text';
+  }
+  
+  const existingUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+  if (existingUrl) {
+    try { document.getElementById('sheetsUrlInput').value = JSON.parse(existingUrl); } catch(e){}
+  }
+}
+
+function checkStatuses() {
+  const apiKey  = localStorage.getItem('PLATFORM_API_KEY');
+  const pin     = localStorage.getItem('teacher_pin');
+  const codes   = JSON.parse(localStorage.getItem('student_codes')||'[]');
+  const sheetsUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+  
+  setStatus('s1status', apiKey && apiKey.startsWith('sk-ant-'), apiKey?'Configured':'Not configured');
+  setStatus('s2status', pin && pin !== '1529', pin?`PIN: ${'*'.repeat(pin.length)}`:'Using default PIN — change it');
+  setStatus('s3status', codes.length > 0, codes.length?codes.length+' codes generated':'Not generated');
+  setStatus('s4status', !!sheetsUrl, sheetsUrl?'URL saved':'Not configured');
+  
+  // Mark steps complete
+  if (apiKey && apiKey.startsWith('sk-ant-')) markComplete('step1');
+  if (pin) markComplete('step2');
+  if (codes.length) markComplete('step3');
+  if (sheetsUrl) markComplete('step4');
+}
+
+function setStatus(id, good, text) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = text; el.style.color = good ? 'var(--grn)' : 'var(--tx3)'; }
+}
+
+function markComplete(stepId) {
+  document.getElementById(stepId)?.classList.add('complete');
+}
+
+function toggleStep(id) {
+  const step = document.getElementById(id);
+  step?.classList.toggle('open');
+}
+
+// ── API KEY ───────────────────────────────────────────────
+function validateApiKey(val) {
+  const input = document.getElementById('apiKeyInput');
+  if (val.startsWith('sk-ant-') && val.length > 20) {
+    input.style.borderColor = 'var(--grn)';
+  } else if (val.length > 5) {
+    input.style.borderColor = 'var(--red)';
+  } else {
+    input.style.borderColor = 'var(--b2)';
+  }
+}
+
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val || !val.startsWith('sk-ant-')) {
+    showResult('apiTestResult','err','API key must start with sk-ant-');
+    return;
+  }
+  localStorage.setItem('PLATFORM_API_KEY', val);
+  markComplete('step1');
+  checkStatuses();
+  toast('API key saved','ok');
+  showResult('apiTestResult','ok','✓ API key saved. Click Test Connection to verify it works.');
+}
+
+function clearApiKey() {
+  localStorage.removeItem('PLATFORM_API_KEY');
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('step1').classList.remove('complete');
+  checkStatuses();
+  toast('API key cleared','info');
+}
+
+async function testApiKey() {
+  const key = localStorage.getItem('PLATFORM_API_KEY');
+  if (!key) { showResult('apiTestResult','err','Save an API key first'); return; }
+  showResult('apiTestResult','info','⏳ Testing connection to Claude…');
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:30,messages:[{role:'user',content:'Reply with exactly: CONNECTED'}]})
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || '';
+    if (text.includes('CONNECTED') || resp.ok) {
+      showResult('apiTestResult','ok','✓ Connected! Claude is ready. AI lessons, labs, and quizzes will work.');
+      markComplete('step1');
+    } else {
+      showResult('apiTestResult','err','Connected but unexpected response: ' + text.substring(0,50));
+    }
+  } catch(e) {
+    showResult('apiTestResult','err','Connection failed: ' + e.message);
+  }
+}
+
+// ── PIN ───────────────────────────────────────────────────
+function savePin() {
+  const newPin = document.getElementById('newPinInput').value.trim();
+  const confirm = document.getElementById('confirmPinInput').value.trim();
+  if (!newPin || newPin.length < 4) { showResult('pinSaveResult','err','PIN must be at least 4 characters'); return; }
+  if (newPin !== confirm) { showResult('pinSaveResult','err','PINs do not match'); return; }
+  localStorage.setItem('teacher_pin', newPin);
+  document.getElementById('newPinInput').value = '';
+  document.getElementById('confirmPinInput').value = '';
+  markComplete('step2');
+  checkStatuses();
+  showResult('pinSaveResult','ok','✓ PIN updated. You\'ll use this to access teacher mode.');
+  toast('PIN updated','ok');
+}
+
+// ── STUDENT CODES ─────────────────────────────────────────
+function generateCodes() {
+  const n = parseInt(document.getElementById('numStudents').value) || 18;
+  const prefix = document.getElementById('codePrefix').value.trim().toUpperCase() || 'STU';
+  const codes = Array.from({length:n},(_,i) => `${prefix}-${String(i+1).padStart(3,'0')}`);
+  localStorage.setItem('student_codes', JSON.stringify(codes));
+  markComplete('step3');
+  checkStatuses();
+  
+  document.getElementById('codesOutput').innerHTML = `
+    <div style="font-size:12px;color:var(--grn);margin-bottom:8px">✓ ${n} codes generated — hand one to each student</div>
+    <div class="codes-grid">${codes.map(c=>`<div class="code-chip">${c}</div>`).join('')}</div>`;
+  document.getElementById('codesActions').style.display = 'flex';
+  toast('Codes generated','ok');
+}
+
+function copyCodes() {
+  const codes = JSON.parse(localStorage.getItem('student_codes')||'[]');
+  navigator.clipboard?.writeText(codes.join('\n')).then(()=>toast('Codes copied','ok'));
+}
+
+function printCodes() {
+  const codes = JSON.parse(localStorage.getItem('student_codes')||'[]');
+  const w = window.open();
+  w.document.write(`<html><body style="font-family:monospace;padding:20px">
+    <h2>Student Codes — CompTIA A+</h2>
+    <p>Give one code to each student. Codes are anonymous — no real names stored.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px">
+      ${codes.map(c=>`<div style="border:1px solid #ccc;padding:10px;text-align:center;border-radius:4px;font-size:14px">${c}</div>`).join('')}
+    </div>
+  </body></html>`);
+  w.print();
+}
+
+// ── GOOGLE SHEETS ─────────────────────────────────────────
+function copyScript() {
+  const text = document.getElementById('appsScriptBox').textContent;
+  navigator.clipboard?.writeText(text).then(()=>toast('Script copied','ok'));
+}
+
+function saveSheetsUrl() {
+  const val = document.getElementById('sheetsUrlInput').value.trim();
+  if (!val || !val.includes('script.google.com')) {
+    showResult('sheetsTestResult','err','URL must be a Google Apps Script deployment URL');
+    return;
+  }
+  localStorage.setItem('PLATFORM_SYNC_URL', JSON.stringify(val));
+  markComplete('step4');
+  checkStatuses();
+  buildSummary();
+  showResult('sheetsTestResult','ok','✓ URL saved. Click Test Connection to verify.');
+  toast('Sheets URL saved','ok');
+}
+
+async function testSheets() {
+  let url = localStorage.getItem('PLATFORM_SYNC_URL');
+  if (!url) { showResult('sheetsTestResult','err','Save the URL first'); return; }
+  try { url = JSON.parse(url); } catch(e){}
+  showResult('sheetsTestResult','info','⏳ Testing connection…');
+  try {
+    const resp = await fetch(url+'?action=ping', {mode:'cors'});
+    const data = await resp.json();
+    if (data.ok) {
+      showResult('sheetsTestResult','ok','✓ Connected to Google Sheets! Grades and scores will sync automatically.');
+    } else {
+      showResult('sheetsTestResult','err','Connected but got error: '+data.error);
+    }
+  } catch(e) {
+    showResult('sheetsTestResult','info','CORS block (normal from browser) — connection likely works from the deployed site. Test by loading your live GitHub Pages URL.');
+  }
+}
+
+// ── SUMMARY ───────────────────────────────────────────────
+function buildSummary() {
+  const apiKey  = localStorage.getItem('PLATFORM_API_KEY');
+  const pin     = localStorage.getItem('teacher_pin');
+  const codes   = JSON.parse(localStorage.getItem('student_codes')||'[]');
+  const sheetsUrl = localStorage.getItem('PLATFORM_SYNC_URL');
+  
+  const checks = [
+    [!!(apiKey && apiKey.startsWith('sk-ant-')), 'API Key', apiKey?'Configured — AI content generation enabled':'Not configured — AI features disabled'],
+    [!!(pin && pin !== '1529'), 'Teacher PIN', pin==='1529'?'⚠️ Using default PIN — change it before sharing with students':'Custom PIN set'],
+    [codes.length > 0, 'Student Codes', codes.length?codes.length+' codes ready to distribute':'No codes generated'],
+    [!!sheetsUrl, 'Google Sheets', sheetsUrl?'URL configured — grades sync automatically':'Not configured — grades stay local only'],
+  ];
+  
+  const el = document.getElementById('summaryBody');
+  if (!el) return;
+  
+  const allGood = checks.filter(c=>c[0]).length;
+  
+  el.innerHTML = `
+    <div style="margin-bottom:16px">
+      ${checks.map(([good,label,desc])=>`
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1)">
+          <span style="font-size:16px">${good?'✅':'⚠️'}</span>
+          <div style="flex:1">
+            <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:${good?'var(--grn)':'var(--amb)'};">${label}</div>
+            <div style="font-size:12px;color:var(--tx2);margin-top:2px">${desc}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="padding:14px;background:${allGood>=3?'var(--grn-d)':'var(--amb-d)'};border:1px solid ${allGood>=3?'var(--grn)':'var(--amb)'};border-radius:var(--r);margin-bottom:14px;font-size:13px;color:var(--tx)">
+      ${allGood>=3?'✓ Platform is ready to use! Open the classroom and start teaching.':'Configure the items marked ⚠️ for full functionality.'}
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="hub-new.html" class="btn btn-acc">→ Open Hub</a>
+      <a href="classroom.html" class="btn btn-ghost">→ Open Classroom</a>
+      <a href="lesson-library.html" class="btn btn-ghost">→ Lesson Library</a>
+    </div>
+  `;
+}
+
+// ── UTILS ──────────────────────────────────────────────────
+function showResult(id, type, msg) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = `<div class="test-result ${type}">${msg}</div>`;
+}
+
+function toast(msg, type='info') {
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;
+  c.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

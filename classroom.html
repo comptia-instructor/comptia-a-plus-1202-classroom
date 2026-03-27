@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Active Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08090d;
+  --s1: #0e1018;
+  --s2: #13151f;
+  --s3: #1a1d2a;
+  --b1: #252836;
+  --b2: #2e3245;
+  --tx: #e8eaf0;
+  --tx2: #9096b0;
+  --tx3: #5a607a;
+  --acc: #4f9eff;
+  --acc-d: rgba(79,158,255,.08);
+  --grn: #3dd68c;
+  --grn-d: rgba(61,214,140,.08);
+  --red: #ff4560;
+  --red-d: rgba(255,69,96,.08);
+  --amb: #ffb830;
+  --amb-d: rgba(255,184,48,.08);
+  --pur: #a855f7;
+  --pur-d: rgba(168,85,247,.08);
+  --gold: #ffd700;
+  --r: 8px; --rl: 12px; --rxl: 16px;
+  --mono: 'Space Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --sans: 'Inter', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--tx); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
+
+/* ─── HEADER ──────────────────────────────────────────── */
+.hdr { display: flex; align-items: center; gap: 12px; padding: 0 20px; height: 52px; background: var(--s1); border-bottom: 1px solid var(--b1); position: sticky; top: 0; z-index: 100; }
+.hdr-logo { font-family: var(--display); font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--acc); }
+.hdr-sep { width: 1px; height: 20px; background: var(--b2); }
+.hdr-obj { font-family: var(--mono); font-size: 11px; color: var(--tx3); flex: 1; }
+.hdr-phase { font-family: var(--mono); font-size: 10px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--b2); color: var(--tx3); letter-spacing: .5px; }
+.hdr-phase.active { border-color: var(--acc); color: var(--acc); background: var(--acc-d); }
+.mode-toggle { display: flex; background: var(--s2); border: 1px solid var(--b1); border-radius: 6px; padding: 2px; }
+.mode-btn { padding: 4px 12px; border-radius: 4px; border: none; background: transparent; color: var(--tx3); font-family: var(--mono); font-size: 10px; cursor: pointer; transition: all .15s; }
+.mode-btn.active { background: var(--acc); color: var(--bg); }
+
+/* ─── LAYOUT ──────────────────────────────────────────── */
+.layout { display: grid; grid-template-columns: 260px 1fr; height: calc(100vh - 52px); }
+.sidebar { background: var(--s1); border-right: 1px solid var(--b1); overflow-y: auto; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+.main { overflow-y: auto; padding: 24px; }
+
+/* ─── SIDEBAR ─────────────────────────────────────────── */
+.sidebar-section { font-family: var(--mono); font-size: 9px; color: var(--tx3); letter-spacing: 1px; text-transform: uppercase; padding: 12px 8px 6px; }
+.phase-btn { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r); border: none; background: transparent; color: var(--tx2); font-family: var(--sans); font-size: 13px; cursor: pointer; transition: all .15s; width: 100%; text-align: left; }
+.phase-btn:hover { background: var(--s2); color: var(--tx); }
+.phase-btn.active { background: var(--acc-d); border: 1px solid var(--acc); color: var(--acc); }
+.phase-btn.pushed { border: 1px solid var(--grn); color: var(--grn); background: var(--grn-d); }
+.phase-icon { font-size: 18px; flex-shrink: 0; }
+.phase-info { display: flex; flex-direction: column; gap: 2px; }
+.phase-name { font-weight: 600; font-size: 12px; }
+.phase-sub { font-family: var(--mono); font-size: 9px; color: var(--tx3); }
+.push-btn { width: 100%; margin-top: 2px; padding: 8px; border-radius: var(--r); border: 1px solid var(--b2); background: transparent; color: var(--tx3); font-family: var(--mono); font-size: 9px; cursor: pointer; transition: all .15s; letter-spacing: .5px; text-transform: uppercase; }
+.push-btn:hover { border-color: var(--grn); color: var(--grn); background: var(--grn-d); }
+.push-btn.active { border-color: var(--grn); color: var(--grn); background: var(--grn-d); }
+.obj-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px; background: var(--s2); border: 1px solid var(--b1); font-family: var(--mono); font-size: 10px; color: var(--tx3); cursor: pointer; margin: 4px 8px; width: calc(100% - 16px); }
+.obj-pill:hover { border-color: var(--acc); color: var(--acc); }
+.obj-pill.active { border-color: var(--acc); color: var(--acc); background: var(--acc-d); }
+
+/* ─── CARDS ───────────────────────────────────────────── */
+.card { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--rl); overflow: hidden; margin-bottom: 16px; }
+.card-header { padding: 14px 18px; border-bottom: 1px solid var(--b1); display: flex; align-items: center; gap: 10px; }
+.card-title { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--tx); }
+.card-sub { font-family: var(--mono); font-size: 10px; color: var(--tx3); margin-left: auto; letter-spacing: .5px; }
+.card-body { padding: 18px; }
+.tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+.tag-acc { background: var(--acc-d); color: var(--acc); border: 1px solid var(--acc); }
+.tag-grn { background: var(--grn-d); color: var(--grn); border: 1px solid var(--grn); }
+.tag-red { background: var(--red-d); color: var(--red); border: 1px solid var(--red); }
+.tag-amb { background: var(--amb-d); color: var(--amb); border: 1px solid var(--amb); }
+.tag-pur { background: var(--pur-d); color: var(--pur); border: 1px solid var(--pur); }
+
+/* ─── INCIDENT BOARD ──────────────────────────────────── */
+.incident-box { background: linear-gradient(135deg, rgba(79,158,255,.06), rgba(168,85,247,.04)); border: 1px solid var(--acc); border-radius: var(--rl); padding: 20px; margin-bottom: 16px; position: relative; overflow: hidden; }
+.incident-box::before { content: '🚨 INCIDENT REPORT'; font-family: var(--mono); font-size: 9px; color: var(--red); letter-spacing: 1px; display: block; margin-bottom: 10px; }
+.incident-text { font-size: 15px; line-height: 1.8; color: var(--tx); font-style: italic; }
+.incident-meta { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+/* ─── CONCEPT BRIEF ───────────────────────────────────── */
+.brief-section { margin-bottom: 18px; }
+.brief-label { font-family: var(--mono); font-size: 9px; color: var(--tx3); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 8px; }
+.brief-content { font-size: 13px; line-height: 1.85; color: var(--tx2); }
+.brief-content strong { color: var(--tx); }
+.key-terms { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.term-card { background: var(--s3); border: 1px solid var(--b1); border-radius: var(--r); padding: 10px 12px; }
+.term-name { font-family: var(--mono); font-size: 10px; color: var(--acc); margin-bottom: 4px; font-weight: 700; }
+.term-def { font-size: 11px; color: var(--tx2); line-height: 1.6; }
+.exam-trap { background: var(--red-d); border: 1px solid var(--red); border-radius: var(--r); padding: 10px 14px; font-size: 12px; color: var(--tx); margin-bottom: 6px; line-height: 1.6; }
+.exam-trap::before { content: '⚠️ '; }
+
+/* ─── SANDBOX LAB ─────────────────────────────────────── */
+.lab-container { background: var(--bg); border: 1px solid var(--b1); border-radius: var(--rl); overflow: hidden; }
+.lab-header { background: var(--s3); padding: 10px 16px; border-bottom: 1px solid var(--b1); display: flex; align-items: center; gap: 10px; }
+.lab-title { font-family: var(--mono); font-size: 11px; color: var(--tx2); }
+.terminal { font-family: var(--mono); font-size: 12px; color: #d4ffb4; padding: 16px; min-height: 200px; background: #0a0c0a; line-height: 1.7; }
+.terminal-line { display: flex; gap: 8px; }
+.terminal-prompt { color: #3dd68c; flex-shrink: 0; }
+.terminal-input { background: transparent; border: none; outline: none; color: #d4ffb4; font-family: var(--mono); font-size: 12px; flex: 1; caret-color: #3dd68c; }
+.terminal-output { color: #9ab8a0; padding: 2px 0; white-space: pre-wrap; }
+.terminal-error { color: #ff6b7a; }
+.terminal-success { color: #3dd68c; }
+
+/* Ticket system */
+.ticket { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--rl); padding: 16px; margin-bottom: 12px; }
+.ticket-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ticket-id { font-family: var(--mono); font-size: 10px; color: var(--tx3); }
+.ticket-status { padding: 2px 8px; border-radius: 4px; font-family: var(--mono); font-size: 9px; font-weight: 700; }
+.ticket-status.open { background: var(--red-d); color: var(--red); border: 1px solid var(--red); }
+.ticket-status.in-progress { background: var(--amb-d); color: var(--amb); border: 1px solid var(--amb); }
+.ticket-status.resolved { background: var(--grn-d); color: var(--grn); border: 1px solid var(--grn); }
+.ticket-body { font-size: 13px; line-height: 1.7; color: var(--tx2); margin-bottom: 12px; }
+.ticket-steps { display: flex; flex-direction: column; gap: 6px; }
+.ticket-step { display: flex; gap: 10px; align-items: flex-start; }
+.step-num { background: var(--s3); border: 1px solid var(--b1); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: var(--tx3); flex-shrink: 0; }
+.step-num.done { background: var(--grn-d); border-color: var(--grn); color: var(--grn); }
+.step-text { font-size: 12px; color: var(--tx2); line-height: 1.6; padding-top: 2px; }
+
+/* Discussion */
+.disc-prompt { background: var(--amb-d); border: 1px solid var(--amb); border-radius: var(--r); padding: 12px 16px; margin-bottom: 8px; }
+.disc-prompt-text { font-size: 13px; color: var(--tx); line-height: 1.7; margin-bottom: 8px; }
+.disc-response-input { width: 100%; background: var(--s3); border: 1px solid var(--b1); border-radius: 6px; padding: 8px 12px; color: var(--tx); font-family: var(--sans); font-size: 12px; resize: none; outline: none; min-height: 56px; line-height: 1.6; transition: border-color .2s; }
+.disc-response-input:focus { border-color: var(--amb); }
+
+/* Quiz */
+.quiz-q { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--rl); padding: 16px; margin-bottom: 10px; }
+.quiz-q-text { font-size: 14px; color: var(--tx); line-height: 1.7; margin-bottom: 12px; font-weight: 500; }
+.quiz-opts { display: flex; flex-direction: column; gap: 6px; }
+.quiz-opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 13px; border-radius: var(--r); border: 1px solid var(--b1); cursor: pointer; background: var(--s3); transition: all .15s; font-size: 13px; color: var(--tx2); }
+.quiz-opt:hover:not(.locked) { border-color: var(--b2); background: var(--s2); color: var(--tx); }
+.quiz-opt.correct { border-color: var(--grn); background: var(--grn-d); color: var(--tx); }
+.quiz-opt.wrong { border-color: var(--red); background: var(--red-d); }
+.quiz-opt.faded { opacity: .4; }
+.quiz-opt.locked { cursor: default; }
+.opt-ltr { font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--tx3); min-width: 16px; margin-top: 1px; }
+.quiz-rationale { font-size: 11px; color: var(--tx3); padding: 8px 12px; background: var(--s3); border-radius: 6px; margin-top: 8px; line-height: 1.6; display: none; }
+.quiz-rationale.show { display: block; }
+
+/* Notes inline */
+.notes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.notes-field { background: var(--s3); border: 1px solid var(--b2); border-radius: var(--r); padding: 10px 12px; }
+.notes-label { font-family: var(--mono); font-size: 9px; color: var(--grn); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.notes-ta { width: 100%; background: transparent; border: none; outline: none; color: var(--tx); font-family: var(--sans); font-size: 12px; resize: none; min-height: 72px; line-height: 1.7; }
+
+/* Student view */
+.student-phase-display { max-width: 760px; margin: 0 auto; }
+.student-waiting { text-align: center; padding: 80px 20px; }
+.student-waiting-icon { font-size: 72px; margin-bottom: 20px; }
+.student-waiting-title { font-family: var(--display); font-size: 32px; font-weight: 800; letter-spacing: -0.5px; color: var(--tx); margin-bottom: 10px; }
+.student-waiting-sub { font-size: 14px; color: var(--tx2); line-height: 1.8; max-width: 360px; margin: 0 auto; }
+.pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--grn); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+/* Phase banner for students */
+.phase-banner { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--b1); margin-bottom: 20px; border-radius: var(--r); }
+.phase-banner-icon { font-size: 28px; }
+.phase-banner-title { font-family: var(--display); font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
+.phase-banner-desc { font-size: 12px; color: var(--tx2); margin-top: 2px; }
+.phase-banner.cold { background: var(--acc-d); border-color: var(--acc); }
+.phase-banner.lesson { background: rgba(168,85,247,.08); border-color: var(--pur); }
+.phase-banner.lab { background: var(--grn-d); border-color: var(--grn); }
+.phase-banner.disc { background: var(--amb-d); border-color: var(--amb); }
+.phase-banner.quiz { background: var(--red-d); border-color: var(--red); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: var(--r); border: none; cursor: pointer; font-family: var(--display); font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; transition: all .15s; }
+.btn-acc { background: var(--acc); color: var(--bg); }
+.btn-grn { background: var(--grn); color: var(--bg); }
+.btn-red { background: var(--red); color: #fff; }
+.btn-ghost { background: transparent; border: 1px solid var(--b2); color: var(--tx2); }
+.btn-ghost:hover { border-color: var(--b2); color: var(--tx); background: var(--s3); }
+.btn-sm { padding: 6px 14px; font-size: 10px; }
+.btn-lg { padding: 12px 32px; font-size: 14px; }
+
+/* Loading */
+.loading-bar { height: 2px; background: linear-gradient(90deg, var(--acc), var(--pur)); border-radius: 1px; animation: loadbar 1.5s ease-in-out infinite; margin-bottom: 16px; }
+@keyframes loadbar { 0%{width:0;opacity:1} 70%{width:100%;opacity:1} 100%{width:100%;opacity:0} }
+.loading-text { font-family: var(--mono); font-size: 11px; color: var(--tx3); animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* Toast */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 10px 16px; border-radius: var(--r); font-family: var(--mono); font-size: 11px; animation: toastIn .2s ease; max-width: 280px; }
+.toast.ok { background: var(--grn-d); border: 1px solid var(--grn); color: var(--grn); }
+.toast.err { background: var(--red-d); border: 1px solid var(--red); color: var(--red); }
+.toast.info { background: var(--acc-d); border: 1px solid var(--acc); color: var(--acc); }
+@keyframes toastIn { from{transform:translateY(8px);opacity:0} to{transform:none;opacity:1} }
+
+/* Progress ring */
+.progress-ring { display: flex; align-items: center; justify-content: center; }
+
+/* Score display */
+.score-hero { text-align: center; padding: 32px; }
+.score-number { font-family: var(--display); font-size: 80px; font-weight: 900; line-height: 1; }
+.score-label { font-family: var(--mono); font-size: 12px; color: var(--tx3); letter-spacing: .8px; margin-top: 6px; }
+
+/* Teacher live input */
+.live-input { width: 100%; background: var(--s2); border: 1px solid var(--b2); border-radius: var(--r); padding: 10px 14px; color: var(--tx); font-size: 14px; outline: none; transition: border-color .2s; font-family: var(--sans); }
+.live-input:focus { border-color: var(--amb); }
+.live-input::placeholder { color: var(--tx3); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--s1); }
+::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 2px; }
+
+/* Teacher login fixed */
+#teacherLoginBtn { position: fixed; bottom: 20px; left: 20px; z-index: 99999; cursor: pointer; display: flex; align-items: center; gap: 6px; background: rgba(8,9,13,.95); border: 1.5px solid var(--gold); border-radius: 20px; padding: 8px 16px; font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--gold); backdrop-filter: blur(12px); }
+#teacherModeBadge { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 99999; cursor: pointer; align-items: center; gap: 6px; background: rgba(8,9,13,.95); border: 1.5px solid var(--gold); border-radius: 20px; padding: 8px 16px; font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--gold); backdrop-filter: blur(12px); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(6px); z-index: 10000; display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--s1); border: 1px solid var(--b2); border-radius: var(--rxl); padding: 32px; width: 400px; max-width: 90vw; text-align: center; }
+.modal-title { font-family: var(--display); font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: .5px; }
+.modal-sub { font-size: 12px; color: var(--tx2); margin-bottom: 20px; line-height: 1.7; }
+.pin-input { background: var(--s2); border: 1.5px solid var(--b2); border-radius: var(--r); padding: 12px 20px; color: var(--tx); font-family: var(--mono); font-size: 24px; letter-spacing: 8px; text-align: center; width: 200px; outline: none; transition: border-color .2s; }
+.pin-input:focus { border-color: var(--acc); }
+.pin-error { font-family: var(--mono); font-size: 11px; color: var(--red); min-height: 20px; margin-top: 6px; }
+
+/* Objective banner */
+.obj-banner { background: linear-gradient(135deg, rgba(79,158,255,.06), rgba(168,85,247,.03)); border: 1px solid var(--b1); border-radius: var(--rl); padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.obj-banner-id { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--acc); }
+.obj-banner-text { flex: 1; }
+.obj-banner-title { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--tx); margin-bottom: 4px; }
+.obj-banner-domain { font-family: var(--mono); font-size: 10px; color: var(--tx3); }
+
+/* Responsive */
+@media(max-width:768px){ .layout{grid-template-columns:1fr} .sidebar{display:none} .notes-grid{grid-template-columns:1fr} }
+
+/* ─── LESSON FEEDBACK ─────────────────────────────────── */
+.feedback-panel {
+  background: linear-gradient(135deg, rgba(168,85,247,.06), rgba(79,158,255,.04));
+  border: 1.5px solid var(--pur);
+  border-radius: var(--rl);
+  padding: 20px;
+  margin-top: 20px;
+  animation: fadeSlideUp .4s ease;
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.feedback-title {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--pur);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+}
+.feedback-sub {
+  font-size: 12px;
+  color: var(--tx2);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+.rating-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.rating-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: var(--r);
+  border: 1.5px solid var(--b2);
+  background: var(--s3);
+  cursor: pointer;
+  transition: all .15s;
+  flex: 1;
+  min-width: 60px;
+}
+.rating-btn:hover { border-color: var(--pur); background: var(--pur-d); }
+.rating-btn.selected { border-color: var(--pur); background: var(--pur-d); }
+.rating-emoji { font-size: 24px; }
+.rating-label { font-family: var(--mono); font-size: 9px; color: var(--tx3); letter-spacing: .3px; }
+.rating-btn.selected .rating-label { color: var(--pur); }
+
+.feedback-check-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.feedback-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--r);
+  border: 1.5px solid var(--b2);
+  background: var(--s3);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--tx2);
+  transition: all .15s;
+  user-select: none;
+}
+.feedback-check:hover { border-color: var(--acc); color: var(--tx); }
+.feedback-check.selected { border-color: var(--grn); background: var(--grn-d); color: var(--tx); }
+.feedback-check-box {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--b2);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  transition: all .15s;
+}
+.feedback-check.selected .feedback-check-box {
+  background: var(--grn);
+  border-color: var(--grn);
+  color: var(--bg);
+}
+.feedback-text-input {
+  width: 100%;
+  background: var(--s2);
+  border: 1.5px solid var(--b2);
+  border-radius: var(--r);
+  padding: 10px 13px;
+  color: var(--tx);
+  font-family: var(--sans);
+  font-size: 12px;
+  resize: none;
+  outline: none;
+  min-height: 72px;
+  line-height: 1.7;
+  transition: border-color .2s;
+  margin-bottom: 12px;
+}
+.feedback-text-input:focus { border-color: var(--pur); }
+.feedback-text-input::placeholder { color: var(--tx3); }
+.feedback-submitted {
+  text-align: center;
+  padding: 20px;
+}
+.feedback-submitted-icon { font-size: 40px; margin-bottom: 8px; }
+.feedback-submitted-title {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--grn);
+  margin-bottom: 4px;
+}
+.feedback-submitted-sub { font-size: 12px; color: var(--tx2); line-height: 1.6; }
+
+</style>
+</head>
+<body>
+
+<!-- TEACHER MODAL -->
+<div class="modal-overlay" id="teacherModal">
+  <div class="modal-box">
+    <div style="font-size:48px;margin-bottom:12px">🔑</div>
+    <div class="modal-title">Teacher Access</div>
+    <div class="modal-sub">Enter your teacher PIN to access classroom controls.</div>
+    <input type="password" id="pinInput" class="pin-input" maxlength="8" placeholder="····" onkeydown="if(event.key==='Enter')checkPin()">
+    <div class="pin-error" id="pinError"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+      <button class="btn btn-acc" onclick="checkPin()" style="width:100%;justify-content:center">Unlock →</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeTeacherModal()" style="width:100%;justify-content:center">Back to Student View</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEACHER FIXED BTN -->
+<div id="teacherLoginBtn" onclick="openTeacherLogin()">🔑 Teacher Login</div>
+<div id="teacherModeBadge" onclick="exitTeacher()">👨‍🏫 Teacher Mode · Exit</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">CompTIA A+</div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-obj" id="hdrObj">No objective selected</div>
+  <div class="hdr-phase active" id="hdrPhase">Classroom</div>
+  <div class="mode-toggle" id="modeToggle" style="display:none">
+    <button class="mode-btn active" id="btnTeacher" onclick="setMode('teacher')">Teacher</button>
+    <button class="mode-btn" id="btnStudent" onclick="setMode('student')">Student</button>
+  </div>
+</header>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-section">Today's Objective</div>
+    <div style="padding:8px;margin-bottom:8px">
+      <div id="currentObjDisplay" style="font-family:var(--mono);font-size:10px;color:var(--tx3);padding:8px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);line-height:1.6">
+        Select an objective from the library to begin
+      </div>
+    </div>
+    
+    <div class="sidebar-section" id="phasesLabel" style="display:none">Class Phases</div>
+    <div id="helpBadge" style="display:none;margin:4px 8px 8px;padding:8px 12px;background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);font-family:var(--mono);font-size:10px;color:var(--amb);cursor:pointer;letter-spacing:.3px"></div>
+    <div id="phasesList" style="display:none"></div>
+
+    <div class="sidebar-section" style="margin-top:8px">Quick Select</div>
+    <div id="quickObjectives" style="overflow-y:auto;max-height:300px"></div>
+    
+    <div style="margin-top:auto;padding:8px">
+      <a href="lesson-library.html" style="display:block;text-align:center;padding:8px;border-radius:var(--r);border:1px solid var(--b2);color:var(--tx3);font-family:var(--mono);font-size:9px;text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--acc)';this.style.color='var(--acc)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--tx3)'">📚 Open Full Library</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main" id="mainContent">
+
+    <!-- TEACHER VIEW -->
+    <div id="tvTeacher" style="display:none">
+      <div id="teacherContent"></div>
+    </div>
+
+    <!-- STUDENT VIEW -->
+    <div id="tvStudent">
+      <div class="student-phase-display">
+        <div id="studentDisplay">
+          <div class="student-waiting">
+            <div class="student-waiting-icon">📡</div>
+            <div class="student-waiting-title">Waiting for class to start</div>
+            <div class="student-waiting-sub">Your teacher will push each activity to your screen. You don't need to navigate — just wait here.</div>
+            <div style="margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--tx3);display:flex;align-items:center;justify-content:center;gap:8px">
+              <div class="pulse-dot"></div>
+              Connected
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// OBJECTIVE DATA — Both Core 1 & Core 2
+// ══════════════════════════════════════════════════════════
+const OBJECTIVES = {
+  // CORE 1 — 220-1201
+  '1.1': { exam:'1201', domain:'1.0 Mobile Devices', title:'Monitor mobile device hardware and use replacement techniques', weight:'13%' },
+  '1.2': { exam:'1201', domain:'1.0 Mobile Devices', title:'Compare/contrast accessories and connectivity for mobile devices', weight:'13%' },
+  '1.3': { exam:'1201', domain:'1.0 Mobile Devices', title:'Configure mobile device network connectivity and application support', weight:'13%' },
+  '2.1': { exam:'1201', domain:'2.0 Networking', title:'TCP/UDP ports, protocols, and their purposes', weight:'23%' },
+  '2.2': { exam:'1201', domain:'2.0 Networking', title:'Explain wireless networking technologies', weight:'23%' },
+  '2.3': { exam:'1201', domain:'2.0 Networking', title:'Summarize services provided by networked hosts', weight:'23%' },
+  '2.4': { exam:'1201', domain:'2.0 Networking', title:'Explain common network configuration concepts', weight:'23%' },
+  '2.5': { exam:'1201', domain:'2.0 Networking', title:'Compare/contrast common networking hardware devices', weight:'23%' },
+  '2.6': { exam:'1201', domain:'2.0 Networking', title:'Configure basic wired/wireless SOHO networks', weight:'23%' },
+  '2.7': { exam:'1201', domain:'2.0 Networking', title:'Internet connection types and network types', weight:'23%' },
+  '2.8': { exam:'1201', domain:'2.0 Networking', title:'Explain networking tools and their purposes', weight:'23%' },
+  '3.1': { exam:'1201', domain:'3.0 Hardware', title:'Compare/contrast display components and attributes', weight:'25%' },
+  '3.2': { exam:'1201', domain:'3.0 Hardware', title:'Summarize basic cable types, connectors, features, and purposes', weight:'25%' },
+  '3.3': { exam:'1201', domain:'3.0 Hardware', title:'Compare/contrast RAM characteristics', weight:'25%' },
+  '3.4': { exam:'1201', domain:'3.0 Hardware', title:'Compare/contrast storage devices', weight:'25%' },
+  '3.5': { exam:'1201', domain:'3.0 Hardware', title:'Install and configure motherboards, CPUs, and add-on cards', weight:'25%' },
+  '3.6': { exam:'1201', domain:'3.0 Hardware', title:'Install the appropriate power supply', weight:'25%' },
+  '3.7': { exam:'1201', domain:'3.0 Hardware', title:'Deploy and configure multifunction devices/printers', weight:'25%' },
+  '3.8': { exam:'1201', domain:'3.0 Hardware', title:'Perform appropriate printer maintenance', weight:'25%' },
+  '4.1': { exam:'1201', domain:'4.0 Virtualization and Cloud', title:'Explain virtualization concepts', weight:'11%' },
+  '4.2': { exam:'1201', domain:'4.0 Virtualization and Cloud', title:'Summarize cloud computing concepts', weight:'11%' },
+  '5.1': { exam:'1201', domain:'5.0 Hardware & Network Troubleshooting', title:'Troubleshoot motherboards, RAM, CPUs, and power', weight:'28%' },
+  '5.2': { exam:'1201', domain:'5.0 Hardware & Network Troubleshooting', title:'Troubleshoot drive and RAID issues', weight:'28%' },
+  '5.3': { exam:'1201', domain:'5.0 Hardware & Network Troubleshooting', title:'Troubleshoot video, projector, and display issues', weight:'28%' },
+  '5.4': { exam:'1201', domain:'5.0 Hardware & Network Troubleshooting', title:'Troubleshoot common mobile device issues', weight:'28%' },
+  '5.5': { exam:'1201', domain:'5.0 Hardware & Network Troubleshooting', title:'Troubleshoot network issues', weight:'28%' },
+  '5.6': { exam:'1201', domain:'5.0 Hardware & Network Troubleshooting', title:'Troubleshoot printer issues', weight:'28%' },
+  // CORE 2 — 220-1202
+  'C1.1': { exam:'1202', domain:'1.0 Operating Systems', title:'Explain common OS types and their purposes', weight:'28%' },
+  'C1.2': { exam:'1202', domain:'1.0 Operating Systems', title:'Perform OS installations and upgrades in a diverse environment', weight:'28%' },
+  'C1.3': { exam:'1202', domain:'1.0 Operating Systems', title:'Compare/contrast basic features of Microsoft Windows editions', weight:'28%' },
+  'C1.4': { exam:'1202', domain:'1.0 Operating Systems', title:'Use Microsoft Windows OS features and tools', weight:'28%' },
+  'C1.5': { exam:'1202', domain:'1.0 Operating Systems', title:'Use the appropriate Microsoft command-line tools', weight:'28%' },
+  'C1.6': { exam:'1202', domain:'1.0 Operating Systems', title:'Configure Microsoft Windows settings', weight:'28%' },
+  'C1.7': { exam:'1202', domain:'1.0 Operating Systems', title:'Configure Microsoft Windows networking features on a client/desktop', weight:'28%' },
+  'C1.8': { exam:'1202', domain:'1.0 Operating Systems', title:'Explain common features and tools of macOS', weight:'28%' },
+  'C1.9': { exam:'1202', domain:'1.0 Operating Systems', title:'Identify common features and tools of Linux client/desktop', weight:'28%' },
+  'C1.10': { exam:'1202', domain:'1.0 Operating Systems', title:'Install applications according to requirements', weight:'28%' },
+  'C1.11': { exam:'1202', domain:'1.0 Operating Systems', title:'Install and configure cloud-based productivity tools', weight:'28%' },
+  'C2.1': { exam:'1202', domain:'2.0 Security', title:'Summarize various security measures and their purposes', weight:'28%' },
+  'C2.2': { exam:'1202', domain:'2.0 Security', title:'Configure and apply basic Windows OS security settings', weight:'28%' },
+  'C2.3': { exam:'1202', domain:'2.0 Security', title:'Compare/contrast wireless security protocols and authentication methods', weight:'28%' },
+  'C2.4': { exam:'1202', domain:'2.0 Security', title:'Summarize types of malware and detection/removal methods', weight:'28%' },
+  'C2.5': { exam:'1202', domain:'2.0 Security', title:'Compare/contrast social engineering attacks, threats, and vulnerabilities', weight:'28%' },
+  'C2.6': { exam:'1202', domain:'2.0 Security', title:'Implement procedures for basic SOHO malware removal', weight:'28%' },
+  'C2.7': { exam:'1202', domain:'2.0 Security', title:'Apply workstation security options and hardening techniques', weight:'28%' },
+  'C2.8': { exam:'1202', domain:'2.0 Security', title:'Apply common methods for securing mobile devices', weight:'28%' },
+  'C2.9': { exam:'1202', domain:'2.0 Security', title:'Compare/contrast data destruction and disposal methods', weight:'28%' },
+  'C2.10': { exam:'1202', domain:'2.0 Security', title:'Apply security settings on SOHO wireless and wired networks', weight:'28%' },
+  'C2.11': { exam:'1202', domain:'2.0 Security', title:'Configure relevant security settings in a browser', weight:'28%' },
+  'C3.1': { exam:'1202', domain:'3.0 Software Troubleshooting', title:'Troubleshoot common Windows OS issues', weight:'23%' },
+  'C3.2': { exam:'1202', domain:'3.0 Software Troubleshooting', title:'Troubleshoot common mobile OS and application issues', weight:'23%' },
+  'C3.3': { exam:'1202', domain:'3.0 Software Troubleshooting', title:'Troubleshoot common mobile OS and application security issues', weight:'23%' },
+  'C3.4': { exam:'1202', domain:'3.0 Software Troubleshooting', title:'Troubleshoot common PC security issues', weight:'23%' },
+  'C4.1': { exam:'1202', domain:'4.0 Operational Procedures', title:'Implement best practices for documentation and support systems', weight:'21%' },
+  'C4.2': { exam:'1202', domain:'4.0 Operational Procedures', title:'Apply change management procedures', weight:'21%' },
+  'C4.3': { exam:'1202', domain:'4.0 Operational Procedures', title:'Implement workstation backup and recovery methods', weight:'21%' },
+  'C4.4': { exam:'1202', domain:'4.0 Operational Procedures', title:'Use common safety procedures', weight:'21%' },
+  'C4.5': { exam:'1202', domain:'4.0 Operational Procedures', title:'Summarize environmental impacts and local environment controls', weight:'21%' },
+  'C4.6': { exam:'1202', domain:'4.0 Operational Procedures', title:'Explain prohibited content/activity, privacy, licensing, and policy', weight:'21%' },
+  'C4.7': { exam:'1202', domain:'4.0 Operational Procedures', title:'Use proper communication techniques and professionalism', weight:'21%' },
+  'C4.8': { exam:'1202', domain:'4.0 Operational Procedures', title:'Explain the basics of scripting', weight:'21%' },
+  'C4.9': { exam:'1202', domain:'4.0 Operational Procedures', title:'Use remote access technologies', weight:'21%' },
+  'C4.10':{ exam:'1202', domain:'4.0 Operational Procedures', title:'Explain basic concepts related to artificial intelligence (AI)', weight:'21%' },
+};
+
+const CLASS_PHASES = [
+  { id:'cold',   icon:'❄️', label:'Cold Retrieval', sub:'Previous objectives', color:'var(--acc)' },
+  { id:'hook',   icon:'🚨', label:'Hook',           sub:'Real-world incident', color:'var(--red)' },
+  { id:'lesson', icon:'📖', label:'Concept Brief',  sub:'Read + key terms',   color:'var(--pur)' },
+  { id:'lab',    icon:'🔬', label:'Sandbox Lab',    sub:'Hands-on practice',  color:'var(--grn)' },
+  { id:'disc',   icon:'💬', label:'Discussion',     sub:'Teacher types live',  color:'var(--amb)' },
+  { id:'quiz',   icon:'⏱', label:'Closing Quiz',   sub:'5 graded questions', color:'var(--red)' },
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let ST = {
+  mode: 'student',
+  objId: null,
+  isTeacher: false,
+  currentPhase: null,
+  liveDiscQuestions: [],
+  generatedContent: {},
+  answers: {},
+  notes: {},
+  code: null,
+};
+
+let pollTimer = null;
+let lastPhaseTs = '0';
+let lastDiscTs = '0';
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function init() {
+  // PIN init
+  if (!localStorage.getItem('teacher_pin')) localStorage.setItem('teacher_pin', '1529');
+  
+  // Check teacher
+  ST.isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+  
+  // Load student code
+  try { ST.code = JSON.parse(localStorage.getItem('PLATFORM_CODE')); } catch(e){}
+  
+  // Build sidebar
+  buildQuickObjectives();
+  
+  if (ST.isTeacher) {
+    enterTeacherMode(false);
+  } else {
+    startPolling();
+    // Check if there's an active phase
+    const phase = localStorage.getItem('class_current_phase');
+    if (phase) renderStudentPhase(phase);
+  }
+  
+  // Keyboard shortcut T for teacher login
+  document.addEventListener('keydown', e => {
+    if (e.key === 'T' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+      if (!ST.isTeacher) openTeacherLogin();
+    }
+  });
+
+  // New features
+  buildHelpButton();
+  buildStreakDisplay();
+  checkAnnouncement();
+  if (ST.isTeacher) {
+    setupTeacherShortcuts();
+    pollHelpSignals();
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// TEACHER AUTH
+// ══════════════════════════════════════════════════════════
+function openTeacherLogin() {
+  const modal = document.getElementById('teacherModal');
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('pinInput').focus(), 50);
+}
+function closeTeacherModal() {
+  document.getElementById('teacherModal').classList.remove('open');
+}
+function checkPin() {
+  const pin = document.getElementById('pinInput').value.trim();
+  const saved = localStorage.getItem('teacher_pin') || '1529';
+  if (pin === saved) {
+    localStorage.setItem('teacher_unlocked', 'true');
+    localStorage.setItem('PLATFORM_CODE', JSON.stringify('TEACHER'));
+    ST.isTeacher = true;
+    closeTeacherModal();
+    enterTeacherMode(true);
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN.';
+    document.getElementById('pinInput').value = '';
+    setTimeout(() => document.getElementById('pinError').textContent = '', 2000);
+  }
+}
+function exitTeacher() {
+  localStorage.removeItem('teacher_unlocked');
+  localStorage.removeItem('PLATFORM_CODE');
+  location.reload();
+}
+
+function enterTeacherMode(firstTime) {
+  ST.isTeacher = true;
+  ST.mode = 'teacher';
+  document.getElementById('modeToggle').style.display = 'flex';
+  document.getElementById('teacherLoginBtn').style.display = 'none';
+  document.getElementById('teacherModeBadge').style.display = 'flex';
+  setMode('teacher');
+  if (firstTime) toast('Teacher mode activated', 'ok');
+  
+  // Build phase sidebar
+  document.getElementById('phasesLabel').style.display = 'block';
+  document.getElementById('phasesList').style.display = 'block';
+  buildPhasesSidebar();
+}
+
+// ══════════════════════════════════════════════════════════
+// MODE SWITCHING
+// ══════════════════════════════════════════════════════════
+function setMode(m) {
+  ST.mode = m;
+  document.getElementById('btnTeacher').classList.toggle('active', m==='teacher');
+  document.getElementById('btnStudent').classList.toggle('active', m==='student');
+  document.getElementById('tvTeacher').style.display = m==='teacher' ? 'block' : 'none';
+  document.getElementById('tvStudent').style.display = m==='student' ? 'block' : 'none';
+  if (m === 'student' && !ST.currentPhase) {
+    document.getElementById('studentDisplay').innerHTML = `
+      <div class="student-waiting">
+        <div class="student-waiting-icon">📡</div>
+        <div class="student-waiting-title">Waiting for class to start</div>
+        <div class="student-waiting-sub">Your teacher will push each activity to your screen.</div>
+        <div style="margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--tx3);display:flex;align-items:center;justify-content:center;gap:8px">
+          <div class="pulse-dot"></div> Connected
+        </div>
+      </div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════════════════════
+function buildQuickObjectives() {
+  const container = document.getElementById('quickObjectives');
+  // Group by exam
+  const core1 = Object.entries(OBJECTIVES).filter(([,o]) => o.exam === '1201').slice(0,6);
+  const core2 = Object.entries(OBJECTIVES).filter(([,o]) => o.exam === '1202').slice(0,6);
+  
+  container.innerHTML = `
+    <div class="sidebar-section" style="padding-top:4px">Core 1 · 220-1201</div>
+    ${core1.map(([id,o]) => `
+      <div class="obj-pill ${ST.objId===id?'active':''}" onclick="selectObjective('${id}')">
+        <span style="font-weight:700;color:var(--acc)">${id}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px">${o.title.substring(0,38)}…</span>
+      </div>`).join('')}
+    <div class="sidebar-section">Core 2 · 220-1202</div>
+    ${core2.map(([id,o]) => `
+      <div class="obj-pill ${ST.objId===id?'active':''}" onclick="selectObjective('${id}')">
+        <span style="font-weight:700;color:var(--pur)">${id.replace('C','')}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px">${o.title.substring(0,38)}…</span>
+      </div>`).join('')}
+  `;
+}
+
+function buildPhasesSidebar() {
+  const list = document.getElementById('phasesList');
+  const currentPhase = localStorage.getItem('class_current_phase') || '';
+  list.innerHTML = CLASS_PHASES.map(p => `
+    <div class="phase-btn ${currentPhase===p.id?'pushed':''}" onclick="handlePhaseClick('${p.id}')">
+      <div class="phase-icon">${p.icon}</div>
+      <div class="phase-info">
+        <div class="phase-name">${p.label}</div>
+        <div class="phase-sub">${p.sub}</div>
+      </div>
+    </div>`).join('') +
+    `<button class="push-btn" style="margin-top:8px" onclick="endClass()">⬛ End Class</button>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// OBJECTIVE SELECTION
+// ══════════════════════════════════════════════════════════
+function selectObjective(id) {
+  ST.objId = id;
+  const obj = OBJECTIVES[id];
+  if (!obj) return;
+  
+  // Update header
+  document.getElementById('hdrObj').textContent = `${id}: ${obj.title.substring(0,50)}`;
+  
+  // Update current obj display
+  document.getElementById('currentObjDisplay').innerHTML = `
+    <div style="color:var(--acc);font-weight:700;margin-bottom:4px">${id}</div>
+    <div style="color:var(--tx2)">${obj.title}</div>
+    <div style="color:var(--tx3);margin-top:4px">${obj.domain} · ${obj.exam==='1201'?'Core 1':'Core 2'}</div>
+  `;
+  
+  // Update sidebar highlighting
+  buildQuickObjectives();
+  
+  // Save to localStorage for student sync
+  localStorage.setItem('class_objective', JSON.stringify({ id, ...obj }));
+  
+  if (ST.isTeacher) {
+    renderTeacherDashboard();
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// TEACHER DASHBOARD
+// ══════════════════════════════════════════════════════════
+function renderTeacherDashboard() {
+  if (!ST.objId) {
+    document.getElementById('teacherContent').innerHTML = `
+      <div style="text-align:center;padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:16px">📚</div>
+        <div style="font-family:var(--display);font-size:24px;font-weight:800;color:var(--tx);margin-bottom:8px">Select an Objective</div>
+        <div style="font-size:13px;color:var(--tx2);line-height:1.8;max-width:400px;margin:0 auto">Choose an objective from the sidebar or open the full library to begin today's lesson.</div>
+        <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <a href="lesson-library.html" class="btn btn-acc">📚 Open Lesson Library</a>
+        </div>
+      </div>`;
+    return;
+  }
+  
+  const obj = OBJECTIVES[ST.objId];
+  const phase = localStorage.getItem('class_current_phase') || '';
+  
+  document.getElementById('teacherContent').innerHTML = `
+    <div class="obj-banner">
+      <div class="obj-banner-id">${ST.objId}</div>
+      <div class="obj-banner-text">
+        <div class="obj-banner-title">${obj.title}</div>
+        <div class="obj-banner-domain">${obj.domain} · ${obj.exam === '1201' ? 'Core 1 (220-1201)' : 'Core 2 (220-1202)'} · ${obj.weight} of exam</div>
+      </div>
+      <span class="tag ${phase ? 'tag-grn' : 'tag-acc'}">${phase ? phase.toUpperCase() + ' ACTIVE' : 'NOT STARTED'}</span>
+    </div>
+    
+    <!-- Phase Push Buttons -->
+    <div class="card" style="border-color:var(--b2)">
+      <div class="card-header">
+        <div class="card-title">Push Phase to Students</div>
+        <div class="card-sub" style="color:var(--tx3)">Students see whichever phase you push</div>
+      </div>
+      <div class="card-body" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+        ${CLASS_PHASES.map(p => `
+          <button onclick="pushPhase('${p.id}')" style="padding:12px 8px;border-radius:var(--r);border:1.5px solid ${phase===p.id?p.color:'var(--b2)'};background:${phase===p.id?p.color+'22':'transparent'};color:${phase===p.id?p.color:'var(--tx3)'};font-family:var(--display);font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;letter-spacing:.3px;text-transform:uppercase;line-height:1.4">
+            <div style="font-size:22px;margin-bottom:4px">${p.icon}</div>
+            ${p.label}
+          </button>`).join('')}
+      </div>
+    </div>
+    
+    <!-- Live Discussion Input -->
+    <div class="card">
+      <div class="card-header" style="border-color:rgba(255,184,48,.2)">
+        <div class="card-title">💬 Live Discussion</div>
+        <div class="card-sub">Students see your questions in real time</div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:8px" id="discInputs">
+          ${[1,2,3].map(n=>`
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--amb);min-width:24px">Q${n}</span>
+              <input id="discQ${n}" class="live-input" placeholder="Type a discussion question — students see it when you stop typing…" oninput="debouncePushDisc()">
+              <span id="discQ${n}icon" style="font-size:14px;min-width:16px"></span>
+            </div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="clearDisc()">Clear</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleDiscWall()">View Responses</button>
+          <span id="discPushMsg" style="font-family:var(--mono);font-size:9px;color:var(--grn);margin-left:auto"></span>
+        </div>
+        <div id="discWall" style="display:none;margin-top:14px;border-top:1px solid var(--b1);padding-top:12px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:8px">STUDENT RESPONSES</div>
+          <div id="discWallContent"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- AI Content Area -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">AI Content Preview</div>
+        <div class="card-sub">What students will see · Generated by Claude</div>
+      </div>
+      <div class="card-body" id="aiPreview">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+          <button class="btn btn-ghost" onclick="previewPhase('hook')">🚨 Preview Hook</button>
+          <button class="btn btn-ghost" onclick="previewPhase('lesson')">📖 Preview Lesson</button>
+          <button class="btn btn-ghost" onclick="previewPhase('lab')">🔬 Preview Lab</button>
+        </div>
+        <div id="aiPreviewContent" style="font-family:var(--mono);font-size:11px;color:var(--tx3)">
+          Click a preview button to see what Claude will generate for this objective.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Student Response Summary -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Class Summary</div>
+        <div class="card-sub">Live from localStorage</div>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="showFeedbackSummary()">💬 View Feedback</button>
+      </div>
+      <div class="card-body" id="classSummary">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">Push a phase to see student activity.</div>
+      </div>
+    </div>
+  `;
+  
+  // Refresh disc wall every 5s if showing
+  setInterval(refreshDiscWall, 5000);
+}
+
+// ══════════════════════════════════════════════════════════
+// PHASE PUSH SYSTEM
+// ══════════════════════════════════════════════════════════
+function pushPhase(phaseId) {
+  ST.currentPhase = phaseId;
+  localStorage.setItem('class_current_phase', phaseId);
+  localStorage.setItem('class_phase_ts', Date.now()+'');
+  localStorage.setItem('class_objective', JSON.stringify({ id: ST.objId, ...OBJECTIVES[ST.objId] }));
+  buildPhasesSidebar();
+  renderTeacherDashboard();
+  toast('Pushed: ' + phaseId + ' → all screens', 'ok');
+}
+
+function handlePhaseClick(id) { pushPhase(id); }
+
+function endClass() {
+  localStorage.removeItem('class_current_phase');
+  localStorage.removeItem('class_phase_ts');
+  localStorage.removeItem('live_disc_questions');
+  buildPhasesSidebar();
+  if (ST.isTeacher) renderTeacherDashboard();
+  toast('Class ended', 'info');
+}
+
+async function previewPhase(phase) {
+  const preview = document.getElementById('aiPreviewContent');
+  preview.innerHTML = '<div class="loading-bar"></div><div class="loading-text">Generating preview…</div>';
+  const content = await generatePhaseContent(phase);
+  preview.innerHTML = renderPhaseHTML(phase, content, true);
+}
+
+// ══════════════════════════════════════════════════════════
+// AI CONTENT GENERATION
+// ══════════════════════════════════════════════════════════
+const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
+
+// ── STUDENT PROFILE CONTEXT ──────────────────────────────
+// Returns a string Claude uses to personalize content
+function getStudentProfileContext() {
+  let ctx = '';
+  
+  // Learning style
+  try {
+    const ls = JSON.parse(localStorage.getItem('student_learning_style') || '{}');
+    if (ls.primary) {
+      const styleHints = {
+        visual:      'Use diagrams described in text, visual analogies, and structured comparisons. Format explanations with clear visual hierarchy.',
+        auditory:    'Write in a conversational, explanatory tone. Encourage the student to say concepts out loud and explain to peers. Use narrative flow.',
+        kinesthetic: 'Lead with hands-on applications. Connect every concept to something the student can try. Prioritize the lab activity. Use action verbs.',
+        reading:     'Provide detailed written explanations. Include thorough definitions. Encourage note-taking. Use well-organized text.',
+      };
+      ctx += `LEARNING STYLE: This student is a ${ls.primary} learner (secondary: ${ls.secondary||'unknown'}). ${styleHints[ls.primary] || ''}
+`;
+    }
+  } catch(e) {}
+  
+  // Interests
+  try {
+    const interests = JSON.parse(localStorage.getItem('student_interests') || '{}');
+    if (interests.interestLabels?.length) {
+      ctx += `STUDENT INTERESTS: ${interests.interestLabels.join(', ')}`;
+      if (interests.customInterest) ctx += `, ${interests.customInterest}`;
+      ctx += '. Use these interests to create analogies and examples that connect IT concepts to things this student actually cares about.
+';
+    }
+    if (interests.career) {
+      const careerHints = {
+        help_desk:  'Frame concepts through the lens of a help desk technician solving user problems.',
+        network:    'Connect concepts to network engineering and infrastructure work.',
+        security:   'Emphasize security implications and threat perspectives.',
+        dev:        'Connect to software development and system programming where relevant.',
+        data:       'Relate to data systems, storage, and cloud infrastructure.',
+        cloud:      'Frame through cloud environments and virtual infrastructure.',
+        not_sure:   'Keep examples broad and show multiple career paths this knowledge opens.',
+      };
+      ctx += `CAREER GOAL: ${interests.careerLabel || interests.career}. ${careerHints[interests.career] || ''}
+`;
+    }
+  } catch(e) {}
+  
+  return ctx ? `
+
+STUDENT PERSONALIZATION:
+${ctx}` : '';
+}
+
+async function callClaude(prompt, maxTokens = 1500) {
+  const apiKey = localStorage.getItem('PLATFORM_API_KEY');
+  if (!apiKey) {
+    return '{"error":"No API key configured. Go to Setup Wizard to add your Anthropic API key."}';
+  }
+  try {
+    const resp = await fetch(ANTHROPIC_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await resp.json();
+    return data.content?.[0]?.text || '{"error":"No response"}';
+  } catch(e) { return `{"error":"${e.message}"}`; }
+}
+
+async function generatePhaseContent(phase) {
+  const obj = OBJECTIVES[ST.objId];
+  if (!obj) return null;
+  
+  const cacheKey = `gen_${ST.objId}_${phase}`;
+  const cached = ST.generatedContent[cacheKey];
+  if (cached) return cached;
+  
+  let prompt = '';
+  
+  if (phase === 'hook') {
+    const profile = getStudentProfileContext();
+    prompt = `You are a CompTIA A+ instructor. Create a short real-world IT incident for objective ${ST.objId}: "${obj.title}" from domain "${obj.domain}" (Exam ${obj.exam === '1201' ? '220-1201' : '220-1202'}).
+
+${profile}
+
+Return ONLY valid JSON, no markdown:
+{
+  "incident": "2-3 sentence realistic IT incident that a help desk technician would encounter. Make it specific and vivid.",
+  "question": "One open-ended question: What would you check/do first, and why?",
+  "context": "Brief 1-sentence setting (company, user, urgency)",
+  "difficulty": "Beginner/Intermediate/Advanced"
+}`;
+  }
+  else if (phase === 'lesson') {
+    prompt = `You are a CompTIA A+ instructor teaching objective ${ST.objId}: "${obj.title}" from domain "${obj.domain}" to high school CTE students who are new to IT.
+
+${profile}
+
+Return ONLY valid JSON, no markdown:
+{
+  "hook": "One sentence that connects this topic to something students already know or care about",
+  "plain_english": "3-4 sentences explaining this concept in plain language a 16-year-old would understand. No jargon unless defined.",
+  "analogy": "A real-world analogy that makes the concept click",
+  "key_terms": [{"term":"term1","definition":"clear simple definition","example":"how it shows up in the real world"},{"term":"term2","definition":"...","example":"..."},{"term":"term3","definition":"...","example":"..."},{"term":"term4","definition":"...","example":"..."},{"term":"term5","definition":"...","example":"..."}],
+  "exam_traps": ["Common exam mistake 1 — what CompTIA tries to trick you on","Common exam mistake 2","Common exam mistake 3"],
+  "remember_this": "The single most important thing to remember about this topic for the exam — one sentence"
+}`;
+  }
+  else if (phase === 'lab') {
+    prompt = `You are a CompTIA A+ instructor. Create a browser-based sandbox lab for objective ${ST.objId}: "${obj.title}". Students are on Chromebooks. The lab must be completable in a browser with no installations.
+
+${profile}
+
+Return ONLY valid JSON, no markdown:
+{
+  "lab_type": "terminal|ticket|config|identify",
+  "title": "Lab title",
+  "scenario": "2-3 sentence scenario that sets up the lab",
+  "objective": "What the student will do/learn",
+  "steps": [
+    {"num":1,"instruction":"What to do","hint":"Help if stuck","answer":"What correct action looks like"},
+    {"num":2,"instruction":"...","hint":"...","answer":"..."},
+    {"num":3,"instruction":"...","hint":"...","answer":"..."},
+    {"num":4,"instruction":"...","hint":"...","answer":"..."},
+    {"num":5,"instruction":"...","hint":"...","answer":"..."}
+  ],
+  "terminal_commands": ["command1 --flag","command2","command3"],
+  "success_message": "What students should see/understand when done correctly"
+}`;
+  }
+  else if (phase === 'quiz') {
+    prompt = `You are a CompTIA A+ exam writer. Generate 5 exam-quality multiple choice questions for objective ${ST.objId}: "${obj.title}" (${obj.exam === '1201' ? '220-1201' : '220-1202'} exam, ${obj.weight} of exam weight).
+
+Requirements: Use CompTIA language (BEST, FIRST, MOST, NEXT). Include scenario-based questions. Mix difficulty. Real distractors.
+
+${profile}
+
+Return ONLY valid JSON array, no markdown:
+[{"q":"question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"Why correct; why others wrong"},...]`;
+  }
+  
+  const raw = await callClaude(prompt);
+  try {
+    const clean = raw.replace(/```json\n?|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    ST.generatedContent[cacheKey] = parsed;
+    return parsed;
+  } catch(e) {
+    return { error: 'Failed to parse AI response. Check your API key.' };
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// STUDENT PHASE RENDERING
+// ══════════════════════════════════════════════════════════
+let lastPhase = null;
+
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(checkPhaseUpdate, 2000);
+  checkPhaseUpdate();
+}
+
+function checkPhaseUpdate() {
+  const phase = localStorage.getItem('class_current_phase');
+  const discTs = localStorage.getItem('live_disc_ts') || '0';
+  
+  // Check for disc update within same phase
+  if (phase === 'disc' && phase === lastPhase && discTs !== lastDiscTs) {
+    lastDiscTs = discTs;
+    renderStudentPhase('disc');
+    return;
+  }
+  
+  if (phase === lastPhase) return;
+  lastPhase = phase;
+  
+  if (!phase) {
+    showWaiting();
+    return;
+  }
+  renderStudentPhase(phase);
+}
+
+function showWaiting() {
+  document.getElementById('studentDisplay').innerHTML = `
+    <div class="student-waiting">
+      <div class="student-waiting-icon">📡</div>
+      <div class="student-waiting-title">Waiting for class to start</div>
+      <div class="student-waiting-sub">Your teacher will push each activity to your screen.</div>
+      <div style="margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--tx3);display:flex;align-items:center;justify-content:center;gap:8px">
+        <div class="pulse-dot"></div> Connected
+      </div>
+    </div>`;
+}
+
+async function renderStudentPhase(phase) {
+  ST.currentPhase = phase;
+  
+  // Load objective from localStorage (teacher set it)
+  try {
+    const objData = JSON.parse(localStorage.getItem('class_objective') || '{}');
+    if (objData.id && objData.id !== ST.objId) {
+      ST.objId = objData.id;
+      document.getElementById('hdrObj').textContent = `${objData.id}: ${objData.title?.substring(0,50) || ''}`;
+    }
+  } catch(e){}
+  
+  const display = document.getElementById('studentDisplay');
+  const phases = { cold:'❄️', hook:'🚨', lesson:'📖', lab:'🔬', disc:'💬', quiz:'⏱' };
+  const phaseObj = CLASS_PHASES.find(p => p.id === phase);
+  
+  display.innerHTML = `
+    <div class="phase-banner ${phase}" style="background:${phaseObj?.color+'11'||''};border-color:${phaseObj?.color||'var(--b1)'}">
+      <div class="phase-banner-icon">${phases[phase]||'📌'}</div>
+      <div>
+        <div class="phase-banner-title" style="color:${phaseObj?.color||'var(--tx)'}">${phaseObj?.label||phase}</div>
+        <div class="phase-banner-desc">${phaseObj?.sub||''} · Objective ${ST.objId||'—'}</div>
+      </div>
+    </div>
+    <div id="phaseBody"><div class="loading-bar"></div><div class="loading-text">Loading content…</div></div>`;
+  
+  if (!ST.objId) {
+    document.getElementById('phaseBody').innerHTML = '<div style="font-family:var(--mono);font-size:12px;color:var(--tx3);text-align:center;padding:40px">Waiting for teacher to select an objective…</div>';
+    return;
+  }
+  
+  if (phase === 'cold') {
+    renderColdRetrieval();
+    return;
+  }
+  if (phase === 'disc') {
+    renderStudentDisc();
+    return;
+  }
+  
+  const content = await generatePhaseContent(phase);
+  if (!content) {
+    document.getElementById('phaseBody').innerHTML = '<div style="color:var(--red);font-family:var(--mono);font-size:12px;padding:20px">Failed to load content. Check API key in Setup Wizard.</div>';
+    return;
+  }
+  document.getElementById('phaseBody').innerHTML = renderPhaseHTML(phase, content, false);
+  
+  // Post-render setup
+  if (phase === 'lab') setupTerminal();
+  if (phase === 'quiz') setupQuiz(content);
+}
+
+function renderPhaseHTML(phase, content, isPreview) {
+  if (content.error) return `<div style="color:var(--red);font-family:var(--mono);font-size:12px;padding:20px;background:var(--red-d);border:1px solid var(--red);border-radius:var(--r)">${content.error}</div>`;
+  
+  if (phase === 'hook') return renderHook(content, isPreview);
+  if (phase === 'lesson') return renderLesson(content, isPreview);
+  if (phase === 'lab') return renderLab(content, isPreview);
+  if (phase === 'quiz') return renderQuiz(content, isPreview);
+  return '';
+}
+
+function renderHook(c, preview) {
+  return `
+    <div class="incident-box">
+      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-bottom:8px">📍 ${c.context||''} · ${c.difficulty||'Intermediate'}</div>
+      <div class="incident-text">"${c.incident}"</div>
+      <div class="incident-meta">
+        <span class="tag tag-red">Real Incident</span>
+        <span class="tag tag-acc">Obj. ${ST.objId}</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🤔 Before we learn anything — what would you do?</div></div>
+      <div class="card-body">
+        <div style="font-size:15px;color:var(--tx);line-height:1.8;margin-bottom:14px;font-weight:500">${c.question}</div>
+        ${!preview ? `
+          <textarea class="disc-response-input" id="hookResponse" placeholder="Write your initial response — there's no wrong answer yet…" style="min-height:80px"></textarea>
+          <button class="btn btn-acc btn-sm" style="margin-top:8px" onclick="saveHookResponse()">Submit Initial Answer</button>
+          <div id="hookMsg" style="font-family:var(--mono);font-size:10px;color:var(--grn);min-height:16px;margin-top:6px"></div>` : '<div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">Students respond in a text field here</div>'}
+      </div>
+    </div>`;
+}
+
+function renderLesson(c, preview) {
+  const terms = (c.key_terms||[]).map(t => `
+    <div class="term-card">
+      <div class="term-name">${t.term}</div>
+      <div class="term-def">${t.definition}</div>
+      ${t.example ? `<div style="font-size:10px;color:var(--acc);margin-top:4px;font-family:var(--mono)">→ ${t.example}</div>` : ''}
+    </div>`).join('');
+  
+  const traps = (c.exam_traps||[]).map(t => `<div class="exam-trap">${t}</div>`).join('');
+  
+  return `
+    <div class="card">
+      <div class="card-header"><div class="card-title">📖 Concept Brief · Objective ${ST.objId}</div></div>
+      <div class="card-body">
+        <div class="brief-section">
+          <div class="brief-label">Why does this matter?</div>
+          <div class="brief-content" style="background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:12px 14px;font-style:italic">${c.hook}</div>
+        </div>
+        <div class="brief-section">
+          <div class="brief-label">Plain English Explanation</div>
+          <div class="brief-content">${c.plain_english}</div>
+        </div>
+        <div class="brief-section">
+          <div class="brief-label">💡 Analogy</div>
+          <div class="brief-content" style="background:var(--pur-d);border:1px solid var(--pur);border-radius:var(--r);padding:12px 14px">${c.analogy}</div>
+        </div>
+        <div class="brief-section">
+          <div class="brief-label">Key Terms</div>
+          <div class="key-terms">${terms}</div>
+        </div>
+        <div class="brief-section">
+          <div class="brief-label">⚠️ Exam Traps</div>
+          ${traps}
+        </div>
+        <div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:12px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--amb);letter-spacing:1px;margin-bottom:4px">★ REMEMBER THIS</div>
+          <div style="font-size:13px;color:var(--tx);font-weight:500">${c.remember_this}</div>
+        </div>
+      </div>
+    </div>
+    ${!preview ? `
+    <div class="card">
+      <div class="card-header"><div class="card-title">📝 Cornell Notes</div><div class="card-sub">Auto-saved · Counts toward grade</div></div>
+      <div class="card-body">
+        <div class="notes-grid">
+          <div class="notes-field"><div class="notes-label">🔑 Key Terms</div><textarea class="notes-ta" id="nTerms" placeholder="List terms and definitions…" oninput="autoSaveNotes()">${getSavedNote('terms')}</textarea></div>
+          <div class="notes-field"><div class="notes-label">⚙️ How It Works</div><textarea class="notes-ta" id="nHow" placeholder="Explain in your own words…" oninput="autoSaveNotes()">${getSavedNote('how')}</textarea></div>
+          <div class="notes-field"><div class="notes-label">🌐 Real-World Connection</div><textarea class="notes-ta" id="nReal" placeholder="How does this apply in IT jobs?" oninput="autoSaveNotes()">${getSavedNote('real')}</textarea></div>
+          <div class="notes-field"><div class="notes-label">⚠️ Exam Traps</div><textarea class="notes-ta" id="nTraps" placeholder="What tricks does CompTIA use?" oninput="autoSaveNotes()">${getSavedNote('traps')}</textarea></div>
+        </div>
+        <div id="notesSavedMsg" style="font-family:var(--mono);font-size:9px;color:var(--grn);text-align:right;opacity:0;transition:opacity .3s;margin-top:8px">✓ SAVED</div>
+      </div>
+    </div>` : ''}`;
+}
+
+function renderLab(c, preview) {
+  const steps = (c.steps||[]).map(s => `
+    <div class="ticket-step" id="step_${s.num}">
+      <div class="step-num" id="stepnum_${s.num}">${s.num}</div>
+      <div style="flex:1">
+        <div class="step-text"><strong>${s.instruction}</strong></div>
+        <div id="hint_${s.num}" style="display:none;font-size:11px;color:var(--tx3);margin-top:4px;font-style:italic">${s.hint}</div>
+        ${!preview ? `
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="btn btn-ghost btn-sm" onclick="toggleHint(${s.num})">💡 Hint</button>
+            <button class="btn btn-grn btn-sm" onclick="markStepDone(${s.num})">✓ Done</button>
+          </div>` : ''}
+      </div>
+    </div>`).join('');
+
+  const cmds = (c.terminal_commands||[]).map(cmd => `<div class="terminal-output" style="color:var(--acc)">${cmd}</div>`).join('');
+  
+  return `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🔬 ${c.title}</div>
+        <span class="tag tag-grn">Lab</span>
+      </div>
+      <div class="card-body">
+        <div style="background:var(--pur-d);border:1px solid var(--pur);border-radius:var(--r);padding:12px 14px;margin-bottom:14px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--pur);letter-spacing:1px;margin-bottom:4px">SCENARIO</div>
+          <div style="font-size:13px;color:var(--tx);line-height:1.7">${c.scenario}</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;margin-bottom:10px">OBJECTIVE: <span style="color:var(--tx)">${c.objective}</span></div>
+        <div class="ticket-steps" style="margin-bottom:16px">${steps}</div>
+        ${c.terminal_commands?.length ? `
+          <div class="lab-container" style="margin-top:12px">
+            <div class="lab-header">
+              <span style="color:var(--grn)">⬤</span><span style="color:var(--amb)">⬤</span><span style="color:var(--red)">⬤</span>
+              <span class="lab-title">Terminal Simulator</span>
+            </div>
+            <div class="terminal" id="terminalOutput">
+              <div class="terminal-output">$ # Type commands below. Try: ${c.terminal_commands[0]||''}</div>
+              ${cmds}
+            </div>
+            <div style="background:#0a0c0a;padding:8px 16px;border-top:1px solid #1a2a1a;display:flex;gap:8px;align-items:center">
+              <span style="color:#3dd68c;font-family:var(--mono);font-size:12px">$</span>
+              <input id="termInput" class="terminal-input" placeholder="Type a command…" onkeydown="if(event.key==='Enter')runTerminalCommand(this.value,${JSON.stringify(c.terminal_commands||[]).replace(/"/g,"'")})">
+            </div>
+          </div>` : ''}
+        <div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:10px 14px;margin-top:12px;font-size:12px;color:var(--tx)">
+          <strong style="color:var(--grn)">✓ Success looks like:</strong> ${c.success_message}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderQuiz(c, preview) {
+  if (!Array.isArray(c)) return '<div style="color:var(--red);font-family:var(--mono);font-size:12px">Invalid quiz data</div>';
+  
+  return `
+    <div class="card" style="border-color:var(--red)">
+      <div class="card-header" style="border-color:rgba(255,69,96,.2)">
+        <div class="card-title">⏱ Closing Quiz</div>
+        <span class="tag tag-red">GRADED · 5 Questions</span>
+        <span id="quizCountdown" style="font-family:var(--mono);font-size:12px;color:var(--tx3);margin-left:auto;letter-spacing:.5px"></span>
+      </div>
+      <div class="card-body">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--tx3);margin-bottom:16px;line-height:1.7">Score 80%+ to earn PBIS points · Read each question carefully · Look for qualifier words: <strong style="color:var(--amb)">BEST, FIRST, MOST, NEXT</strong></div>
+        ${c.map((q,i) => `
+          <div class="quiz-q">
+            <div class="quiz-q-text"><span style="font-family:var(--mono);font-size:10px;color:var(--tx3)">Q${i+1} · </span>${q.q}</div>
+            <div class="quiz-opts">
+              ${['A','B','C','D'].map(l => `
+                <div class="quiz-opt" id="opt_${i}_${l}" onclick="pickAnswer(${i},'${l}','${q.answer}',this)">
+                  <span class="opt-ltr">${l}</span> ${q.opts[l]}
+                </div>`).join('')}
+            </div>
+            <div class="quiz-rationale" id="rat_${i}">${q.rationale||''}</div>
+          </div>`).join('')}
+        ${!preview ? `
+          <div id="quizSubmitArea" style="text-align:center;margin-top:16px">
+            <button class="btn btn-red btn-lg" onclick="submitQuiz(${c.length})" style="justify-content:center">Submit Quiz →</button>
+          </div>
+          <div id="quizResult" style="display:none;text-align:center"></div>` : ''}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// STUDENT DISCUSSION
+// ══════════════════════════════════════════════════════════
+function renderStudentDisc() {
+  const liveQs = JSON.parse(localStorage.getItem('live_disc_questions') || '[]');
+  const body = document.getElementById('phaseBody');
+  
+  if (!liveQs.length) {
+    body.innerHTML = `
+      <div class="card">
+        <div class="card-body" style="text-align:center;padding:40px 20px">
+          <div style="font-size:40px;margin-bottom:12px">💬</div>
+          <div style="font-family:var(--display);font-size:18px;font-weight:800;color:var(--amb);text-transform:uppercase;margin-bottom:6px">Discussion</div>
+          <div style="font-size:13px;color:var(--tx2)">Waiting for your teacher to post discussion questions…</div>
+        </div>
+      </div>`;
+    return;
+  }
+  
+  const discKey = `disc_${ST.objId}_${ST.code||'STU'}`;
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('st_ans')||'{}')[discKey] || {}; } catch(e){}
+  
+  body.innerHTML = `
+    <div class="card" style="border-color:var(--amb)">
+      <div class="card-header" style="border-color:rgba(255,184,48,.2)">
+        <div class="card-title">💬 Discussion Questions</div>
+        <span class="tag tag-amb">Based on today's objective</span>
+      </div>
+      <div class="card-body">
+        ${liveQs.map((q,i) => `
+          <div class="disc-prompt" style="margin-bottom:12px">
+            <div class="disc-prompt-text"><strong style="color:var(--amb)">${i+1}.</strong> ${q}</div>
+            <textarea id="discResp_${i}" class="disc-response-input" placeholder="Your response…" oninput="saveDiscResp(${i},this.value,${liveQs.length})">${saved[i]||''}</textarea>
+          </div>`).join('')}
+        <div id="discGradeBadge" style="font-family:var(--mono);font-size:10px;color:var(--tx3);text-align:right">0/${liveQs.length} answered</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📝 Cornell Notes</div><div class="card-sub">Continue taking notes</div></div>
+      <div class="card-body">
+        <div class="notes-grid">
+          <div class="notes-field"><div class="notes-label">🔑 Key Terms</div><textarea class="notes-ta" id="nTerms" placeholder="…" oninput="autoSaveNotes()">${getSavedNote('terms')}</textarea></div>
+          <div class="notes-field"><div class="notes-label">⚙️ How It Works</div><textarea class="notes-ta" id="nHow" placeholder="…" oninput="autoSaveNotes()">${getSavedNote('how')}</textarea></div>
+        </div>
+        <div id="notesSavedMsg" style="font-family:var(--mono);font-size:9px;color:var(--grn);text-align:right;opacity:0;margin-top:6px">✓ SAVED</div>
+      </div>
+    </div>`;
+  
+  updateDiscGrade(liveQs.length);
+}
+
+let discSaveTimer = null;
+function saveDiscResp(idx, val, total) {
+  const discKey = `disc_${ST.objId}_${ST.code||'STU'}`;
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem('st_ans')||'{}'); } catch(e){}
+  if (!all[discKey]) all[discKey] = {};
+  all[discKey][idx] = val;
+  localStorage.setItem('st_ans', JSON.stringify(all));
+  updateDiscGrade(total);
+}
+
+function updateDiscGrade(total) {
+  const discKey = `disc_${ST.objId}_${ST.code||'STU'}`;
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem('st_ans')||'{}'); } catch(e){}
+  const saved = all[discKey] || {};
+  const answered = Object.values(saved).filter(v => v && v.trim().length >= 15).length;
+  const badge = document.getElementById('discGradeBadge');
+  if (badge) {
+    const color = answered === total ? 'var(--grn)' : answered > 0 ? 'var(--amb)' : 'var(--tx3)';
+    badge.textContent = `${answered}/${total} answered`;
+    badge.style.color = color;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// LIVE DISCUSSION — TEACHER
+// ══════════════════════════════════════════════════════════
+let discPushTimer = null;
+function debouncePushDisc() {
+  clearTimeout(discPushTimer);
+  discPushTimer = setTimeout(pushDisc, 600);
+}
+
+function pushDisc() {
+  const qs = [1,2,3].map(n => document.getElementById(`discQ${n}`)?.value.trim()).filter(q => q?.length > 0);
+  localStorage.setItem('live_disc_questions', JSON.stringify(qs));
+  localStorage.setItem('live_disc_ts', Date.now()+'');
+  [1,2,3].forEach(n => {
+    const el = document.getElementById(`discQ${n}icon`);
+    if (el) el.textContent = document.getElementById(`discQ${n}`)?.value.trim() ? '📡' : '';
+  });
+  const msg = document.getElementById('discPushMsg');
+  if (msg) { msg.textContent = qs.length ? `✓ ${qs.length} question${qs.length>1?'s':''} live` : ''; }
+}
+
+function clearDisc() {
+  [1,2,3].forEach(n => { const el = document.getElementById(`discQ${n}`); if(el) el.value=''; });
+  localStorage.removeItem('live_disc_questions');
+  localStorage.removeItem('live_disc_ts');
+  [1,2,3].forEach(n => { const el = document.getElementById(`discQ${n}icon`); if(el) el.textContent=''; });
+}
+
+function toggleDiscWall() {
+  const wall = document.getElementById('discWall');
+  if (wall) { wall.style.display = wall.style.display === 'none' ? 'block' : 'none'; refreshDiscWall(); }
+}
+
+function refreshDiscWall() {
+  const wall = document.getElementById('discWall');
+  if (!wall || wall.style.display === 'none') return;
+  const qs = JSON.parse(localStorage.getItem('live_disc_questions')||'[]');
+  const allAns = {};
+  try {
+    const all = JSON.parse(localStorage.getItem('st_ans')||'{}');
+    Object.entries(all).forEach(([k,v]) => { if(k.startsWith(`disc_${ST.objId}_`)) { const code=k.split('_').pop(); allAns[code]=v; } });
+  } catch(e){}
+  const wc = document.getElementById('discWallContent');
+  const count = document.getElementById('discWall')?.previousElementSibling?.querySelector('#discPushMsg');
+  const students = Object.keys(allAns).length;
+  if (wc) {
+    if (!Object.keys(allAns).length) { wc.innerHTML = '<div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">No responses yet.</div>'; return; }
+    wc.innerHTML = Object.entries(allAns).map(([code, resps]) =>
+      `<div style="margin-bottom:10px"><div style="font-family:var(--mono);font-size:9px;color:var(--acc);margin-bottom:4px">${code}</div>
+      ${Object.values(resps).map(r=>`<div style="background:var(--s3);border-left:2px solid var(--amb);padding:6px 10px;border-radius:0 6px 6px 0;font-size:11px;color:var(--tx2);margin-bottom:3px">${r}</div>`).join('')}</div>`
+    ).join('');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// QUIZ LOGIC
+// ══════════════════════════════════════════════════════════
+let quizAnswers = {};
+function pickAnswer(qIdx, letter, correct, el) {
+  const opts = ['A','B','C','D'];
+  opts.forEach(l => {
+    const o = document.getElementById(`opt_${qIdx}_${l}`);
+    if (!o || o.classList.contains('locked')) return;
+    o.classList.add('locked');
+    if (l === correct) o.classList.add('correct');
+    else if (l === letter && l !== correct) o.classList.add('wrong');
+    else o.classList.add('faded');
+  });
+  quizAnswers[qIdx] = letter;
+  const rat = document.getElementById(`rat_${qIdx}`);
+  if (rat) rat.classList.add('show');
+}
+
+function submitQuiz(total) {
+  let correct = 0;
+  Object.entries(quizAnswers).forEach(([i, ans]) => {
+    // Count answers where the correct option was picked (it has .correct class)
+    const cacheKey = `gen_${ST.objId}_quiz`;
+    const q = ST.generatedContent[cacheKey];
+    if (q && Array.isArray(q) && q[i]) { if (ans === q[i].answer) correct++; }
+  });
+  const pct = Math.round(correct / total * 100);
+  const area = document.getElementById('quizSubmitArea');
+  const result = document.getElementById('quizResult');
+  if (area) area.style.display = 'none';
+  if (result) {
+    result.style.display = 'block';
+    const color = pct >= 80 ? 'var(--grn)' : pct >= 60 ? 'var(--amb)' : 'var(--red)';
+    result.innerHTML = `
+      <div class="score-hero">
+        <div class="score-number" style="color:${color}">${pct}%</div>
+        <div class="score-label">${correct}/${total} CORRECT</div>
+        ${pct >= 80 ? '<div style="color:var(--grn);font-size:14px;margin-top:8px">🏆 +5 PBIS Points Earned!</div>' : ''}
+        <div style="color:var(--tx2);font-size:13px;margin-top:8px">${pct>=80?'Excellent work!':pct>=60?'Good effort — review the ones you missed.':'Keep studying — you\'ll get there!'}</div>
+      </div>
+      <div id="feedbackContainer"></div>`;
+    // Show feedback after brief pause
+    setTimeout(() => buildFeedbackPanel('feedbackContainer', pct), 900);
+    // Save score
+    const scores = JSON.parse(localStorage.getItem('classroom_scores')||'{}');
+    const key = `quiz_${ST.objId}_${ST.code||'STU'}_${Date.now()}`;
+    scores[key] = { pct, correct, total, obj: ST.objId, ts: Date.now() };
+    localStorage.setItem('classroom_scores', JSON.stringify(scores));
+  }
+  toast(pct >= 80 ? `${pct}% — PBIS points earned! 🏆` : `${pct}% — ${correct}/${total} correct`, pct>=60?'ok':'err');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// LESSON FEEDBACK
+// ══════════════════════════════════════════════════════════
+
+let feedbackState = {
+  rating: null,
+  checks: new Set(),
+  comment: '',
+};
+
+const FEEDBACK_WHAT_HELPED = [
+  { id: 'analogy',    label: 'The analogy clicked' },
+  { id: 'lab',        label: 'The hands-on lab' },
+  { id: 'terms',      label: 'The key terms' },
+  { id: 'incident',   label: 'The real scenario' },
+  { id: 'discussion', label: 'The discussion' },
+  { id: 'quiz',       label: 'The practice quiz' },
+  { id: 'examples',   label: 'The examples' },
+  { id: 'simple',     label: 'Simple language' },
+];
+
+const FEEDBACK_WHAT_CONFUSED = [
+  { id: 'too_fast',    label: 'Too much too fast' },
+  { id: 'jargon',      label: 'Too much jargon' },
+  { id: 'not_relevant',label: 'Hard to see why it matters' },
+  { id: 'lab_unclear', label: 'Lab instructions unclear' },
+  { id: 'more_time',   label: 'Needed more time' },
+  { id: 'quiz_hard',   label: 'Quiz was too hard' },
+];
+
+function buildFeedbackPanel(containerId, quizPct) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  feedbackState = { rating: null, checks: new Set(), comment: '' };
+
+  // Don't show if already submitted this objective today
+  const fbKey = `feedback_${ST.objId}_${ST.code||'STU'}_${new Date().toDateString()}`;
+  if (localStorage.getItem(fbKey)) {
+    container.innerHTML = `
+      <div class="feedback-panel">
+        <div class="feedback-submitted">
+          <div class="feedback-submitted-icon">✅</div>
+          <div class="feedback-submitted-title">Feedback already submitted</div>
+          <div class="feedback-submitted-sub">Thanks — your feedback from today is saved and will shape tomorrow's lesson.</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const obj = OBJECTIVES[ST.objId] || {};
+
+  container.innerHTML = `
+    <div class="feedback-panel" id="feedbackInner">
+
+      <div class="feedback-title">💬 How was today's lesson?</div>
+      <div class="feedback-sub">
+        Objective ${ST.objId}: ${(obj.title||'').substring(0,60)}${obj.title?.length>60?'…':''}
+        ${quizPct !== null ? `&nbsp;·&nbsp; You scored <strong style="color:${quizPct>=80?'var(--grn)':quizPct>=60?'var(--amb)':'var(--red)'}">${quizPct}%</strong> on the quiz` : ''}
+      </div>
+
+      <!-- Overall rating -->
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">How much did you enjoy this lesson?</div>
+      <div class="rating-row" id="ratingRow">
+        ${[
+          {val:1, emoji:'😩', label:'Really boring'},
+          {val:2, emoji:'😕', label:'Not great'},
+          {val:3, emoji:'😐', label:'It was okay'},
+          {val:4, emoji:'😊', label:'Pretty good'},
+          {val:5, emoji:'🔥', label:'Loved it'},
+        ].map(r => `
+          <div class="rating-btn" onclick="pickRating(${r.val})" id="rb_${r.val}">
+            <div class="rating-emoji">${r.emoji}</div>
+            <div class="rating-label">${r.label}</div>
+          </div>`).join('')}
+      </div>
+
+      <!-- What helped -->
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">What helped you understand? (pick all that apply)</div>
+      <div class="feedback-check-grid" id="helpedChecks">
+        ${FEEDBACK_WHAT_HELPED.map(item => `
+          <div class="feedback-check" id="fch_${item.id}" onclick="toggleFeedbackCheck('${item.id}', 'helped')">
+            <div class="feedback-check-box" id="fchbox_${item.id}"></div>
+            ${item.label}
+          </div>`).join('')}
+      </div>
+
+      <!-- What confused -->
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Anything that confused you or could be better?</div>
+      <div class="feedback-check-grid" id="confusedChecks">
+        ${FEEDBACK_WHAT_CONFUSED.map(item => `
+          <div class="feedback-check" id="fcc_${item.id}" onclick="toggleFeedbackCheck('${item.id}', 'confused')">
+            <div class="feedback-check-box" id="fccbox_${item.id}"></div>
+            ${item.label}
+          </div>`).join('')}
+      </div>
+
+      <!-- Free text -->
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Anything else? Tell Claude how to teach this better for you:</div>
+      <textarea id="feedbackComment" class="feedback-text-input"
+        placeholder="e.g. I got confused when… / It would help if… / The analogy about ___ didn't work for me but ___ would have…"></textarea>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost btn-sm" onclick="dismissFeedback()">Skip</button>
+        <button class="btn btn-acc btn-sm" onclick="submitFeedback('${fbKey}')">Submit Feedback ✓</button>
+      </div>
+    </div>`;
+}
+
+function pickRating(val) {
+  feedbackState.rating = val;
+  [1,2,3,4,5].forEach(v => {
+    const btn = document.getElementById('rb_' + v);
+    if (btn) btn.classList.toggle('selected', v === val);
+  });
+}
+
+function toggleFeedbackCheck(id, type) {
+  const key = type + '_' + id;
+  const el  = document.getElementById(type === 'helped' ? 'fch_' + id : 'fcc_' + id);
+  const box = document.getElementById(type === 'helped' ? 'fchbox_' + id : 'fccbox_' + id);
+  if (!el) return;
+
+  if (feedbackState.checks.has(key)) {
+    feedbackState.checks.delete(key);
+    el.classList.remove('selected');
+    if (box) box.textContent = '';
+  } else {
+    feedbackState.checks.add(key);
+    el.classList.add('selected');
+    if (box) box.textContent = '✓';
+  }
+}
+
+function submitFeedback(fbKey) {
+  const comment = document.getElementById('feedbackComment')?.value.trim() || '';
+  feedbackState.comment = comment;
+
+  // Build feedback object
+  const feedback = {
+    objId:     ST.objId,
+    code:      ST.code || 'STU',
+    date:      new Date().toDateString(),
+    ts:        Date.now(),
+    rating:    feedbackState.rating,
+    helped:    [...feedbackState.checks].filter(k=>k.startsWith('helped_')).map(k=>k.replace('helped_','')),
+    confused:  [...feedbackState.checks].filter(k=>k.startsWith('confused_')).map(k=>k.replace('confused_','')),
+    comment:   comment,
+  };
+
+  // Save to localStorage
+  localStorage.setItem(fbKey, '1'); // mark as submitted for today
+
+  // Save to feedback history
+  const all = JSON.parse(localStorage.getItem('lesson_feedback') || '[]');
+  all.unshift(feedback);
+  localStorage.setItem('lesson_feedback', JSON.stringify(all.slice(0, 200))); // keep last 200
+
+  // Update student profile with feedback patterns
+  updateProfileFromFeedback(feedback);
+
+  // Show confirmation
+  const inner = document.getElementById('feedbackInner');
+  if (inner) {
+    inner.innerHTML = `
+      <div class="feedback-submitted">
+        <div class="feedback-submitted-icon">${feedback.rating >= 4 ? '🙌' : feedback.rating >= 3 ? '👍' : '💪'}</div>
+        <div class="feedback-submitted-title">Thanks for the feedback!</div>
+        <div class="feedback-submitted-sub">
+          ${feedback.rating >= 4
+            ? 'Great to hear you enjoyed it! Claude will keep using what worked.'
+            : feedback.rating >= 3
+            ? 'Good feedback — Claude will adjust the approach for next time.'
+            : 'Got it. Claude will change how it teaches this type of content for you.'}
+          ${feedback.comment ? '<br><br>Your note has been saved and will shape future lessons.' : ''}
+        </div>
+      </div>`;
+  }
+
+  // Sync to Google Sheets if connected
+  syncFeedbackToSheets(feedback);
+
+  toast('Feedback saved — lessons will adapt for you', 'ok');
+}
+
+function dismissFeedback() {
+  const panel = document.querySelector('.feedback-panel');
+  if (panel) panel.style.display = 'none';
+}
+
+function updateProfileFromFeedback(fb) {
+  // Build an adaptive profile that accumulates over time
+  const adaptive = JSON.parse(localStorage.getItem('adaptive_profile') || '{}');
+
+  // Track what consistently helps this student
+  fb.helped.forEach(item => {
+    adaptive[`helped_${item}`] = (adaptive[`helped_${item}`] || 0) + 1;
+  });
+  // Track what consistently confuses
+  fb.confused.forEach(item => {
+    adaptive[`confused_${item}`] = (adaptive[`confused_${item}`] || 0) + 1;
+  });
+  // Track average rating trend
+  if (fb.rating) {
+    adaptive.ratingCount = (adaptive.ratingCount || 0) + 1;
+    adaptive.ratingSum   = (adaptive.ratingSum   || 0) + fb.rating;
+    adaptive.ratingAvg   = Math.round((adaptive.ratingSum / adaptive.ratingCount) * 10) / 10;
+  }
+  // Store any free-text notes
+  if (fb.comment) {
+    if (!adaptive.comments) adaptive.comments = [];
+    adaptive.comments.unshift(fb.comment);
+    adaptive.comments = adaptive.comments.slice(0, 10); // keep last 10
+  }
+
+  localStorage.setItem('adaptive_profile', JSON.stringify(adaptive));
+}
+
+function syncFeedbackToSheets(fb) {
+  let url = localStorage.getItem('PLATFORM_SYNC_URL');
+  if (!url) return;
+  try { url = JSON.parse(url); } catch(e) {}
+  if (!url?.includes('script.google.com')) return;
+  const p = new URLSearchParams({
+    action:   'save_feedback',
+    code:     fb.code,
+    obj:      fb.objId,
+    rating:   fb.rating || '',
+    helped:   fb.helped.join(','),
+    confused: fb.confused.join(','),
+    comment:  fb.comment.substring(0, 500),
+  });
+  fetch(url + '?' + p, { mode: 'cors' }).catch(() => {});
+}
+
+// ── EXTEND getStudentProfileContext to include adaptive feedback ──
+const _origProfileContext = getStudentProfileContext;
+function getStudentProfileContext() {
+  let base = _origProfileContext();
+
+  try {
+    const adaptive = JSON.parse(localStorage.getItem('adaptive_profile') || '{}');
+    let adaptiveCtx = '';
+
+    // What consistently helps
+    const topHelped = Object.entries(adaptive)
+      .filter(([k]) => k.startsWith('helped_'))
+      .sort((a,b) => b[1]-a[1])
+      .slice(0,3)
+      .map(([k]) => k.replace('helped_',''));
+    if (topHelped.length) {
+      const labels = { analogy:'analogies', lab:'hands-on labs', terms:'clear key term definitions',
+        incident:'real-world scenarios', discussion:'discussion prompts', quiz:'practice quizzes',
+        examples:'concrete examples', simple:'simple language' };
+      adaptiveCtx += `WHAT WORKS FOR THIS STUDENT: ${topHelped.map(k=>labels[k]||k).join(', ')}. Lean into these.
+`;
+    }
+
+    // What consistently confuses
+    const topConfused = Object.entries(adaptive)
+      .filter(([k]) => k.startsWith('confused_'))
+      .sort((a,b) => b[1]-a[1])
+      .slice(0,3)
+      .map(([k]) => k.replace('confused_',''));
+    if (topConfused.length) {
+      const labels = { too_fast:'pace — slow down and break into smaller pieces', jargon:'jargon — avoid undefined terms',
+        not_relevant:'relevance — clearly explain why this matters for their career',
+        lab_unclear:'lab clarity — make step-by-step instructions very explicit',
+        more_time:'depth — give more time per concept', quiz_hard:'quiz difficulty — start easier and build up' };
+      adaptiveCtx += `WHAT CONFUSES THIS STUDENT: ${topConfused.map(k=>labels[k]||k).join(', ')}. Adjust accordingly.
+`;
+    }
+
+    // Recent free-text feedback
+    const recentComments = (adaptive.comments || []).slice(0, 3);
+    if (recentComments.length) {
+      adaptiveCtx += `STUDENT'S OWN WORDS (recent feedback): "${recentComments.join('" / "')}". Take these literally when generating content.
+`;
+    }
+
+    if (adaptiveCtx) {
+      base += (base ? '' : '\n\nSTUDENT PERSONALIZATION:\n') + adaptiveCtx;
+    }
+  } catch(e) {}
+
+  return base;
+}
+
+// Teacher: view class feedback summary
+function showFeedbackSummary() {
+  const all = JSON.parse(localStorage.getItem('lesson_feedback') || '[]');
+  if (!all.length) { toast('No feedback yet', 'info'); return; }
+
+  const recent = all.slice(0, 10);
+  const avgRating = recent.filter(f=>f.rating).reduce((s,f)=>s+f.rating,0) / recent.filter(f=>f.rating).length;
+  const helped  = {};
+  const confused = {};
+  recent.forEach(f => {
+    f.helped.forEach(h  => helped[h]   = (helped[h]   || 0) + 1);
+    f.confused.forEach(c => confused[c] = (confused[c] || 0) + 1);
+  });
+
+  const topHelped   = Object.entries(helped).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v}x)`).join(', ');
+  const topConfused = Object.entries(confused).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v}x)`).join(', ');
+
+  alert(`Class Feedback Summary (last ${recent.length} responses):
+
+Avg Rating: ${avgRating?.toFixed(1) || '—'}/5
+What helped: ${topHelped || 'none'}
+What confused: ${topConfused || 'none'}
+
+Recent comments:
+${recent.filter(f=>f.comment).slice(0,3).map(f=>'• '+f.comment).join('
+') || 'none'}`);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// TERMINAL SIMULATOR
+// ══════════════════════════════════════════════════════════
+const TERMINAL_RESPONSES = {
+  'ipconfig': `Windows IP Configuration\n\nEthernet adapter Ethernet:\n   IPv4 Address. . . . . : 192.168.1.105\n   Subnet Mask . . . . . : 255.255.255.0\n   Default Gateway . . . : 192.168.1.1`,
+  'ipconfig /all': `Windows IP Configuration\n   Host Name . . . . . . : DESKTOP-ABC123\n   DNS Servers . . . . . : 8.8.8.8\n   DHCP Enabled. . . . . : Yes\n   IPv4 Address. . . . . : 192.168.1.105`,
+  'ping google.com': `Pinging google.com [142.250.80.46] with 32 bytes of data:\nReply from 142.250.80.46: bytes=32 time=12ms TTL=115\nReply from 142.250.80.46: bytes=32 time=11ms TTL=115\nPing statistics: Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)`,
+  'ping 192.168.1.1': `Pinging 192.168.1.1 with 32 bytes of data:\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\nPing statistics: Packets: Sent = 4, Received = 4, Lost = 0`,
+  'netstat': `Proto  Local Address         Foreign Address       State\nTCP    0.0.0.0:80            0.0.0.0:0             LISTENING\nTCP    0.0.0.0:443           0.0.0.0:0             LISTENING\nTCP    192.168.1.105:49152   172.217.4.46:443      ESTABLISHED`,
+  'nslookup google.com': `Server: 8.8.8.8\nAddress: 8.8.8.8#53\nNon-authoritative answer:\nName: google.com\nAddress: 142.250.80.46`,
+  'dir': ` Directory of C:\\Users\\Student\n10/15/2024  09:22 AM    <DIR>  Desktop\n10/15/2024  09:22 AM    <DIR>  Documents\n10/15/2024  09:22 AM    <DIR>  Downloads\n               0 File(s)              0 bytes\n               3 Dir(s)  125,432,123,456 bytes free`,
+  'cd desktop': `C:\\Users\\Student\\Desktop>`,
+  'hostname': `DESKTOP-ABC123`,
+  'whoami': `desktop-abc123\\student`,
+  'winver': `Windows Version: Windows 11 Pro, Version 23H2 (Build 22631.2715)`,
+  'sfc /scannow': `Beginning system scan.  This process will take some time.\nBeginning verification phase of system scan.\nVerification 100% complete.\nWindows Resource Protection did not find any integrity violations.`,
+  'chkdsk': `The type of the file system is NTFS.\nA disk check has been scheduled.\nWindows will now check the disk.\nWindows has checked the file system and found no problems.`,
+  'diskpart': `Microsoft DiskPart version 10.0.22000.1\nCopyright (C) Microsoft Corporation.\nOn computer: DESKTOP-ABC123\nDISKPART>`,
+  'gpupdate': `Updating policy...\nComputer Policy update has completed successfully.\nUser Policy update has completed successfully.`,
+  'tasklist': `Image Name                     PID Session Name  Session#  Mem Usage\nexplorer.exe                  4128 Console              1     62,456 K\nsvchost.exe                   1024 Services             0     15,320 K\nchrome.exe                    7892 Console              1    234,112 K`,
+  'net user': `User accounts for \\\\DESKTOP-ABC123\nAdministrator  DefaultAccount  Guest  Student\nThe command completed successfully.`,
+  'ls': `Desktop  Documents  Downloads  Music  Pictures  Videos`,
+  'pwd': `/home/student`,
+  'ip addr': `1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536\n    inet 127.0.0.1/8 scope host lo\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n    inet 192.168.1.105/24 brd 192.168.1.255 scope global eth0`,
+  'clear': '__clear__',
+  'help': `Available commands: ipconfig, ping, netstat, nslookup, dir, cd, hostname, whoami, winver, sfc /scannow, chkdsk, diskpart, gpupdate, tasklist, net user, ls, pwd, ip addr, clear`,
+};
+
+function setupTerminal() {
+  const inp = document.getElementById('termInput');
+  if (inp) inp.focus();
+}
+
+function runTerminalCommand(cmd, validCmds) {
+  const terminal = document.getElementById('terminalOutput');
+  const input = document.getElementById('termInput');
+  if (!terminal || !cmd.trim()) return;
+  
+  // Add command line
+  const cmdLine = document.createElement('div');
+  cmdLine.className = 'terminal-line';
+  cmdLine.innerHTML = `<span class="terminal-prompt">$</span><span style="color:#e8eaf0">${cmd}</span>`;
+  terminal.appendChild(cmdLine);
+  
+  // Get response
+  const cmdLower = cmd.toLowerCase().trim();
+  let response = TERMINAL_RESPONSES[cmdLower] || TERMINAL_RESPONSES[cmd.split(' ')[0].toLowerCase()];
+  
+  if (!response) {
+    // Check if it's close to a valid command
+    const closeTo = Object.keys(TERMINAL_RESPONSES).find(k => cmdLower.startsWith(k.split(' ')[0]));
+    if (closeTo) {
+      response = TERMINAL_RESPONSES[closeTo];
+    } else {
+      response = `'${cmd}' is not recognized as a command. Type 'help' to see available commands.`;
+    }
+  }
+  
+  if (response === '__clear__') {
+    terminal.innerHTML = '<div class="terminal-output">$ # Terminal cleared</div>';
+    if (input) input.value = '';
+    return;
+  }
+  
+  const out = document.createElement('div');
+  out.className = 'terminal-output';
+  out.textContent = response;
+  
+  // Check if command was in the valid list for this lab
+  if (validCmds && Array.isArray(validCmds) && validCmds.some(v => cmdLower.includes(v.toLowerCase().split(' ')[0]))) {
+    out.classList.add('terminal-success');
+  }
+  
+  terminal.appendChild(out);
+  terminal.scrollTop = terminal.scrollHeight;
+  if (input) input.value = '';
+}
+
+function toggleHint(n) {
+  const hint = document.getElementById(`hint_${n}`);
+  if (hint) hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
+}
+
+function markStepDone(n) {
+  const num = document.getElementById(`stepnum_${n}`);
+  if (num) { num.classList.add('done'); num.textContent = '✓'; }
+}
+
+// ══════════════════════════════════════════════════════════
+// NOTES
+// ══════════════════════════════════════════════════════════
+function getSavedNote(field) {
+  const key = `notes_${ST.objId}_${ST.code||'STU'}`;
+  try { const n = JSON.parse(localStorage.getItem('classroom_notes')||'{}'); return n[key]?.[field]||''; } catch(e){ return ''; }
+}
+
+let notesSaveTimer = null;
+function autoSaveNotes() {
+  clearTimeout(notesSaveTimer);
+  notesSaveTimer = setTimeout(() => {
+    const key = `notes_${ST.objId}_${ST.code||'STU'}`;
+    const terms = document.getElementById('nTerms')?.value || '';
+    const how   = document.getElementById('nHow')?.value   || '';
+    const real  = document.getElementById('nReal')?.value  || '';
+    const traps = document.getElementById('nTraps')?.value || '';
+    const all   = JSON.parse(localStorage.getItem('classroom_notes')||'{}');
+    all[key] = { terms, how, real, traps, ts: Date.now(), obj: ST.objId };
+    localStorage.setItem('classroom_notes', JSON.stringify(all));
+    // Also save to legacy st_notes key
+    const st_notes = JSON.parse(localStorage.getItem('st_notes')||'{}');
+    st_notes[`n_${ST.objId}_${ST.code||'STU'}`] = { terms, how, real, traps };
+    localStorage.setItem('st_notes', JSON.stringify(st_notes));
+    const msg = document.getElementById('notesSavedMsg');
+    if (msg) { msg.style.opacity = '1'; setTimeout(()=>msg.style.opacity='0', 1500); }
+  }, 800);
+}
+
+function saveHookResponse() {
+  const val = document.getElementById('hookResponse')?.value.trim();
+  if (!val) return;
+  const key = `hook_${ST.objId}_${ST.code||'STU'}`;
+  const all = JSON.parse(localStorage.getItem('classroom_notes')||'{}');
+  all[key] = { response: val, ts: Date.now() };
+  localStorage.setItem('classroom_notes', JSON.stringify(all));
+  const msg = document.getElementById('hookMsg');
+  if (msg) msg.textContent = '✓ Response saved — good thinking!';
+  toast('Initial response saved', 'ok');
+}
+
+// ══════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════
+function toast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// COLD RETRIEVAL — Spaced review of past objectives
+// ══════════════════════════════════════════════════════════
+async function renderColdRetrieval() {
+  const display = document.getElementById('studentDisplay');
+  const body    = document.getElementById('phaseBody');
+  if (!body) return;
+
+  body.innerHTML = '<div class="loading-bar"></div><div class="loading-text">Pulling questions from past objectives…</div>';
+
+  // Find past objectives student has notes or quiz scores for
+  const notes  = JSON.parse(localStorage.getItem('classroom_notes')  || '{}');
+  const scores = JSON.parse(localStorage.getItem('classroom_scores') || '{}');
+  const code   = ST.code || 'STU';
+
+  const coveredObjs = new Set([
+    ...Object.keys(notes).filter(k=>k.includes(code)).map(k=>k.split('_')[1]),
+    ...Object.keys(scores).filter(k=>k.includes(code)).map(k=>{
+      // key format: quiz_OBJID_CODE_ts
+      const parts = k.split('_');
+      return parts[1];
+    }),
+  ].filter(Boolean));
+
+  // Remove current objective
+  if (ST.objId) coveredObjs.delete(ST.objId);
+
+  const pastObjs = [...coveredObjs].filter(id => OBJECTIVES[id]);
+
+  if (pastObjs.length < 1) {
+    body.innerHTML = `
+      <div style="text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:14px">❄️</div>
+        <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--acc);text-transform:uppercase;margin-bottom:8px">Cold Retrieval</div>
+        <div style="font-size:13px;color:var(--tx2);line-height:1.8">No past objectives yet — cold retrieval will activate after you've completed at least one other lesson.</div>
+      </div>`;
+    return;
+  }
+
+  // Pick 3 random past objectives, weighted toward ones with lower scores
+  const objsWithScores = pastObjs.map(id => {
+    const objScores = Object.entries(scores)
+      .filter(([k]) => k.includes(id) && k.includes(code))
+      .map(([,v]) => v.pct || 0);
+    const avg = objScores.length ? Math.round(objScores.reduce((a,b)=>a+b,0)/objScores.length) : 50;
+    return { id, avg };
+  });
+  // Sort: lowest scores first (need most review)
+  objsWithScores.sort((a,b) => a.avg - b.avg);
+  const selected = objsWithScores.slice(0, Math.min(3, objsWithScores.length)).map(o=>o.id);
+
+  // Generate 2 questions per selected objective
+  const apiKey = localStorage.getItem('PLATFORM_API_KEY');
+  if (!apiKey) {
+    body.innerHTML = `<div style="padding:20px;font-family:var(--mono);font-size:12px;color:var(--amb)">API key needed to generate cold retrieval questions. Add it in Setup Wizard.</div>`;
+    return;
+  }
+
+  const objNames = selected.map(id => `${id}: ${OBJECTIVES[id]?.title}`).join('
+');
+  const prompt = `Generate 5 mixed CompTIA A+ review questions covering these PAST objectives:
+${objNames}
+
+Mix the objectives. Keep questions short. Focus on recall.
+Return ONLY valid JSON array:
+[{"q":"question","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","obj":"objective_id"}]`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || '[]';
+    const qs   = JSON.parse(text.replace(/```json
+?|```/g,'').trim());
+
+    body.innerHTML = `
+      <div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:12px;padding:14px 18px;margin-bottom:18px">
+        <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--acc);text-transform:uppercase;margin-bottom:3px">❄️ Cold Retrieval</div>
+        <div style="font-size:12px;color:var(--tx2)">Review from past lessons · <strong>Not graded</strong> · wakes up your memory</div>
+      </div>
+      ${qs.map((q,i) => `
+        <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;margin-bottom:10px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-bottom:8px">Q${i+1} · ${q.obj||''}</div>
+          <div style="font-size:14px;font-weight:500;color:var(--tx);line-height:1.7;margin-bottom:12px">${q.q}</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${['A','B','C','D'].map(l => `
+              <div onclick="pickColdAnswer(${i},'${l}','${q.answer}',this)"
+                style="display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:8px;border:1px solid var(--b1);cursor:pointer;background:var(--s3);font-size:13px;color:var(--tx2);transition:all .15s">
+                <span style="font-family:var(--mono);font-size:10px;font-weight:700;min-width:16px;color:var(--tx3)">${l}</span>
+                ${q.opts[l]||''}
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}`;
+  } catch(e) {
+    body.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:12px;padding:20px">Failed to generate questions: ${e.message}</div>`;
+  }
+}
+
+function pickColdAnswer(qIdx, letter, answer, el) {
+  const siblings = el.parentElement.querySelectorAll('div');
+  siblings.forEach(s => s.style.pointerEvents = 'none');
+  if (letter === answer) {
+    el.style.borderColor = 'var(--grn)'; el.style.background = 'var(--grn-d)'; el.style.color = 'var(--tx)';
+  } else {
+    el.style.borderColor = 'var(--red)'; el.style.background = 'var(--red-d)';
+    // Show correct
+    siblings.forEach(s => {
+      if (s.textContent.trim().startsWith(answer)) {
+        s.style.borderColor = 'var(--grn)'; s.style.background = 'var(--grn-d)'; s.style.color = 'var(--tx)';
+      }
+    });
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// COUNTDOWN TIMER — Closing Quiz
+// ══════════════════════════════════════════════════════════
+let quizTimerInterval = null;
+let quizSecondsLeft = 0;
+
+function startQuizTimer(seconds) {
+  quizSecondsLeft = seconds;
+  clearInterval(quizTimerInterval);
+
+  const timerEl = document.getElementById('quizCountdown');
+  if (!timerEl) return;
+
+  updateTimerDisplay();
+  quizTimerInterval = setInterval(() => {
+    quizSecondsLeft--;
+    updateTimerDisplay();
+    if (quizSecondsLeft <= 0) {
+      clearInterval(quizTimerInterval);
+      // Auto-submit if time runs out
+      const submitBtn = document.getElementById('quizSubmitBtn');
+      if (submitBtn) {
+        timerEl.style.color = 'var(--red)';
+        timerEl.textContent = "⏰ Time's up!";
+        setTimeout(() => submitBtn.click(), 1000);
+      }
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('quizCountdown');
+  if (!el) return;
+  const mins = Math.floor(quizSecondsLeft / 60);
+  const secs = quizSecondsLeft % 60;
+  const str  = mins > 0
+    ? `${mins}:${String(secs).padStart(2,'0')}`
+    : `${secs}s`;
+  el.textContent = '⏱ ' + str;
+  // Color warning
+  if (quizSecondsLeft <= 30) el.style.color = 'var(--red)';
+  else if (quizSecondsLeft <= 60) el.style.color = 'var(--amb)';
+  else el.style.color = 'var(--tx3)';
+}
+
+
+// ══════════════════════════════════════════════════════════
+// "I NEED HELP" BUTTON — Student signals teacher quietly
+// ══════════════════════════════════════════════════════════
+function buildHelpButton() {
+  // Only show in student mode
+  if (ST.isTeacher) return;
+  if (document.getElementById('helpBtn')) return;
+
+  const btn = document.createElement('div');
+  btn.id = 'helpBtn';
+  btn.innerHTML = '🙋 Help';
+  btn.style.cssText = `
+    position:fixed;bottom:20px;right:20px;z-index:9999;
+    cursor:pointer;display:flex;align-items:center;gap:6px;
+    background:rgba(8,9,13,.95);border:1.5px solid var(--amb);
+    border-radius:20px;padding:8px 16px;
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    color:var(--amb);backdrop-filter:blur(12px);
+    transition:all .2s;user-select:none;
+  `;
+  btn.onclick = sendHelpSignal;
+  document.body.appendChild(btn);
+}
+
+function sendHelpSignal() {
+  const code = ST.code || 'STU';
+  const obj  = ST.objId || 'unknown';
+
+  // Write to localStorage — teacher polls this
+  const helps = JSON.parse(localStorage.getItem('help_signals') || '[]');
+  helps.unshift({ code, obj, ts: Date.now(), phase: ST.currentPhase });
+  localStorage.setItem('help_signals', JSON.stringify(helps.slice(0,50)));
+
+  // Visual feedback to student
+  const btn = document.getElementById('helpBtn');
+  if (btn) {
+    btn.innerHTML = '✓ Teacher notified';
+    btn.style.borderColor = 'var(--grn)';
+    btn.style.color = 'var(--grn)';
+    setTimeout(() => {
+      btn.innerHTML = '🙋 Help';
+      btn.style.borderColor = 'var(--amb)';
+      btn.style.color = 'var(--amb)';
+    }, 4000);
+  }
+  toast('Your teacher has been notified 🙋', 'info');
+}
+
+// Teacher: poll for help signals and show badge
+function pollHelpSignals() {
+  if (!ST.isTeacher) return;
+  setInterval(() => {
+    const helps = JSON.parse(localStorage.getItem('help_signals') || '[]');
+    const recent = helps.filter(h => Date.now() - h.ts < 120000); // last 2 mins
+    const badge = document.getElementById('helpBadge');
+    if (!badge) return;
+    if (recent.length > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = `🙋 ${recent.length} student${recent.length>1?'s':''} need help`;
+      badge.onclick = () => {
+        alert('Students needing help:
+' + recent.map(h=>`• ${h.code} (${h.phase||'unknown phase'})`).join('
+'));
+        localStorage.removeItem('help_signals');
+        badge.style.display = 'none';
+      };
+    } else {
+      badge.style.display = 'none';
+    }
+  }, 3000);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// STREAK TRACKER
+// ══════════════════════════════════════════════════════════
+function checkAndUpdateStreak() {
+  const today    = new Date().toDateString();
+  const lastDay  = localStorage.getItem('streak_last_day');
+  let streak     = parseInt(localStorage.getItem('streak_count') || '0');
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+  if (lastDay === today) {
+    // Already logged today — just return current streak
+    return streak;
+  } else if (lastDay === yesterday) {
+    // Consecutive day — increment
+    streak++;
+  } else if (!lastDay) {
+    // First ever
+    streak = 1;
+  } else {
+    // Streak broken
+    streak = 1;
+  }
+
+  localStorage.setItem('streak_last_day', today);
+  localStorage.setItem('streak_count', streak);
+
+  // Show streak toast for milestone streaks
+  if (streak > 1) {
+    setTimeout(() => toast(`🔥 ${streak}-day streak! Keep it up!`, 'ok'), 1500);
+  }
+  return streak;
+}
+
+function buildStreakDisplay() {
+  if (ST.isTeacher) return;
+  const streak = checkAndUpdateStreak();
+  if (!streak) return;
+
+  // Add streak pill to header
+  const hdrObj = document.getElementById('hdrObj');
+  if (hdrObj && !document.getElementById('streakPill')) {
+    const pill = document.createElement('span');
+    pill.id = 'streakPill';
+    pill.style.cssText = 'font-family:var(--mono);font-size:9px;color:var(--amb);background:var(--amb-d);border:1px solid var(--amb);border-radius:20px;padding:3px 10px;margin-left:8px;letter-spacing:.3px';
+    pill.textContent = `🔥 ${streak}-day streak`;
+    hdrObj.parentNode.insertBefore(pill, hdrObj.nextSibling);
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS — Teacher phase navigation
+// ══════════════════════════════════════════════════════════
+function setupTeacherShortcuts() {
+  document.addEventListener('keydown', e => {
+    if (!ST.isTeacher) return;
+    if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+
+    const shortcuts = { '1':'cold', '2':'hook', '3':'lesson', '4':'lab', '5':'disc', '6':'quiz' };
+    if (shortcuts[e.key]) {
+      pushPhase(shortcuts[e.key]);
+      toast(`Phase pushed: ${shortcuts[e.key]} (key ${e.key})`, 'info');
+    }
+    if (e.key === 'e' || e.key === 'E') { endClass(); }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// ANNOUNCEMENTS — Show teacher announcements to students
+// ══════════════════════════════════════════════════════════
+function checkAnnouncement() {
+  const ann = localStorage.getItem('hub_announcement');
+  if (!ann || ST.isTeacher) return;
+
+  const lastSeen = localStorage.getItem('ann_last_seen');
+  if (lastSeen === ann) return;
+
+  const bar = document.createElement('div');
+  bar.style.cssText = 'background:linear-gradient(135deg,rgba(79,158,255,.1),rgba(168,85,247,.06));border-bottom:1px solid var(--acc);padding:10px 20px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--tx);position:sticky;top:52px;z-index:99';
+  bar.innerHTML = `<span style="font-size:18px">📢</span><span style="flex:1">${ann}</span><button onclick="this.parentElement.remove();localStorage.setItem('ann_last_seen','${ann.replace(/'/g,"\'")}');" style="background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:16px">✕</button>`;
+  document.body.insertBefore(bar, document.body.children[1]);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

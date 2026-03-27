@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Student Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090d;--s1:#0e1018;--s2:#13151f;--s3:#1a1d2a;--b1:#252836;--b2:#2e3245;--tx:#e8eaf0;--tx2:#9096b0;--tx3:#5a607a;--acc:#4f9eff;--acc-d:rgba(79,158,255,.08);--grn:#3dd68c;--grn-d:rgba(61,214,140,.08);--red:#ff4560;--red-d:rgba(255,69,96,.08);--amb:#ffb830;--amb-d:rgba(255,184,48,.08);--pur:#a855f7;--pur-d:rgba(168,85,247,.08);--gold:#ffd700;--r:8px;--rl:12px;--rxl:20px;--mono:'Space Mono',monospace;--display:'Syne',sans-serif;--sans:'Inter',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100vh}
+.hdr{display:flex;align-items:center;gap:12px;padding:0 20px;height:52px;background:var(--s1);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100}
+.hdr-logo{font-family:var(--display);font-size:18px;font-weight:800;color:var(--acc)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;border:1px solid var(--b1);background:transparent;color:var(--tx3);font-family:var(--mono);font-size:10px;cursor:pointer;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:var(--acc);color:var(--acc)}
+.content{max-width:960px;margin:0 auto;padding:28px 20px}
+.nav-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--b1);padding-bottom:12px;flex-wrap:wrap}
+.nav-tab{padding:7px 16px;border-radius:6px;border:1px solid var(--b1);font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--tx3);background:transparent;transition:all .15s}
+.nav-tab.active{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+.panel{display:none}
+.panel.active{display:block}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px}
+.card-title{font-family:var(--display);font-size:15px;font-weight:700;color:var(--tx)}
+.card-body{padding:18px}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.tag-acc{background:var(--acc-d);color:var(--acc);border:1px solid var(--acc)}
+.tag-grn{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn)}
+.tag-red{background:var(--red-d);color:var(--red);border:1px solid var(--red)}
+.tag-amb{background:var(--amb-d);color:var(--amb);border:1px solid var(--amb)}
+.tag-pur{background:var(--pur-d);color:var(--pur);border:1px solid var(--pur)}
+
+/* GRADE HERO */
+.grade-hero{background:linear-gradient(135deg,rgba(79,158,255,.06),rgba(168,85,247,.03));border:1px solid var(--b1);border-radius:var(--rxl);padding:28px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.grade-circle{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:3px solid var(--b2);background:var(--s2);flex-shrink:0;position:relative}
+.grade-pct{font-family:var(--display);font-size:34px;font-weight:900;line-height:1}
+.grade-letter{font-family:var(--mono);font-size:12px;color:var(--tx3);letter-spacing:.5px}
+.grade-info{flex:1}
+.grade-name{font-family:var(--display);font-size:24px;font-weight:800;color:var(--tx);margin-bottom:4px}
+.grade-sub{font-size:13px;color:var(--tx2);margin-bottom:14px;line-height:1.6}
+.grade-bar-wrap{display:flex;flex-direction:column;gap:6px}
+.grade-bar-row{display:flex;align-items:center;gap:8px}
+.grade-bar-label{font-family:var(--mono);font-size:9px;color:var(--tx3);width:120px;flex-shrink:0}
+.grade-bar{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.grade-bar-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.grade-bar-pct{font-family:var(--mono);font-size:9px;color:var(--tx3);width:32px;text-align:right}
+
+/* SCORE LOG */
+.score-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r);background:var(--s2);border:1px solid var(--b1);margin-bottom:6px}
+.score-icon{font-size:18px;width:28px;text-align:center}
+.score-info{flex:1}
+.score-label{font-size:12px;font-weight:500;color:var(--tx)}
+.score-date{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:2px}
+.score-value{font-family:var(--display);font-size:18px;font-weight:800}
+
+/* STUDY PLAN */
+.study-item{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .15s;text-decoration:none}
+.study-item:hover{border-color:var(--acc)}
+.study-priority{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.study-priority.high{background:var(--red-d);border:1px solid var(--red)}
+.study-priority.med{background:var(--amb-d);border:1px solid var(--amb)}
+.study-priority.low{background:var(--grn-d);border:1px solid var(--grn)}
+.study-info{flex:1}
+.study-obj{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--acc);margin-bottom:3px}
+.study-title{font-size:13px;color:var(--tx);font-weight:500;margin-bottom:3px;line-height:1.4}
+.study-reason{font-size:11px;color:var(--tx2)}
+.study-action{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:2px}
+
+/* OBJECTIVE PROGRESS */
+.obj-progress-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.obj-prog-item{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px;transition:all .15s;cursor:pointer}
+.obj-prog-item:hover{border-color:var(--acc)}
+.obj-prog-id{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--acc);margin-bottom:4px}
+.obj-prog-title{font-size:11px;color:var(--tx2);line-height:1.4;margin-bottom:6px}
+.obj-prog-bar{height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.obj-prog-fill{height:100%;border-radius:2px}
+.obj-prog-status{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:4px}
+
+/* READINESS */
+.readiness-gauge{display:flex;align-items:center;gap:20px;padding:20px;background:var(--s2);border-radius:var(--rl);margin-bottom:16px}
+.gauge-circle{position:relative;width:90px;height:90px}
+.gauge-circle svg{width:90px;height:90px;transform:rotate(-90deg)}
+.gauge-track{fill:none;stroke:var(--b2);stroke-width:8}
+.gauge-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.gauge-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--display);font-size:18px;font-weight:900;line-height:1}
+.gauge-sub{font-family:var(--mono);font-size:8px;color:var(--tx3)}
+
+/* BADGES */
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.badge{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:14px 12px;text-align:center;transition:all .2s}
+.badge.earned{border-color:var(--gold);background:rgba(255,215,0,.04)}
+.badge.locked{opacity:.4}
+.badge-icon{font-size:32px;margin-bottom:6px}
+.badge-name{font-family:var(--display);font-size:11px;font-weight:700;color:var(--tx)}
+.badge-desc{font-size:10px;color:var(--tx3);margin-top:3px;line-height:1.4}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;text-decoration:none}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{background:var(--s3);color:var(--tx)}
+.btn-sm{padding:5px 12px;font-size:10px}
+
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:var(--r);font-family:var(--mono);font-size:11px;animation:toastIn .2s}
+.toast.ok{background:var(--grn-d);border:1px solid var(--grn);color:var(--grn)}
+.toast.info{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc)}
+@keyframes toastIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@media(max-width:600px){.grade-hero{flex-direction:column}.obj-progress-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<header class="hdr">
+  <a href="hub-new.html" class="back-btn">← Hub</a>
+  <div style="width:1px;height:18px;background:var(--b2)"></div>
+  <div class="hdr-logo">Student Dashboard</div>
+  <div style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--tx3)" id="headerCode">Not logged in</div>
+  <button class="btn btn-ghost btn-sm" onclick="refreshAll()">↺ Refresh</button>
+</header>
+
+<div class="content">
+
+  <!-- LOGIN CHECK -->
+  <div id="loginPrompt" style="display:none;text-align:center;padding:60px 20px">
+    <div style="font-size:56px;margin-bottom:16px">🎓</div>
+    <div style="font-family:var(--display);font-size:24px;font-weight:800;margin-bottom:8px">Enter Your Code</div>
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:20px">Enter your student code to see your dashboard</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <input id="codeLoginInput" style="background:var(--s2);border:1.5px solid var(--b2);border-radius:8px;padding:10px 18px;color:var(--tx);font-family:var(--mono);font-size:16px;letter-spacing:4px;text-align:center;outline:none;width:180px" placeholder="STU-001" oninput="this.value=this.value.toUpperCase()">
+      <button class="btn btn-acc" onclick="loginFromDash()">Enter →</button>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <div id="dashMain" style="display:none">
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchPanel('grades')">📊 My Grades</button>
+      <button class="nav-tab" onclick="switchPanel('study')">🎯 Study Tonight</button>
+      <button class="nav-tab" onclick="switchPanel('progress')">📈 Objective Progress</button>
+      <button class="nav-tab" onclick="switchPanel('readiness')">🎓 Exam Readiness</button>
+      <button class="nav-tab" onclick="switchPanel('badges')">🏆 Badges</button>
+    </div>
+
+    <!-- ─── GRADES PANEL ─── -->
+    <div class="panel active" id="panelGrades">
+
+      <div class="grade-hero">
+        <div class="grade-circle" id="gradeCircle">
+          <div class="grade-pct" id="gradePct" style="color:var(--acc)">—</div>
+          <div class="grade-letter" id="gradeLetter">No data</div>
+        </div>
+        <div class="grade-info">
+          <div class="grade-name" id="gradeStudentName">Loading…</div>
+          <div class="grade-sub">Current weighted grade based on all submitted work</div>
+          <div class="grade-bar-wrap">
+            <div class="grade-bar-row">
+              <div class="grade-bar-label">Notes + Quizzes</div>
+              <div class="grade-bar"><div class="grade-bar-fill" id="barNQ" style="background:var(--acc);width:0%"></div></div>
+              <div class="grade-bar-pct" id="pctNQ">—</div>
+              <span class="tag tag-acc" style="font-size:8px">35%</span>
+            </div>
+            <div class="grade-bar-row">
+              <div class="grade-bar-label">Discussions</div>
+              <div class="grade-bar"><div class="grade-bar-fill" id="barDisc" style="background:var(--amb);width:0%"></div></div>
+              <div class="grade-bar-pct" id="pctDisc">—</div>
+              <span class="tag tag-amb" style="font-size:8px">10%</span>
+            </div>
+            <div class="grade-bar-row">
+              <div class="grade-bar-label">Chapter Tests</div>
+              <div class="grade-bar"><div class="grade-bar-fill" id="barTests" style="background:var(--pur);width:0%"></div></div>
+              <div class="grade-bar-pct" id="pctTests">—</div>
+              <span class="tag tag-pur" style="font-size:8px">55%</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-acc btn-sm" onclick="refreshAll()">↺ Recalculate</button>
+            <button class="btn btn-ghost btn-sm" onclick="syncToSheets()">☁ Sync to Sheets</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📋 Score History</div><span id="scoreCount" class="tag tag-acc">0 entries</span></div>
+        <div class="card-body" id="scoreLog">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">Complete quizzes and labs to see your score history.</div>
+        </div>
+      </div>
+
+      <div id="syncStatus" style="font-family:var(--mono);font-size:10px;color:var(--tx3);text-align:center;padding:8px"></div>
+    </div>
+
+    <!-- ─── STUDY TONIGHT PANEL ─── -->
+    <div class="panel" id="panelStudy">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🎯 What to Study Tonight</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--tx3)">Personalized based on your quiz history</div>
+        </div>
+        <div class="card-body" id="studyPlan">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">Complete some quizzes first — your study plan will be generated automatically.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">⏱ Spaced Repetition Queue</div></div>
+        <div class="card-body" id="spacedRepQueue">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">Review queue builds as you complete quizzes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── OBJECTIVE PROGRESS PANEL ─── -->
+    <div class="panel" id="panelProgress">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Core 1 · 220-1201</div></div>
+          <div class="card-body" id="progCore1"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Core 2 · 220-1202</div></div>
+          <div class="card-body" id="progCore2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── READINESS PANEL ─── -->
+    <div class="panel" id="panelReadiness">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Core 1 · 220-1201</div><span style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Pass: 675</span></div>
+          <div class="card-body">
+            <div class="readiness-gauge">
+              <div class="gauge-circle">
+                <svg viewBox="0 0 90 90"><circle class="gauge-track" cx="45" cy="45" r="37"/><circle class="gauge-fill" id="gauge1" cx="45" cy="45" r="37" stroke="var(--acc)" stroke-dasharray="232.5" stroke-dashoffset="232.5"/></svg>
+                <div class="gauge-text"><span id="readinessPct1" style="color:var(--acc)">0%</span><span class="gauge-sub">Readiness</span></div>
+              </div>
+              <div>
+                <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--tx);margin-bottom:4px" id="readinessLabel1">Not assessed</div>
+                <div style="font-size:12px;color:var(--tx2);line-height:1.6" id="readinessSub1">Complete quizzes across all 5 domains to see your readiness score.</div>
+              </div>
+            </div>
+            <div id="domainReadiness1"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Core 2 · 220-1202</div><span style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Pass: 700</span></div>
+          <div class="card-body">
+            <div class="readiness-gauge">
+              <div class="gauge-circle">
+                <svg viewBox="0 0 90 90"><circle class="gauge-track" cx="45" cy="45" r="37"/><circle class="gauge-fill" id="gauge2" cx="45" cy="45" r="37" stroke="var(--pur)" stroke-dasharray="232.5" stroke-dashoffset="232.5"/></svg>
+                <div class="gauge-text"><span id="readinessPct2" style="color:var(--pur)">0%</span><span class="gauge-sub">Readiness</span></div>
+              </div>
+              <div>
+                <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--tx);margin-bottom:4px" id="readinessLabel2">Not assessed</div>
+                <div style="font-size:12px;color:var(--tx2);line-height:1.6" id="readinessSub2">Complete quizzes across all 4 domains to see your readiness score.</div>
+              </div>
+            </div>
+            <div id="domainReadiness2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎯 Weak Spots</div><div style="font-family:var(--mono);font-size:10px;color:var(--tx3)">Objectives where you scored below 70%</div></div>
+        <div class="card-body" id="weakSpots">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">No weak spots identified yet — keep taking quizzes!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── BADGES PANEL ─── -->
+    <div class="panel" id="panelBadges">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏆 Your Badges</div><span id="badgeCount" class="tag tag-grn">0 earned</span></div>
+        <div class="card-body">
+          <div class="badges-grid" id="badgesGrid"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dashMain -->
+</div><!-- /content -->
+
+<script>
+const OBJECTIVES = {
+  '1.1':{exam:'1201',domain:'1.0',title:'Mobile Hardware'},
+  '1.2':{exam:'1201',domain:'1.0',title:'Mobile Connectivity'},
+  '1.3':{exam:'1201',domain:'1.0',title:'Mobile Networks'},
+  '2.1':{exam:'1201',domain:'2.0',title:'TCP/UDP Ports'},
+  '2.2':{exam:'1201',domain:'2.0',title:'Wireless Networking'},
+  '2.3':{exam:'1201',domain:'2.0',title:'Network Hosts'},
+  '2.4':{exam:'1201',domain:'2.0',title:'Network Config'},
+  '2.5':{exam:'1201',domain:'2.0',title:'Network Hardware'},
+  '2.6':{exam:'1201',domain:'2.0',title:'SOHO Networks'},
+  '2.7':{exam:'1201',domain:'2.0',title:'Connection Types'},
+  '2.8':{exam:'1201',domain:'2.0',title:'Network Tools'},
+  '3.1':{exam:'1201',domain:'3.0',title:'Displays'},
+  '3.2':{exam:'1201',domain:'3.0',title:'Cables'},
+  '3.3':{exam:'1201',domain:'3.0',title:'RAM'},
+  '3.4':{exam:'1201',domain:'3.0',title:'Storage'},
+  '3.5':{exam:'1201',domain:'3.0',title:'Motherboards/CPU'},
+  '3.6':{exam:'1201',domain:'3.0',title:'Power Supply'},
+  '3.7':{exam:'1201',domain:'3.0',title:'Printers'},
+  '3.8':{exam:'1201',domain:'3.0',title:'Printer Maintenance'},
+  '4.1':{exam:'1201',domain:'4.0',title:'Virtualization'},
+  '4.2':{exam:'1201',domain:'4.0',title:'Cloud Computing'},
+  '5.1':{exam:'1201',domain:'5.0',title:'Motherboard Troubleshoot'},
+  '5.2':{exam:'1201',domain:'5.0',title:'Drive Troubleshoot'},
+  '5.3':{exam:'1201',domain:'5.0',title:'Display Troubleshoot'},
+  '5.4':{exam:'1201',domain:'5.0',title:'Mobile Troubleshoot'},
+  '5.5':{exam:'1201',domain:'5.0',title:'Network Troubleshoot'},
+  '5.6':{exam:'1201',domain:'5.0',title:'Printer Troubleshoot'},
+  'C1.1':{exam:'1202',domain:'1.0',title:'OS Types'},
+  'C1.2':{exam:'1202',domain:'1.0',title:'OS Install'},
+  'C1.3':{exam:'1202',domain:'1.0',title:'Windows Editions'},
+  'C1.4':{exam:'1202',domain:'1.0',title:'Windows Tools'},
+  'C1.5':{exam:'1202',domain:'1.0',title:'CLI Tools'},
+  'C1.6':{exam:'1202',domain:'1.0',title:'Windows Settings'},
+  'C1.7':{exam:'1202',domain:'1.0',title:'Windows Networking'},
+  'C1.8':{exam:'1202',domain:'1.0',title:'macOS'},
+  'C1.9':{exam:'1202',domain:'1.0',title:'Linux'},
+  'C1.10':{exam:'1202',domain:'1.0',title:'App Install'},
+  'C1.11':{exam:'1202',domain:'1.0',title:'Cloud Apps'},
+  'C2.1':{exam:'1202',domain:'2.0',title:'Security Measures'},
+  'C2.2':{exam:'1202',domain:'2.0',title:'Windows Security'},
+  'C2.3':{exam:'1202',domain:'2.0',title:'Wireless Security'},
+  'C2.4':{exam:'1202',domain:'2.0',title:'Malware'},
+  'C2.5':{exam:'1202',domain:'2.0',title:'Social Engineering'},
+  'C2.6':{exam:'1202',domain:'2.0',title:'Malware Removal'},
+  'C2.7':{exam:'1202',domain:'2.0',title:'Hardening'},
+  'C2.8':{exam:'1202',domain:'2.0',title:'Mobile Security'},
+  'C2.9':{exam:'1202',domain:'2.0',title:'Data Destruction'},
+  'C2.10':{exam:'1202',domain:'2.0',title:'SOHO Security'},
+  'C2.11':{exam:'1202',domain:'2.0',title:'Browser Security'},
+  'C3.1':{exam:'1202',domain:'3.0',title:'Windows Troubleshoot'},
+  'C3.2':{exam:'1202',domain:'3.0',title:'Mobile App Issues'},
+  'C3.3':{exam:'1202',domain:'3.0',title:'Mobile Security Issues'},
+  'C3.4':{exam:'1202',domain:'3.0',title:'PC Security Issues'},
+  'C4.1':{exam:'1202',domain:'4.0',title:'Documentation'},
+  'C4.2':{exam:'1202',domain:'4.0',title:'Change Management'},
+  'C4.3':{exam:'1202',domain:'4.0',title:'Backup & Recovery'},
+  'C4.4':{exam:'1202',domain:'4.0',title:'Safety'},
+  'C4.5':{exam:'1202',domain:'4.0',title:'Environment'},
+  'C4.6':{exam:'1202',domain:'4.0',title:'Privacy & Policy'},
+  'C4.7':{exam:'1202',domain:'4.0',title:'Communication'},
+  'C4.8':{exam:'1202',domain:'4.0',title:'Scripting'},
+  'C4.9':{exam:'1202',domain:'4.0',title:'Remote Access'},
+  'C4.10':{exam:'1202',domain:'4.0',title:'AI Concepts'},
+};
+
+const BADGES_DEF = [
+  {id:'first_quiz',icon:'⚡',name:'First Quiz',desc:'Complete your first quiz',earned:false},
+  {id:'perfect_score',icon:'💯',name:'Perfect Score',desc:'Score 100% on any quiz',earned:false},
+  {id:'five_quizzes',icon:'🎯',name:'On a Roll',desc:'Complete 5 quizzes',earned:false},
+  {id:'core1_complete',icon:'🔧',name:'Hardware Hero',desc:'Complete all Core 1 objectives',earned:false},
+  {id:'core2_complete',icon:'🛡️',name:'Security Expert',desc:'Complete all Core 2 objectives',earned:false},
+  {id:'notes_master',icon:'📝',name:'Notes Master',desc:'Complete notes for 10 objectives',earned:false},
+  {id:'discussion_star',icon:'💬',name:'Discussion Star',desc:'Answer 20 discussion questions',earned:false},
+  {id:'streak_5',icon:'🔥',name:'5-Day Streak',desc:'Study 5 days in a row',earned:false},
+  {id:'pbis_100',icon:'🏆',name:'Century',desc:'Earn 100 PBIS points',earned:false},
+  {id:'a_grade',icon:'🌟',name:'Honor Roll',desc:'Maintain an A grade',earned:false},
+  {id:'lab_complete',icon:'🔬',name:'Lab Rat',desc:'Complete 10 sandbox labs',earned:false},
+  {id:'exam_ready',icon:'🎓',name:'Exam Ready',desc:'Reach 80%+ readiness on both exams',earned:false},
+];
+
+let CODE = null;
+
+function init() {
+  try { CODE = JSON.parse(localStorage.getItem('PLATFORM_CODE')); } catch(e){}
+  if (!CODE || CODE === 'TEACHER') {
+    document.getElementById('loginPrompt').style.display = 'block';
+    document.getElementById('dashMain').style.display = 'none';
+  } else {
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('dashMain').style.display = 'block';
+    document.getElementById('headerCode').textContent = CODE;
+    document.getElementById('gradeStudentName').textContent = CODE;
+    loadDashboard();
+  }
+}
+
+function loginFromDash() {
+  const val = document.getElementById('codeLoginInput').value.trim().toUpperCase();
+  if (!val || val.length < 3) return;
+  localStorage.setItem('PLATFORM_CODE', JSON.stringify(val));
+  CODE = val;
+  location.reload();
+}
+
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel' + id.charAt(0).toUpperCase() + id.slice(1))?.classList.add('active');
+  event.target.classList.add('active');
+}
+
+function loadDashboard() {
+  buildGrades();
+  buildStudyPlan();
+  buildObjectiveProgress();
+  buildReadiness();
+  buildBadges();
+}
+
+function refreshAll() { loadDashboard(); toast('Dashboard refreshed','info'); }
+
+// ── GRADES ────────────────────────────────────────────────
+function buildGrades() {
+  const scores = loadLS('classroom_scores', {});
+  const notes  = loadLS('classroom_notes', {});
+  const discAns = loadLS('st_ans', {});
+  const examScores = loadLS('exam_scores', []);
+
+  // Notes + Quizzes (35%)
+  const noteArr = [];
+  Object.entries(notes).forEach(([k,v]) => {
+    if (!k.includes(CODE)) return;
+    const done = [v.terms,v.how,v.real,v.traps].filter(f=>f&&f.trim().length>=20).length;
+    noteArr.push(Math.round(done/4*100));
+  });
+  const quizArr = [];
+  Object.entries(scores).forEach(([k,v]) => {
+    if (!k.includes(CODE)) return;
+    quizArr.push(v.pct||0);
+  });
+  const nqParts = [...noteArr, ...quizArr];
+  const nqPct = nqParts.length ? Math.round(nqParts.reduce((a,b)=>a+b,0)/nqParts.length) : null;
+
+  // Discussions (10%)
+  const discArr = [];
+  Object.entries(discAns).forEach(([k,v]) => {
+    if (!k.includes(CODE)) return;
+    const done = Object.values(v).filter(r=>r&&r.trim().length>=15).length;
+    discArr.push(Math.round(done/Math.max(Object.keys(v).length,1)*100));
+  });
+  const discPct = discArr.length ? Math.round(discArr.reduce((a,b)=>a+b,0)/discArr.length) : null;
+
+  // Tests (55%)
+  const myTests = Array.isArray(examScores) ? examScores.filter(s=>!s.code||s.code===CODE) : [];
+  const testPct = myTests.length ? Math.round(myTests.reduce((a,b)=>a+(b.pct||0),0)/myTests.length) : null;
+
+  // Weighted final
+  let wSum=0,wPct=0;
+  if(nqPct!==null){wPct+=nqPct*0.35;wSum+=0.35;}
+  if(discPct!==null){wPct+=discPct*0.10;wSum+=0.10;}
+  if(testPct!==null){wPct+=testPct*0.55;wSum+=0.55;}
+  const finalPct = wSum > 0 ? Math.round(wPct/wSum*100) : null;
+  const letter = finalPct===null?'—':finalPct>=90?'A':finalPct>=80?'B':finalPct>=70?'C':finalPct>=60?'D':'F';
+  const color = finalPct===null?'var(--tx3)':finalPct>=90?'var(--grn)':finalPct>=80?'var(--acc)':finalPct>=70?'var(--amb)':'var(--red)';
+
+  // Render
+  const pctEl = document.getElementById('gradePct');
+  const letterEl = document.getElementById('gradeLetter');
+  if (pctEl) { pctEl.textContent = finalPct!==null?finalPct+'%':'—'; pctEl.style.color = color; }
+  if (letterEl) { letterEl.textContent = letter; }
+
+  const setBar = (id,pctId,val,color) => {
+    const bar = document.getElementById(id); const pctEl = document.getElementById(pctId);
+    if(bar) bar.style.width = (val||0)+'%';
+    if(pctEl) pctEl.textContent = val!==null?val+'%':'—';
+  };
+  setBar('barNQ','pctNQ',nqPct,'var(--acc)');
+  setBar('barDisc','pctDisc',discPct,'var(--amb)');
+  setBar('barTests','pctTests',testPct,'var(--pur)');
+
+  // Score log
+  const log = [];
+  noteArr.forEach((p,i) => log.push({icon:'📝',label:`Cornell Notes`,pct:p,ts:i}));
+  quizArr.forEach((p,i) => log.push({icon:'⏱',label:`Closing Quiz`,pct:p,ts:100+i}));
+  discArr.forEach((p,i) => log.push({icon:'💬',label:`Discussion`,pct:p,ts:200+i}));
+  myTests.forEach((s,i) => log.push({icon:'🎓',label:'Chapter Test',pct:s.pct||0,ts:s.ts||300+i}));
+  log.sort((a,b)=>b.ts-a.ts);
+
+  const logEl = document.getElementById('scoreLog');
+  const countEl = document.getElementById('scoreCount');
+  if(countEl) countEl.textContent = log.length + ' entries';
+  if(logEl) logEl.innerHTML = log.length ? log.slice(0,20).map(s => {
+    const c = s.pct>=80?'var(--grn)':s.pct>=60?'var(--amb)':'var(--red)';
+    return `<div class="score-item"><div class="score-icon">${s.icon}</div><div class="score-info"><div class="score-label">${s.label}</div></div><div class="score-value" style="color:${c}">${s.pct}%</div></div>`;
+  }).join('') : '<div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">No scores yet. Complete quizzes to see your history.</div>';
+
+  // Sync
+  if (finalPct !== null) syncGrade(nqPct||0, discPct||0, testPct||0, finalPct, letter);
+}
+
+function syncGrade(nq, disc, test, final, letter) {
+  let url = localStorage.getItem('PLATFORM_SYNC_URL');
+  if (!url) return;
+  try { url = JSON.parse(url); } catch(e){}
+  if (!url?.includes('script.google.com')) return;
+  const p = new URLSearchParams({action:'save_grade',code:CODE,notes_pct:nq,disc_pct:disc,test_pct:test,final_pct:final,letter});
+  fetch(url+'?'+p,{mode:'cors'})
+    .then(()=>{const el=document.getElementById('syncStatus');if(el)el.textContent='✓ Grade synced to Google Sheets — '+new Date().toLocaleTimeString();})
+    .catch(()=>{});
+}
+
+function syncToSheets() { buildGrades(); toast('Syncing…','info'); }
+
+// ── STUDY PLAN ─────────────────────────────────────────────
+function buildStudyPlan() {
+  const scores = loadLS('classroom_scores', {});
+  
+  // Find objectives with scores below 80%
+  const objScores = {};
+  Object.entries(scores).forEach(([k,v]) => {
+    if (!k.includes(CODE)) return;
+    const obj = v.obj;
+    if (!obj) return;
+    if (!objScores[obj]) objScores[obj] = [];
+    objScores[obj].push(v.pct||0);
+  });
+  
+  const studyItems = [];
+  
+  // Objectives with low scores — high priority
+  Object.entries(objScores).forEach(([obj, ptcs]) => {
+    const avg = Math.round(ptcs.reduce((a,b)=>a+b,0)/ptcs.length);
+    if (avg < 80) {
+      studyItems.push({
+        priority: avg < 60 ? 'high' : 'med',
+        obj, avg,
+        title: OBJECTIVES[obj]?.title || obj,
+        reason: `Scored ${avg}% — needs review`,
+        action: 'Take quiz again in Lesson Library'
+      });
+    }
+  });
+  
+  // Objectives not yet attempted
+  const attemptedObjs = Object.keys(objScores);
+  const notAttempted = Object.keys(OBJECTIVES).filter(id => !attemptedObjs.includes(id));
+  notAttempted.slice(0,5).forEach(id => {
+    studyItems.push({
+      priority: 'low', obj: id, avg: null,
+      title: OBJECTIVES[id]?.title || id,
+      reason: 'Not yet covered',
+      action: 'Open in Lesson Library'
+    });
+  });
+  
+  studyItems.sort((a,b) => {
+    const order = {high:0,med:1,low:2};
+    return order[a.priority] - order[b.priority];
+  });
+  
+  const el = document.getElementById('studyPlan');
+  if (!el) return;
+  if (!studyItems.length) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">Great job! No weak spots identified. Keep completing objectives.</div>';
+    return;
+  }
+  
+  el.innerHTML = studyItems.slice(0,8).map(item => {
+    const colors = {high:'var(--red)',med:'var(--amb)',low:'var(--grn)'};
+    const icons  = {high:'🔴',med:'🟡',low:'🟢'};
+    return `<a href="lesson-library.html" class="study-item" style="display:flex">
+      <div class="study-priority ${item.priority}">${icons[item.priority]}</div>
+      <div class="study-info">
+        <div class="study-obj">${item.obj} ${item.avg!==null?'· '+item.avg+'%':''}</div>
+        <div class="study-title">${item.title}</div>
+        <div class="study-reason">${item.reason}</div>
+        <div class="study-action">→ ${item.action}</div>
+      </div>
+    </a>`;
+  }).join('');
+
+  // Spaced rep queue
+  const srEl = document.getElementById('spacedRepQueue');
+  if (srEl) {
+    const highPri = studyItems.filter(i=>i.priority==='high').slice(0,3);
+    if (highPri.length) {
+      srEl.innerHTML = `<div style="font-size:12px;color:var(--tx2);margin-bottom:10px">Review these today — you scored below 60%:</div>` +
+        highPri.map(i=>`<div style="background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;font-size:12px"><strong style="color:var(--red)">${i.obj}</strong> · ${i.title}</div>`).join('');
+    } else {
+      srEl.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--tx3)">No urgent reviews — you\'re doing well!</div>';
+    }
+  }
+}
+
+// ── OBJECTIVE PROGRESS ─────────────────────────────────────
+function buildObjectiveProgress() {
+  const scores = loadLS('classroom_scores', {});
+  const notes  = loadLS('classroom_notes', {});
+  
+  const getProgress = (id) => {
+    const hasNote = Object.keys(notes).some(k=>k.includes(id)&&k.includes(CODE)&&notes[k]?.terms?.length>10);
+    const quizScores = Object.entries(scores).filter(([k])=>k.includes(id)&&k.includes(CODE)).map(([,v])=>v.pct||0);
+    const quizAvg = quizScores.length ? Math.round(quizScores.reduce((a,b)=>a+b,0)/quizScores.length) : null;
+    let prog = 0;
+    if (hasNote) prog += 30;
+    if (quizAvg !== null) prog += Math.min(70, Math.round(quizAvg * 0.7));
+    return { prog, quizAvg, hasNote };
+  };
+
+  const renderGrid = (exam, elId) => {
+    const objs = Object.entries(OBJECTIVES).filter(([,o])=>o.exam===exam);
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.innerHTML = `<div class="obj-progress-grid">${objs.map(([id,o]) => {
+      const {prog, quizAvg, hasNote} = getProgress(id);
+      const color = prog>=80?'var(--grn)':prog>=50?'var(--amb)':prog>0?'var(--acc)':'var(--b2)';
+      const displayId = id.replace('C','');
+      return `<a href="lesson-library.html" class="obj-prog-item" style="text-decoration:none">
+        <div class="obj-prog-id" style="color:${exam==='1202'?'var(--pur)':'var(--acc)'}">${displayId}</div>
+        <div class="obj-prog-title">${o.title}</div>
+        <div class="obj-prog-bar"><div class="obj-prog-fill" style="width:${prog}%;background:${color}"></div></div>
+        <div class="obj-prog-status">${prog>0?prog+'% complete':(hasNote?'Notes ✓':'Not started')}</div>
+      </a>`;
+    }).join('')}</div>`;
+  };
+  renderGrid('1201','progCore1');
+  renderGrid('1202','progCore2');
+}
+
+// ── READINESS ──────────────────────────────────────────────
+function buildReadiness() {
+  const scores = loadLS('classroom_scores', {});
+  
+  const getExamReadiness = (exam) => {
+    const examObjs = Object.entries(OBJECTIVES).filter(([,o])=>o.exam===exam);
+    const domainScores = {};
+    examObjs.forEach(([id,o]) => {
+      const objScores = Object.entries(scores).filter(([k])=>k.includes(id)&&k.includes(CODE)).map(([,v])=>v.pct||0);
+      if (objScores.length) {
+        if (!domainScores[o.domain]) domainScores[o.domain] = [];
+        domainScores[o.domain].push(Math.round(objScores.reduce((a,b)=>a+b,0)/objScores.length));
+      }
+    });
+    const allDomainAvgs = Object.values(domainScores).map(arr => Math.round(arr.reduce((a,b)=>a+b,0)/arr.length));
+    const overall = allDomainAvgs.length ? Math.round(allDomainAvgs.reduce((a,b)=>a+b,0)/allDomainAvgs.length) : 0;
+    return { overall, domainScores };
+  };
+
+  const setGauge = (idx, pct, color) => {
+    const g = document.getElementById('gauge'+idx);
+    const pEl = document.getElementById('readinessPct'+idx);
+    const lEl = document.getElementById('readinessLabel'+idx);
+    const sEl = document.getElementById('readinessSub'+idx);
+    if (!g||!pEl) return;
+    const circumference = 232.5;
+    const offset = circumference - (pct/100) * circumference;
+    g.style.strokeDashoffset = offset;
+    pEl.textContent = pct+'%';
+    if(lEl) lEl.textContent = pct>=80?'Ready to Test':pct>=60?'Almost There':pct>=30?'In Progress':'Getting Started';
+    if(sEl) sEl.textContent = pct>=80?'You\'re scoring well across domains. Consider scheduling your exam.':pct>=60?'Strong in some areas — focus on weak domains.':'Keep completing objective quizzes to build your readiness score.';
+  };
+
+  const r1 = getExamReadiness('1201');
+  const r2 = getExamReadiness('1202');
+  setGauge(1, r1.overall, 'var(--acc)');
+  setGauge(2, r2.overall, 'var(--pur)');
+
+  // Domain breakdown
+  const renderDomains = (ds, elId, color) => {
+    const el = document.getElementById(elId);
+    if (!el||!Object.keys(ds).length) return;
+    el.innerHTML = Object.entries(ds).map(([domain, scores]) => {
+      const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+      const c = avg>=80?'var(--grn)':avg>=60?'var(--amb)':'var(--red)';
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);width:80px">${domain}</div>
+        <div style="flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;background:${c};width:${avg}%"></div></div>
+        <div style="font-family:var(--mono);font-size:9px;color:${c};width:32px;text-align:right">${avg}%</div>
+      </div>`;
+    }).join('');
+  };
+  renderDomains(r1.domainScores,'domainReadiness1','var(--acc)');
+  renderDomains(r2.domainScores,'domainReadiness2','var(--pur)');
+
+  // Weak spots
+  const all = loadLS('classroom_scores',{});
+  const weakItems = [];
+  Object.entries(OBJECTIVES).forEach(([id,o]) => {
+    const objScores = Object.entries(all).filter(([k])=>k.includes(id)&&k.includes(CODE)).map(([,v])=>v.pct||0);
+    if (objScores.length) {
+      const avg = Math.round(objScores.reduce((a,b)=>a+b,0)/objScores.length);
+      if (avg < 70) weakItems.push({id, avg, title:o.title, exam:o.exam});
+    }
+  });
+  const wsEl = document.getElementById('weakSpots');
+  if (wsEl) {
+    wsEl.innerHTML = weakItems.length ? weakItems.map(w => {
+      const c = w.avg<60?'var(--red)':'var(--amb)';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:6px">
+        <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:${c}">${w.id}</span>
+        <div style="flex:1;font-size:12px;color:var(--tx2)">${w.title}</div>
+        <span style="font-family:var(--mono);font-size:12px;color:${c};font-weight:700">${w.avg}%</span>
+        <a href="lesson-library.html" style="font-family:var(--mono);font-size:9px;color:var(--acc);text-decoration:none">Review →</a>
+      </div>`;
+    }).join('') : '<div style="font-family:var(--mono);font-size:11px;color:var(--grn)">✓ No weak spots — scoring above 70% on all attempted objectives!</div>';
+  }
+}
+
+// ── BADGES ─────────────────────────────────────────────────
+function buildBadges() {
+  const scores = loadLS('classroom_scores',{});
+  const notes  = loadLS('classroom_notes',{});
+  const discAns = loadLS('st_ans',{});
+  const pbis   = parseInt(localStorage.getItem('pbis_total')||'0');
+  
+  const myScores = Object.entries(scores).filter(([k])=>k.includes(CODE));
+  const myNotes  = Object.entries(notes).filter(([k])=>k.includes(CODE));
+  const myDisc   = Object.entries(discAns).filter(([k])=>k.includes(CODE));
+  
+  const allScorePcts = myScores.map(([,v])=>v.pct||0);
+  const hasPerfect   = allScorePcts.some(p=>p===100);
+  
+  const earned = {
+    first_quiz:   myScores.length >= 1,
+    perfect_score: hasPerfect,
+    five_quizzes:  myScores.length >= 5,
+    core1_complete: Object.keys(OBJECTIVES).filter(k=>OBJECTIVES[k].exam==='1201').every(id=>myScores.some(([k])=>k.includes(id))),
+    core2_complete: Object.keys(OBJECTIVES).filter(k=>OBJECTIVES[k].exam==='1202').every(id=>myScores.some(([k])=>k.includes(id))),
+    notes_master:  myNotes.length >= 10,
+    discussion_star: myDisc.reduce((sum,[,v])=>sum+Object.keys(v).length,0) >= 20,
+    streak_5:      false, // would need daily tracking
+    pbis_100:      pbis >= 100,
+    a_grade:       false, // calculated from grade
+    lab_complete:  myScores.length >= 10,
+    exam_ready:    false, // would need readiness scores
+  };
+  
+  const earnedCount = Object.values(earned).filter(Boolean).length;
+  const countEl = document.getElementById('badgeCount');
+  if (countEl) countEl.textContent = earnedCount + ' earned';
+  
+  const grid = document.getElementById('badgesGrid');
+  if (!grid) return;
+  grid.innerHTML = BADGES_DEF.map(b => `
+    <div class="badge ${earned[b.id]?'earned':'locked'}">
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+      ${earned[b.id]?'<div style="font-family:var(--mono);font-size:8px;color:var(--gold);margin-top:4px">✓ EARNED</div>':''}
+    </div>`).join('');
+}
+
+// ── UTILS ──────────────────────────────────────────────────
+function loadLS(key, def) {
+  try { const v=localStorage.getItem(key); return v?JSON.parse(v):def; } catch(e){ return def; }
+}
+
+function toast(msg,type='info') {
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;
+  c.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

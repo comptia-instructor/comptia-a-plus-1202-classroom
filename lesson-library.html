@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Lesson Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090d;--s1:#0e1018;--s2:#13151f;--s3:#1a1d2a;--b1:#252836;--b2:#2e3245;--tx:#e8eaf0;--tx2:#9096b0;--tx3:#5a607a;--acc:#4f9eff;--acc-d:rgba(79,158,255,.08);--grn:#3dd68c;--grn-d:rgba(61,214,140,.08);--red:#ff4560;--red-d:rgba(255,69,96,.08);--amb:#ffb830;--amb-d:rgba(255,184,48,.08);--pur:#a855f7;--pur-d:rgba(168,85,247,.08);--gold:#ffd700;--r:8px;--rl:12px;--mono:'Space Mono',monospace;--display:'Syne',sans-serif;--sans:'Inter',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100vh}
+
+.hdr{display:flex;align-items:center;gap:12px;padding:0 24px;height:52px;background:var(--s1);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100}
+.hdr-logo{font-family:var(--display);font-size:18px;font-weight:800;color:var(--acc)}
+.hdr-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--tx)}
+.search-box{flex:1;max-width:400px;position:relative}
+.search-box input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:7px 16px 7px 36px;color:var(--tx);font-size:13px;outline:none;font-family:var(--sans);transition:border-color .2s}
+.search-box input:focus{border-color:var(--acc)}
+.search-box::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px}
+.exam-tab{padding:6px 16px;border-radius:6px;border:1px solid var(--b1);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;color:var(--tx3);background:transparent}
+.exam-tab.active{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+
+.layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 52px)}
+.lib-sidebar{background:var(--s1);border-right:1px solid var(--b1);overflow-y:auto;padding:12px}
+.lib-main{overflow-y:auto;padding:24px;max-width:960px}
+
+.domain-header{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1.2px;text-transform:uppercase;padding:10px 8px 6px;display:flex;align-items:center;justify-content:space-between}
+.domain-weight{font-size:10px;color:var(--acc)}
+.obj-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--r);cursor:pointer;transition:all .15s;border:1px solid transparent;margin-bottom:2px}
+.obj-item:hover{background:var(--s2);border-color:var(--b1)}
+.obj-item.active{background:var(--acc-d);border-color:var(--acc)}
+.obj-item-id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--acc);min-width:40px;padding-top:1px}
+.obj-item-id.core2{color:var(--pur)}
+.obj-item-text{font-size:11px;color:var(--tx2);line-height:1.5}
+.obj-item.active .obj-item-text{color:var(--tx)}
+
+.page-title{font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--tx2);margin-bottom:24px;line-height:1.7}
+
+.obj-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.obj-card:hover{border-color:var(--b2);transform:translateY(-1px)}
+.obj-card.expanded{border-color:var(--acc)}
+.obj-card-header{padding:16px 20px;display:flex;align-items:center;gap:14px}
+.obj-card-id{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--acc);min-width:60px}
+.obj-card-id.core2{color:var(--pur)}
+.obj-card-info{flex:1}
+.obj-card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px}
+.obj-card-meta{font-family:var(--mono);font-size:9px;color:var(--tx3);display:flex;gap:8px;flex-wrap:wrap}
+.obj-card-actions{display:flex;gap:8px;flex-shrink:0}
+
+.obj-card-body{border-top:1px solid var(--b1);padding:20px;display:none}
+.obj-card.expanded .obj-card-body{display:block}
+
+.content-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--b1);padding-bottom:12px;flex-wrap:wrap}
+.content-tab{padding:6px 14px;border-radius:6px;border:1px solid var(--b1);font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--tx3);background:transparent;transition:all .15s}
+.content-tab.active{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+.content-tab:hover:not(.active){border-color:var(--b2);color:var(--tx2)}
+
+.content-panel{display:none}
+.content-panel.active{display:block}
+
+.brief-section{margin-bottom:18px}
+.brief-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px}
+.brief-content{font-size:13px;line-height:1.85;color:var(--tx2)}
+.brief-content strong{color:var(--tx)}
+.key-terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.term-card{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px}
+.term-name{font-family:var(--mono);font-size:10px;color:var(--acc);margin-bottom:4px;font-weight:700}
+.term-def{font-size:11px;color:var(--tx2);line-height:1.6}
+.exam-trap{background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--tx);margin-bottom:6px;line-height:1.6}
+.exam-trap::before{content:'⚠️ '}
+
+.quiz-q{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;margin-bottom:10px}
+.quiz-q-text{font-size:14px;color:var(--tx);line-height:1.7;margin-bottom:12px;font-weight:500}
+.quiz-opts{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:var(--r);border:1px solid var(--b1);cursor:pointer;background:var(--s3);transition:all .15s;font-size:13px;color:var(--tx2)}
+.quiz-opt:hover:not(.locked){border-color:var(--b2);background:var(--s2);color:var(--tx)}
+.quiz-opt.correct{border-color:var(--grn);background:var(--grn-d);color:var(--tx)}
+.quiz-opt.wrong{border-color:var(--red);background:var(--red-d)}
+.quiz-opt.faded{opacity:.4}
+.quiz-opt.locked{cursor:default}
+.opt-ltr{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--tx3);min-width:16px}
+.quiz-rationale{font-size:11px;color:var(--tx3);padding:8px 12px;background:var(--s3);border-radius:6px;margin-top:8px;line-height:1.6;display:none}
+.quiz-rationale.show{display:block}
+
+.lab-container{background:var(--bg);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-top:12px}
+.lab-header{background:var(--s3);padding:10px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px}
+.terminal{font-family:var(--mono);font-size:12px;color:#d4ffb4;padding:16px;min-height:200px;background:#0a0c0a;line-height:1.7;max-height:300px;overflow-y:auto}
+.terminal-output{color:#9ab8a0;padding:2px 0;white-space:pre-wrap}
+.terminal-success{color:#3dd68c}
+.terminal-input{background:transparent;border:none;outline:none;color:#d4ffb4;font-family:var(--mono);font-size:12px;flex:1;caret-color:#3dd68c}
+
+.ticket-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.step-num{background:var(--s3);border:1px solid var(--b1);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--tx3);flex-shrink:0}
+.step-num.done{background:var(--grn-d);border-color:var(--grn);color:var(--grn)}
+.step-text{font-size:12px;color:var(--tx2);line-height:1.6;padding-top:3px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:all .15s}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-grn{background:var(--grn);color:var(--bg)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{border-color:var(--b2);color:var(--tx);background:var(--s3)}
+.btn-sm{padding:5px 12px;font-size:10px}
+
+.loading-bar{height:2px;background:linear-gradient(90deg,var(--acc),var(--pur));border-radius:1px;animation:loadbar 1.5s ease-in-out infinite;margin-bottom:12px}
+@keyframes loadbar{0%{width:0;opacity:1}70%{width:100%;opacity:1}100%{width:100%;opacity:0}}
+.loading-text{font-family:var(--mono);font-size:11px;color:var(--tx3);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.tag-acc{background:var(--acc-d);color:var(--acc);border:1px solid var(--acc)}
+.tag-grn{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn)}
+.tag-pur{background:var(--pur-d);color:var(--pur);border:1px solid var(--pur)}
+.tag-amb{background:var(--amb-d);color:var(--amb);border:1px solid var(--amb)}
+.tag-red{background:var(--red-d);color:var(--red);border:1px solid var(--red)}
+
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:var(--r);font-family:var(--mono);font-size:11px;animation:toastIn .2s ease;max-width:280px}
+.toast.ok{background:var(--grn-d);border:1px solid var(--grn);color:var(--grn)}
+.toast.err{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.toast.info{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc)}
+@keyframes toastIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+.progress-bar{height:3px;background:var(--s3);border-radius:2px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;background:var(--grn);border-radius:2px;transition:width .3s}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.stat-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:14px;text-align:center}
+.stat-number{font-family:var(--display);font-size:32px;font-weight:800;color:var(--acc);line-height:1}
+.stat-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-top:6px;text-transform:uppercase}
+
+#teacherLoginBtn{position:fixed;bottom:20px;left:20px;z-index:99999;cursor:pointer;display:flex;align-items:center;gap:6px;background:rgba(8,9,13,.95);border:1.5px solid var(--gold);border-radius:20px;padding:8px 16px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);backdrop-filter:blur(12px)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:10000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--s1);border:1px solid var(--b2);border-radius:16px;padding:32px;width:400px;max-width:90vw;text-align:center}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.lib-sidebar{display:none}}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+<div id="teacherLoginBtn" onclick="openTeacherLogin()">🔑 Teacher Login</div>
+
+<!-- TEACHER MODAL -->
+<div class="modal-overlay" id="teacherModal">
+  <div class="modal-box">
+    <div style="font-size:48px;margin-bottom:12px">🔑</div>
+    <div style="font-family:var(--display);font-size:20px;font-weight:800;margin-bottom:8px">Teacher Access</div>
+    <input type="password" id="pinInput" style="background:var(--s2);border:1.5px solid var(--b2);border-radius:8px;padding:12px 20px;color:var(--tx);font-family:var(--mono);font-size:22px;letter-spacing:8px;text-align:center;width:180px;outline:none;margin-bottom:8px" placeholder="····" maxlength="8" onkeydown="if(event.key==='Enter')checkPin()">
+    <div id="pinError" style="font-family:var(--mono);font-size:11px;color:var(--red);min-height:18px;margin-bottom:10px"></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-acc" onclick="checkPin()" style="width:100%;justify-content:center">Unlock →</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('teacherModal').classList.remove('open')" style="width:100%;justify-content:center">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <a href="hub.html" style="text-decoration:none"><div class="hdr-logo">A+</div></a>
+  <div style="width:1px;height:20px;background:var(--b2)"></div>
+  <div class="hdr-title">Lesson Library</div>
+  <div class="search-box">
+    <input id="searchInput" placeholder="Search objectives, topics, terms…" oninput="filterObjectives(this.value)">
+  </div>
+  <button class="exam-tab active" id="tab1201" onclick="switchExam('1201')">Core 1 · 220-1201</button>
+  <button class="exam-tab" id="tab1202" onclick="switchExam('1202')">Core 2 · 220-1202</button>
+  <a href="classroom.html" class="btn btn-acc btn-sm" style="text-decoration:none;margin-left:8px">→ Classroom</a>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="lib-sidebar" id="libSidebar"></div>
+
+  <!-- MAIN -->
+  <div class="lib-main" id="libMain">
+    <div id="homeView">
+      <div class="page-title">CompTIA A+ Lesson Library</div>
+      <div class="page-sub">49 objectives · Both Core 1 & Core 2 · AI-generated concept briefs, labs, and quizzes mapped directly to exam objectives</div>
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div id="objectivesView"></div>
+    </div>
+    <div id="detailView" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+const OBJECTIVES = {
+  '1.1':  {exam:'1201',domain:'1.0 Mobile Devices',pct:'13%',color:'var(--acc)',title:'Monitor mobile device hardware and use appropriate replacement techniques'},
+  '1.2':  {exam:'1201',domain:'1.0 Mobile Devices',pct:'13%',color:'var(--acc)',title:'Compare and contrast accessories and connectivity options for mobile devices'},
+  '1.3':  {exam:'1201',domain:'1.0 Mobile Devices',pct:'13%',color:'var(--acc)',title:'Configure basic mobile device network connectivity and provide application support'},
+  '2.1':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Compare and contrast TCP and UDP ports, protocols, and their purposes'},
+  '2.2':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Explain wireless networking technologies'},
+  '2.3':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Summarize services provided by networked hosts'},
+  '2.4':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Explain common network configuration concepts'},
+  '2.5':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Compare and contrast common networking hardware devices'},
+  '2.6':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Configure basic wired/wireless SOHO networks'},
+  '2.7':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Compare and contrast internet connection types, network types, and their characteristics'},
+  '2.8':  {exam:'1201',domain:'2.0 Networking',pct:'23%',color:'var(--grn)',title:'Explain networking tools and their purposes'},
+  '3.1':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Compare and contrast display components and attributes'},
+  '3.2':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Summarize basic cable types, connectors, features, and purposes'},
+  '3.3':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Compare and contrast RAM characteristics'},
+  '3.4':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Compare and contrast storage devices'},
+  '3.5':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Install and configure motherboards, CPUs, and add-on cards'},
+  '3.6':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Install the appropriate power supply'},
+  '3.7':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Deploy and configure multifunction devices/printers and settings'},
+  '3.8':  {exam:'1201',domain:'3.0 Hardware',pct:'25%',color:'var(--pur)',title:'Perform appropriate printer maintenance'},
+  '4.1':  {exam:'1201',domain:'4.0 Virtualization & Cloud',pct:'11%',color:'var(--amb)',title:'Explain virtualization concepts'},
+  '4.2':  {exam:'1201',domain:'4.0 Virtualization & Cloud',pct:'11%',color:'var(--amb)',title:'Summarize cloud computing concepts'},
+  '5.1':  {exam:'1201',domain:'5.0 Hardware & Network Troubleshooting',pct:'28%',color:'var(--red)',title:'Troubleshoot motherboards, RAM, CPUs, and power'},
+  '5.2':  {exam:'1201',domain:'5.0 Hardware & Network Troubleshooting',pct:'28%',color:'var(--red)',title:'Troubleshoot drive and RAID issues'},
+  '5.3':  {exam:'1201',domain:'5.0 Hardware & Network Troubleshooting',pct:'28%',color:'var(--red)',title:'Troubleshoot video, projector, and display issues'},
+  '5.4':  {exam:'1201',domain:'5.0 Hardware & Network Troubleshooting',pct:'28%',color:'var(--red)',title:'Troubleshoot common mobile device issues'},
+  '5.5':  {exam:'1201',domain:'5.0 Hardware & Network Troubleshooting',pct:'28%',color:'var(--red)',title:'Troubleshoot network issues'},
+  '5.6':  {exam:'1201',domain:'5.0 Hardware & Network Troubleshooting',pct:'28%',color:'var(--red)',title:'Troubleshoot printer issues'},
+  'C1.1': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Explain common OS types and their purposes'},
+  'C1.2': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Perform OS installations and upgrades in a diverse environment'},
+  'C1.3': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Compare and contrast basic features of Microsoft Windows editions'},
+  'C1.4': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Use Microsoft Windows OS features and tools (Task Manager, MMC, etc.)'},
+  'C1.5': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Use the appropriate Microsoft command-line tools'},
+  'C1.6': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Configure Microsoft Windows settings'},
+  'C1.7': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Configure Microsoft Windows networking features on a client/desktop'},
+  'C1.8': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Explain common features and tools of macOS'},
+  'C1.9': {exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Identify common features and tools of Linux client/desktop OS'},
+  'C1.10':{exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Install applications according to requirements'},
+  'C1.11':{exam:'1202',domain:'1.0 Operating Systems',pct:'28%',color:'var(--acc)',title:'Install and configure cloud-based productivity tools'},
+  'C2.1': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Summarize various security measures and their purposes'},
+  'C2.2': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Configure and apply basic Microsoft Windows OS security settings'},
+  'C2.3': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Compare and contrast wireless security protocols and authentication methods'},
+  'C2.4': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Summarize types of malware and tools/methods for detection, removal, and prevention'},
+  'C2.5': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Compare and contrast social engineering attacks, threats, and vulnerabilities'},
+  'C2.6': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Implement procedures for basic SOHO malware removal'},
+  'C2.7': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Apply workstation security options and hardening techniques'},
+  'C2.8': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Apply common methods for securing mobile devices'},
+  'C2.9': {exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Compare and contrast common data destruction and disposal methods'},
+  'C2.10':{exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Apply security settings on SOHO wireless and wired networks'},
+  'C2.11':{exam:'1202',domain:'2.0 Security',pct:'28%',color:'var(--red)',title:'Configure relevant security settings in a browser'},
+  'C3.1': {exam:'1202',domain:'3.0 Software Troubleshooting',pct:'23%',color:'var(--amb)',title:'Troubleshoot common Windows OS issues'},
+  'C3.2': {exam:'1202',domain:'3.0 Software Troubleshooting',pct:'23%',color:'var(--amb)',title:'Troubleshoot common mobile OS and application issues'},
+  'C3.3': {exam:'1202',domain:'3.0 Software Troubleshooting',pct:'23%',color:'var(--amb)',title:'Troubleshoot common mobile OS and application security issues'},
+  'C3.4': {exam:'1202',domain:'3.0 Software Troubleshooting',pct:'23%',color:'var(--amb)',title:'Troubleshoot common PC security issues'},
+  'C4.1': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Implement best practices for documentation and support systems'},
+  'C4.2': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Apply change management procedures'},
+  'C4.3': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Implement workstation backup and recovery methods'},
+  'C4.4': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Use common safety procedures'},
+  'C4.5': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Summarize environmental impacts and local environment controls'},
+  'C4.6': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Explain prohibited content/activity, privacy, licensing, and policy concepts'},
+  'C4.7': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Use proper communication techniques and professionalism'},
+  'C4.8': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Explain the basics of scripting'},
+  'C4.9': {exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Use remote access technologies'},
+  'C4.10':{exam:'1202',domain:'4.0 Operational Procedures',pct:'21%',color:'var(--pur)',title:'Explain basic concepts related to artificial intelligence (AI)'},
+};
+
+let currentExam = '1201';
+let currentObjId = null;
+let generatedContent = {};
+let isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+
+function init() {
+  if (!localStorage.getItem('teacher_pin')) localStorage.setItem('teacher_pin','1529');
+  isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+  buildSidebar();
+  buildStats();
+  buildObjectivesGrid('1201');
+}
+
+function buildStats() {
+  const total = Object.keys(OBJECTIVES).length;
+  const core1 = Object.keys(OBJECTIVES).filter(k=>OBJECTIVES[k].exam==='1201').length;
+  const core2 = Object.keys(OBJECTIVES).filter(k=>OBJECTIVES[k].exam==='1202').length;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-number">${total}</div><div class="stat-label">Total Objectives</div></div>
+    <div class="stat-card"><div class="stat-number">${core1}</div><div class="stat-label">Core 1 · 1201</div></div>
+    <div class="stat-card"><div class="stat-number">${core2}</div><div class="stat-label">Core 2 · 1202</div></div>
+    <div class="stat-card"><div class="stat-number">9</div><div class="stat-label">Domains</div></div>`;
+}
+
+function buildSidebar() {
+  const sidebar = document.getElementById('libSidebar');
+  const exam = currentExam;
+  const objs = Object.entries(OBJECTIVES).filter(([,o])=>o.exam===exam);
+  
+  // Group by domain
+  const domains = {};
+  objs.forEach(([id,o]) => {
+    if (!domains[o.domain]) domains[o.domain] = [];
+    domains[o.domain].push([id,o]);
+  });
+  
+  sidebar.innerHTML = Object.entries(domains).map(([domain,items]) => `
+    <div class="domain-header">
+      <span>${domain}</span>
+      <span class="domain-weight">${items[0][1].pct}</span>
+    </div>
+    ${items.map(([id,o]) => `
+      <div class="obj-item ${currentObjId===id?'active':''}" onclick="openObjective('${id}')">
+        <div class="obj-item-id ${exam==='1202'?'core2':''}">${id.replace('C','')}</div>
+        <div class="obj-item-text">${o.title.substring(0,60)}${o.title.length>60?'…':''}</div>
+      </div>`).join('')}
+  `).join('');
+}
+
+function switchExam(exam) {
+  currentExam = exam;
+  document.getElementById('tab1201').classList.toggle('active',exam==='1201');
+  document.getElementById('tab1202').classList.toggle('active',exam==='1202');
+  buildSidebar();
+  buildObjectivesGrid(exam);
+  document.getElementById('homeView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+}
+
+function buildObjectivesGrid(exam) {
+  const objs = Object.entries(OBJECTIVES).filter(([,o])=>o.exam===exam);
+  const domains = {};
+  objs.forEach(([id,o]) => { if(!domains[o.domain])domains[o.domain]=[]; domains[o.domain].push([id,o]); });
+  
+  const isC2 = exam === '1202';
+  document.getElementById('objectivesView').innerHTML = Object.entries(domains).map(([domain,items]) => `
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--b1)">
+        <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--tx)">${domain}</div>
+        <span class="tag ${items[0][1].color.includes('grn')?'tag-grn':items[0][1].color.includes('red')?'tag-red':items[0][1].color.includes('amb')?'tag-amb':items[0][1].color.includes('pur')?'tag-pur':'tag-acc'}">${items[0][1].pct} of exam</span>
+      </div>
+      ${items.map(([id,o]) => `
+        <div class="obj-card" id="card_${id}" onclick="openObjective('${id}')">
+          <div class="obj-card-header">
+            <div class="obj-card-id ${isC2?'core2':''}">${id.replace('C','')}</div>
+            <div class="obj-card-info">
+              <div class="obj-card-title">${o.title}</div>
+              <div class="obj-card-meta">
+                <span>${o.domain}</span>
+                <span>·</span>
+                <span style="color:var(--acc)">${isC2?'Core 2 · 220-1202':'Core 1 · 220-1201'}</span>
+                <span>·</span>
+                <span>${o.pct} of exam</span>
+              </div>
+            </div>
+            <div class="obj-card-actions">
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();setAsToday('${id}')">📌 Set as Today</button>
+              <button class="btn btn-acc btn-sm" onclick="event.stopPropagation();openObjective('${id}')">Open Lesson →</button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function openObjective(id) {
+  currentObjId = id;
+  buildSidebar();
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  renderDetail(id);
+}
+
+function renderDetail(id) {
+  const obj = OBJECTIVES[id];
+  if (!obj) return;
+  const isC2 = obj.exam === '1202';
+  
+  document.getElementById('detailView').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="backToGrid()">← Back</button>
+      <button class="btn btn-ghost btn-sm" onclick="setAsToday('${id}')">📌 Set as Today's Objective</button>
+      <a href="classroom.html" class="btn btn-acc btn-sm" style="text-decoration:none">→ Open in Classroom</a>
+    </div>
+    
+    <div style="background:linear-gradient(135deg,rgba(79,158,255,.06),rgba(168,85,247,.03));border:1px solid var(--b1);border-radius:var(--rl);padding:20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+      <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:${obj.color}">${id.replace('C','')}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--display);font-size:20px;font-weight:800;color:var(--tx);margin-bottom:6px">${obj.title}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--tx3)">${obj.domain} · ${isC2?'Core 2 (220-1202)':'Core 1 (220-1201)'} · ${obj.pct} of exam</div>
+      </div>
+    </div>
+    
+    <div class="content-tabs">
+      <button class="content-tab active" id="tab_hook" onclick="switchTab('hook')">🚨 Hook</button>
+      <button class="content-tab" id="tab_lesson" onclick="switchTab('lesson')">📖 Concept Brief</button>
+      <button class="content-tab" id="tab_lab" onclick="switchTab('lab')">🔬 Sandbox Lab</button>
+      <button class="content-tab" id="tab_quiz" onclick="switchTab('quiz')">⏱ Practice Quiz</button>
+    </div>
+    
+    <div id="panel_hook" class="content-panel active">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn btn-acc btn-sm" onclick="generateContent('${id}','hook')">⚡ Generate Hook</button>
+        <div id="gen_status_hook" style="font-family:var(--mono);font-size:10px;color:var(--tx3);display:flex;align-items:center"></div>
+      </div>
+      <div id="content_hook"><div style="font-family:var(--mono);font-size:12px;color:var(--tx3);padding:40px;text-align:center;border:1px dashed var(--b2);border-radius:var(--rl)">Click "Generate Hook" to create a real-world incident scenario for this objective.</div></div>
+    </div>
+    
+    <div id="panel_lesson" class="content-panel">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn btn-acc btn-sm" onclick="generateContent('${id}','lesson')">⚡ Generate Lesson</button>
+        <div id="gen_status_lesson" style="font-family:var(--mono);font-size:10px;color:var(--tx3);display:flex;align-items:center"></div>
+      </div>
+      <div id="content_lesson"><div style="font-family:var(--mono);font-size:12px;color:var(--tx3);padding:40px;text-align:center;border:1px dashed var(--b2);border-radius:var(--rl)">Click "Generate Lesson" to create a concept brief, key terms, and exam traps for this objective.</div></div>
+    </div>
+    
+    <div id="panel_lab" class="content-panel">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn btn-acc btn-sm" onclick="generateContent('${id}','lab')">⚡ Generate Lab</button>
+        <div id="gen_status_lab" style="font-family:var(--mono);font-size:10px;color:var(--tx3);display:flex;align-items:center"></div>
+      </div>
+      <div id="content_lab"><div style="font-family:var(--mono);font-size:12px;color:var(--tx3);padding:40px;text-align:center;border:1px dashed var(--b2);border-radius:var(--rl)">Click "Generate Lab" to create a hands-on sandbox activity for Chromebooks.</div></div>
+    </div>
+    
+    <div id="panel_quiz" class="content-panel">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn btn-acc btn-sm" onclick="generateContent('${id}','quiz')">⚡ Generate Quiz</button>
+        <div id="gen_status_quiz" style="font-family:var(--mono);font-size:10px;color:var(--tx3);display:flex;align-items:center"></div>
+      </div>
+      <div id="content_quiz"><div style="font-family:var(--mono);font-size:12px;color:var(--tx3);padding:40px;text-align:center;border:1px dashed var(--b2);border-radius:var(--rl)">Click "Generate Quiz" to create 5 exam-quality practice questions for this objective.</div></div>
+    </div>
+  `;
+  
+  // Auto-generate hook and lesson on open
+  setTimeout(() => generateContent(id, 'hook'), 100);
+  setTimeout(() => generateContent(id, 'lesson'), 200);
+}
+
+function switchTab(tab) {
+  ['hook','lesson','lab','quiz'].forEach(t => {
+    document.getElementById(`tab_${t}`)?.classList.toggle('active',t===tab);
+    document.getElementById(`panel_${t}`)?.classList.toggle('active',t===tab);
+  });
+}
+
+function backToGrid() {
+  currentObjId = null;
+  document.getElementById('homeView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+  buildSidebar();
+}
+
+function setAsToday(id) {
+  const obj = OBJECTIVES[id];
+  localStorage.setItem('class_objective', JSON.stringify({id,...obj}));
+  toast(`${id} set as today's objective`, 'ok');
+}
+
+
+function getStudentProfileContext() {
+  let ctx = '';
+  try {
+    const ls = JSON.parse(localStorage.getItem('student_learning_style') || '{}');
+    if (ls.primary) {
+      const h = {visual:'Use visual analogies and structured comparisons.',auditory:'Write conversationally, encourage explaining out loud.',kinesthetic:'Lead with hands-on application and labs.',reading:'Provide detailed written explanations and encourage note-taking.'};
+      ctx += `LEARNING STYLE: ${ls.primary} learner. ${h[ls.primary]||''}\n`;
+    }
+  } catch(e){}
+  try {
+    const i = JSON.parse(localStorage.getItem('student_interests') || '{}');
+    if (i.interestLabels?.length) ctx += `STUDENT INTERESTS: ${i.interestLabels.join(', ')}${i.customInterest?', '+i.customInterest:''}. Use these for analogies and examples.\n`;
+    if (i.career) ctx += `CAREER GOAL: ${i.careerLabel||i.career}. Frame examples through this career lens.\n`;
+  } catch(e){}
+  return ctx ? `\n\nSTUDENT PERSONALIZATION:\n${ctx}` : '';
+}
+
+async function generateContent(id, type) {
+  const obj = OBJECTIVES[id];
+  const cacheKey = `lib_${id}_${type}`;
+  
+  const contentEl = document.getElementById(`content_${type}`);
+  const statusEl  = document.getElementById(`gen_status_${type}`);
+  if (!contentEl) return;
+  
+  // Check cache
+  if (generatedContent[cacheKey]) {
+    renderLibContent(type, generatedContent[cacheKey], contentEl);
+    return;
+  }
+  
+  const apiKey = localStorage.getItem('PLATFORM_API_KEY');
+  if (!apiKey) {
+    contentEl.innerHTML = `<div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:16px;font-size:13px;color:var(--tx)">
+      <strong>API key required.</strong> Go to <a href="hub.html" style="color:var(--acc)">Hub → Setup Wizard</a> to add your Anthropic API key. Content will generate automatically once configured.
+    </div>`;
+    return;
+  }
+  
+  contentEl.innerHTML = '<div class="loading-bar"></div><div class="loading-text">Generating with Claude…</div>';
+  if (statusEl) statusEl.textContent = '⏳ Generating…';
+  
+  let prompt = '';
+  if (type === 'hook') {
+    prompt = `You are a CompTIA A+ instructor teaching high school CTE students. Create a real-world IT incident for objective ${id}: "${obj.title}" (${obj.exam==='1201'?'220-1201':'220-1202'} exam).
+
+${getStudentProfileContext()}
+
+Return ONLY valid JSON:
+{"incident":"2-3 sentence vivid IT incident a help desk tech would face","question":"One open-ended question before teaching: what would you check/do first?","context":"Brief setting (company/user/urgency)","difficulty":"Beginner/Intermediate/Advanced","why_matters":"One sentence why IT pros need to know this"}`;
+  } else if (type === 'lesson') {
+    prompt = `You are a CompTIA A+ instructor. Teach objective ${id}: "${obj.title}" to high school students who are new to IT. Be thorough but accessible.
+
+${getStudentProfileContext()}
+
+Return ONLY valid JSON:
+{"hook":"One sentence connecting this to something students know","plain_english":"3-4 clear sentences. No jargon unless defined. Use 'you' and 'your'.","analogy":"Real-world analogy that makes this click","key_terms":[{"term":"T","definition":"Clear simple def","example":"Real IT example"},{"term":"T","definition":"...","example":"..."},{"term":"T","definition":"...","example":"..."},{"term":"T","definition":"...","example":"..."},{"term":"T","definition":"...","example":"..."}],"exam_traps":["Trap 1 — specific thing CompTIA tests","Trap 2","Trap 3"],"remember_this":"Single most important sentence for the exam","common_scenario":"One real job scenario where a tech would use this knowledge"}`;
+  } else if (type === 'lab') {
+    prompt = `Create a browser-based sandbox lab for CompTIA A+ objective ${id}: "${obj.title}". Students use Chromebooks. No software to install. Use simulated terminal commands, virtual scenarios, or step-by-step troubleshooting.
+
+${getStudentProfileContext()}
+
+Return ONLY valid JSON:
+{"title":"Short lab title","scenario":"2-3 sentence IT scenario","objective":"What student learns","lab_type":"terminal or ticket","steps":[{"num":1,"instruction":"What to do","hint":"Help if stuck","expected":"What success looks like"},{"num":2,"instruction":"...","hint":"...","expected":"..."},{"num":3,"instruction":"...","hint":"...","expected":"..."},{"num":4,"instruction":"...","hint":"...","expected":"..."},{"num":5,"instruction":"...","hint":"...","expected":"..."}],"terminal_commands":["cmd1","cmd2","cmd3"],"success_message":"What they should understand when done","real_job_connection":"How this maps to an actual IT technician task"}`;
+  } else if (type === 'quiz') {
+    prompt = `Write 5 CompTIA A+ exam-quality questions for objective ${id}: "${obj.title}" (${obj.exam==='1201'?'220-1201 exam':'220-1202 exam'}, ${obj.pct} weight).
+
+Use CompTIA language: BEST, FIRST, MOST, NEXT. Include scenarios. Mix cognitive levels. Realistic wrong answers.
+
+${getStudentProfileContext()}
+
+Return ONLY valid JSON array:
+[{"q":"Question text","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","rationale":"Why correct. Why each wrong answer fails.","difficulty":"Easy/Medium/Hard"}]`;
+  }
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || '{}';
+    const clean = text.replace(/```json\n?|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    generatedContent[cacheKey] = parsed;
+    renderLibContent(type, parsed, contentEl);
+    if (statusEl) statusEl.textContent = '✓ Generated';
+    setTimeout(()=>{ if(statusEl) statusEl.textContent=''; },3000);
+  } catch(e) {
+    contentEl.innerHTML = `<div style="background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:14px;font-size:12px;color:var(--red)">Generation failed: ${e.message}. Check your API key in Setup Wizard.</div>`;
+    if (statusEl) statusEl.textContent = '✗ Failed';
+  }
+}
+
+function renderLibContent(type, data, el) {
+  if (data.error) { el.innerHTML=`<div style="color:var(--red);font-size:12px;padding:14px">${data.error}</div>`; return; }
+  if (type==='hook') el.innerHTML = renderHook(data);
+  else if (type==='lesson') el.innerHTML = renderLesson(data);
+  else if (type==='lab') el.innerHTML = renderLab(data);
+  else if (type==='quiz') el.innerHTML = renderQuiz(data);
+}
+
+function renderHook(c) {
+  return `<div style="background:linear-gradient(135deg,rgba(255,69,96,.06),rgba(79,158,255,.04));border:1px solid var(--red);border-radius:var(--rl);padding:20px;margin-bottom:16px;position:relative">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:1px;margin-bottom:8px">🚨 INCIDENT REPORT · ${c.context||''} · ${c.difficulty||''}</div>
+    <div style="font-size:15px;line-height:1.85;color:var(--tx);font-style:italic;margin-bottom:12px">"${c.incident}"</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="tag tag-red">Real Scenario</span>
+      ${c.why_matters?`<span style="font-size:11px;color:var(--tx2);font-style:italic">Why it matters: ${c.why_matters}</span>`:''}
+    </div>
+  </div>
+  <div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--rl);padding:16px">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1px;margin-bottom:8px">🤔 BEFORE WE LEARN ANYTHING — DISCUSS THIS:</div>
+    <div style="font-size:15px;color:var(--tx);line-height:1.8;font-weight:500">${c.question}</div>
+  </div>`;
+}
+
+function renderLesson(c) {
+  const terms = (c.key_terms||[]).map(t=>`<div class="term-card"><div class="term-name">${t.term}</div><div class="term-def">${t.definition}</div>${t.example?`<div style="font-size:10px;color:var(--acc);margin-top:4px;font-family:var(--mono)">→ ${t.example}</div>`:''}</div>`).join('');
+  const traps = (c.exam_traps||[]).map(t=>`<div class="exam-trap">${t}</div>`).join('');
+  return `<div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-style:italic;font-size:13px;color:var(--tx)">${c.hook}</div>
+  <div class="brief-section"><div class="brief-label">Plain English</div><div class="brief-content">${c.plain_english}</div></div>
+  <div class="brief-section"><div class="brief-label">💡 Analogy</div><div style="background:var(--pur-d);border:1px solid var(--pur);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--tx);line-height:1.7">${c.analogy}</div></div>
+  <div class="brief-section"><div class="brief-label">Key Terms (${(c.key_terms||[]).length})</div><div class="key-terms">${terms}</div></div>
+  <div class="brief-section"><div class="brief-label">⚠️ Exam Traps</div>${traps}</div>
+  ${c.common_scenario?`<div class="brief-section"><div class="brief-label">📋 Real Job Scenario</div><div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--tx);line-height:1.7">${c.common_scenario}</div></div>`:''}
+  <div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:12px 14px"><div style="font-family:var(--mono);font-size:9px;color:var(--amb);letter-spacing:1px;margin-bottom:4px">★ REMEMBER THIS FOR THE EXAM</div><div style="font-size:14px;color:var(--tx);font-weight:600">${c.remember_this}</div></div>`;
+}
+
+function renderLab(c) {
+  const steps = (c.steps||[]).map(s=>`<div class="ticket-step" id="lstep_${s.num}">
+    <div class="step-num" id="lstepnum_${s.num}">${s.num}</div>
+    <div style="flex:1">
+      <div class="step-text"><strong>${s.instruction}</strong></div>
+      ${s.expected?`<div style="font-size:11px;color:var(--tx3);margin-top:2px">Expected: ${s.expected}</div>`:''}
+      <div id="lhint_${s.num}" style="display:none;font-size:11px;color:var(--tx3);margin-top:4px;font-style:italic;background:var(--s3);padding:6px 10px;border-radius:6px">💡 ${s.hint}</div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('lhint_${s.num}').style.display=document.getElementById('lhint_${s.num}').style.display==='none'?'block':'none'">Hint</button>
+        <button class="btn btn-grn btn-sm" onclick="document.getElementById('lstepnum_${s.num}').classList.add('done');document.getElementById('lstepnum_${s.num}').textContent='✓'">Done ✓</button>
+      </div>
+    </div>
+  </div>`).join('');
+  
+  const cmds = (c.terminal_commands||[]).map(cmd=>`<div style="color:var(--acc);font-family:var(--mono);font-size:12px;padding:3px 0">$ ${cmd}</div>`).join('');
+  
+  return `<div style="background:var(--pur-d);border:1px solid var(--pur);border-radius:var(--r);padding:14px;margin-bottom:16px">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--pur);letter-spacing:1px;margin-bottom:6px">SCENARIO</div>
+    <div style="font-size:13px;color:var(--tx);line-height:1.7">${c.scenario}</div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:6px;font-family:var(--mono)">OBJECTIVE: ${c.objective}</div>
+  </div>
+  <div class="ticket-steps" style="margin-bottom:16px">${steps}</div>
+  ${c.terminal_commands?.length?`<div style="background:var(--bg);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-top:12px">
+    <div class="lab-header"><span style="color:var(--grn)">⬤</span><span style="color:var(--amb)">⬤</span><span style="color:var(--red)">⬤</span><span style="font-family:var(--mono);font-size:11px;color:var(--tx2)">Terminal Simulator</span></div>
+    <div class="terminal" id="libTerminal"><div style="color:var(--tx3)">$ # Relevant commands for this lab:</div>${cmds}</div>
+    <div style="background:#0a0c0a;padding:8px 16px;border-top:1px solid #1a2a1a;display:flex;gap:8px;align-items:center">
+      <span style="color:#3dd68c;font-family:var(--mono);font-size:12px">$</span>
+      <input class="terminal-input" id="libTermInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter'){runLibCmd(this.value);this.value=''}">
+    </div>
+  </div>`:''}
+  ${c.real_job_connection?`<div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:10px 14px;margin-top:12px;font-size:12px;color:var(--tx)"><strong style="color:var(--grn)">Real Job Connection:</strong> ${c.real_job_connection}</div>`:''}
+  <div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:10px 14px;margin-top:8px;font-size:12px;color:var(--tx)"><strong style="color:var(--grn)">✓ Success:</strong> ${c.success_message}</div>`;
+}
+
+function renderQuiz(c) {
+  if (!Array.isArray(c)) return '<div style="color:var(--red)">Invalid quiz data</div>';
+  return c.map((q,i)=>`
+    <div class="quiz-q">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--tx3)">Q${i+1} OF ${c.length}</span>
+        ${q.difficulty?`<span class="tag ${q.difficulty==='Hard'?'tag-red':q.difficulty==='Medium'?'tag-amb':'tag-grn'}">${q.difficulty}</span>`:''}
+      </div>
+      <div class="quiz-q-text">${q.q}</div>
+      <div class="quiz-opts">
+        ${['A','B','C','D'].map(l=>`
+          <div class="quiz-opt" id="qo_${i}_${l}" onclick="pickLibAnswer(${i},'${l}','${q.answer}',this)">
+            <span class="opt-ltr">${l}</span> ${q.opts[l]}
+          </div>`).join('')}
+      </div>
+      <div class="quiz-rationale" id="qr_${i}">${q.rationale||''}</div>
+    </div>`).join('');
+}
+
+const TERMINAL_RESPONSES={'ipconfig':'Windows IP Configuration\n\n   IPv4 Address: 192.168.1.105\n   Subnet Mask: 255.255.255.0\n   Default Gateway: 192.168.1.1','ping google.com':'Pinging google.com [142.250.80.46]\nReply: bytes=32 time=12ms TTL=115\nPackets: Sent=4 Received=4 Lost=0','netstat':'Proto  Local Address      Foreign Address   State\nTCP    0.0.0.0:80         0.0.0.0:0         LISTENING\nTCP    0.0.0.0:443        0.0.0.0:0         LISTENING','nslookup google.com':'Server: 8.8.8.8\nNon-authoritative answer:\nName: google.com\nAddress: 142.250.80.46','dir':'Desktop  Documents  Downloads  Music\n0 File(s), 4 Dir(s)  125GB free','hostname':'DESKTOP-ABC123','whoami':'desktop-abc123\\student','ls':'Desktop  Documents  Downloads  Music  Pictures','pwd':'/home/student','ip addr':'inet 192.168.1.105/24 brd 192.168.1.255\ninet6 fe80::1/64 scope link','help':'ipconfig, ping, netstat, nslookup, dir, hostname, whoami, ls, pwd, ip addr, clear'};
+
+function runLibCmd(cmd) {
+  const t = document.getElementById('libTerminal');
+  if (!t||!cmd.trim()) return;
+  const cl=document.createElement('div');cl.style.cssText='color:#e8eaf0;font-family:var(--mono);font-size:12px';cl.textContent='$ '+cmd;t.appendChild(cl);
+  const r=TERMINAL_RESPONSES[cmd.toLowerCase().trim()]||"'"+cmd+"' not recognized. Type 'help' for commands.";
+  const ro=document.createElement('div');ro.className='terminal-output';ro.textContent=r;
+  if(r.includes('not recognized'))ro.style.color='#ff6b7a';
+  t.appendChild(ro);t.scrollTop=t.scrollHeight;
+}
+
+function pickLibAnswer(qIdx,letter,correct,el) {
+  ['A','B','C','D'].forEach(l=>{
+    const o=document.getElementById(`qo_${qIdx}_${l}`);
+    if(!o||o.classList.contains('locked'))return;
+    o.classList.add('locked');
+    if(l===correct)o.classList.add('correct');
+    else if(l===letter&&l!==correct)o.classList.add('wrong');
+    else o.classList.add('faded');
+  });
+  const r=document.getElementById(`qr_${qIdx}`);
+  if(r)r.classList.add('show');
+}
+
+function filterObjectives(query) {
+  if (!query) { buildObjectivesGrid(currentExam); return; }
+  const q = query.toLowerCase();
+  const all = Object.entries(OBJECTIVES).filter(([id,o]) => 
+    id.toLowerCase().includes(q) || o.title.toLowerCase().includes(q) || o.domain.toLowerCase().includes(q)
+  );
+  const container = document.getElementById('objectivesView');
+  if (!all.length) { container.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3);font-family:var(--mono)">No objectives match your search.</div>'; return; }
+  container.innerHTML = all.map(([id,o])=>`
+    <div class="obj-card" onclick="openObjective('${id}')">
+      <div class="obj-card-header">
+        <div class="obj-card-id ${o.exam==='1202'?'core2':''}">${id.replace('C','')}</div>
+        <div class="obj-card-info">
+          <div class="obj-card-title">${o.title}</div>
+          <div class="obj-card-meta"><span>${o.domain}</span><span>·</span><span>${o.exam==='1202'?'Core 2':'Core 1'}</span></div>
+        </div>
+        <button class="btn btn-acc btn-sm" onclick="event.stopPropagation();openObjective('${id}')">Open →</button>
+      </div>
+    </div>`).join('');
+}
+
+function openTeacherLogin() {
+  document.getElementById('teacherModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pinInput').focus(),50);
+}
+function checkPin() {
+  const pin=document.getElementById('pinInput').value.trim();
+  const saved=localStorage.getItem('teacher_pin')||'1529';
+  if(pin===saved){localStorage.setItem('teacher_unlocked','true');document.getElementById('teacherModal').classList.remove('open');isTeacher=true;toast('Teacher mode on','ok');}
+  else{document.getElementById('pinError').textContent='Incorrect PIN.';document.getElementById('pinInput').value='';setTimeout(()=>document.getElementById('pinError').textContent='',2000);}
+}
+
+function toast(msg,type='info'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3500);}
+
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA A+ · Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090d;--s1:#0e1018;--s2:#13151f;--s3:#1a1d2a;--b1:#252836;--b2:#2e3245;--tx:#e8eaf0;--tx2:#9096b0;--tx3:#5a607a;--acc:#4f9eff;--acc-d:rgba(79,158,255,.08);--grn:#3dd68c;--grn-d:rgba(61,214,140,.08);--red:#ff4560;--red-d:rgba(255,69,96,.08);--amb:#ffb830;--amb-d:rgba(255,184,48,.08);--pur:#a855f7;--pur-d:rgba(168,85,247,.08);--gold:#ffd700;--r:8px;--rl:12px;--rxl:20px;--mono:'Space Mono',monospace;--display:'Syne',sans-serif;--sans:'Inter',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:14px;padding:0 28px;height:56px;background:var(--s1);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100}
+.hdr-logo{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-1px;color:var(--acc);white-space:nowrap}
+.hdr-subtitle{font-family:var(--mono);font-size:10px;color:var(--tx3);letter-spacing:.5px}
+.hdr-spacer{flex:1}
+.hdr-code{font-family:var(--mono);font-size:11px;color:var(--tx3);padding:4px 12px;border-radius:20px;border:1px solid var(--b1);cursor:pointer}
+.hdr-code:hover{border-color:var(--acc);color:var(--acc)}
+
+/* HERO */
+.hero{padding:48px 28px 36px;background:linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%);border-bottom:1px solid var(--b1)}
+.hero-tag{font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.hero-title{font-family:var(--display);font-size:42px;font-weight:900;letter-spacing:-2px;line-height:1.1;color:var(--tx);margin-bottom:10px}
+.hero-title span{color:var(--acc)}
+.hero-sub{font-size:15px;color:var(--tx2);line-height:1.8;max-width:600px;margin-bottom:24px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+/* GRID */
+.content-wrap{max-width:1280px;margin:0 auto;padding:32px 28px}
+.section-label{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+/* TOOL CARDS */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:36px}
+.tool-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;cursor:pointer;transition:all .2s;text-decoration:none;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.tool-card::before{content:'';position:absolute;inset:0;background:var(--accent-color,var(--acc));opacity:0;transition:opacity .2s}
+.tool-card:hover{border-color:var(--accent-color,var(--acc));transform:translateY(-2px)}
+.tool-card:hover::before{opacity:.04}
+.tool-card-icon{font-size:28px;line-height:1;position:relative}
+.tool-card-name{font-family:var(--display);font-size:16px;font-weight:800;color:var(--tx);letter-spacing:.3px;position:relative}
+.tool-card-desc{font-size:12px;color:var(--tx2);line-height:1.6;position:relative}
+.tool-card-meta{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.5px;position:relative;margin-top:auto}
+.tool-card-arrow{position:absolute;top:20px;right:20px;font-family:var(--mono);font-size:12px;color:var(--tx3);transition:all .2s}
+.tool-card:hover .tool-card-arrow{color:var(--accent-color,var(--acc));transform:translateX(2px)}
+.tool-card.primary{border-color:var(--acc);background:linear-gradient(135deg,rgba(79,158,255,.08),var(--s1))}
+.tool-card.new-feature{border-color:var(--grn)}
+
+/* TODAY STRIP */
+.today-strip{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px 22px;margin-bottom:24px}
+.today-strip-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.today-strip-title{font-family:var(--display);font-size:14px;font-weight:800;color:var(--tx);text-transform:uppercase;letter-spacing:.5px}
+.today-strip-date{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-left:auto}
+.today-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.today-step{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:4px;position:relative;transition:all .15s;cursor:default}
+.today-step.active{border-color:var(--acc);background:var(--acc-d)}
+.today-step-icon{font-size:20px}
+.today-step-name{font-family:var(--display);font-size:11px;font-weight:700;color:var(--tx);text-transform:uppercase;letter-spacing:.3px}
+.today-step-sub{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+
+/* PROGRESS BAR */
+.domain-progress{margin-bottom:24px}
+.dp-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.dp-label{font-family:var(--mono);font-size:10px;color:var(--tx2);width:200px;flex-shrink:0}
+.dp-bar{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.dp-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.dp-pct{font-family:var(--mono);font-size:10px;color:var(--tx3);width:36px;text-align:right}
+
+/* OBJECTIVES WIDGET */
+.obj-quick{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px 22px;margin-bottom:24px}
+.obj-quick-title{font-family:var(--display);font-size:14px;font-weight:800;color:var(--tx);margin-bottom:12px}
+.obj-chips{display:flex;flex-wrap:wrap;gap:6px}
+.obj-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);font-family:var(--mono);font-size:9px;color:var(--tx3);cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block}
+.obj-chip:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-d)}
+.obj-chip.core2{border-color:var(--b2)}
+.obj-chip.core2:hover{border-color:var(--pur);color:var(--pur);background:var(--pur-d)}
+
+/* ANNOUNCEMENT */
+.announcement{background:linear-gradient(135deg,rgba(79,158,255,.08),rgba(168,85,247,.04));border:1px solid var(--acc);border-radius:var(--rl);padding:16px 20px;margin-bottom:24px;display:none}
+.announcement-text{font-size:14px;color:var(--tx);line-height:1.7}
+.announcement-meta{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-top:6px}
+
+/* STUDENT CODE MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--s1);border:1px solid var(--b2);border-radius:var(--rxl);padding:36px;width:440px;max-width:92vw;text-align:center}
+.modal-title{font-family:var(--display);font-size:26px;font-weight:900;letter-spacing:-0.5px;color:var(--tx);margin-bottom:8px}
+.modal-sub{font-size:13px;color:var(--tx2);line-height:1.8;margin-bottom:22px}
+.code-input{background:var(--s2);border:1.5px solid var(--b2);border-radius:var(--r);padding:14px 20px;color:var(--tx);font-family:var(--mono);font-size:22px;letter-spacing:4px;text-align:center;width:100%;outline:none;margin-bottom:12px;transition:border-color .2s}
+.code-input:focus{border-color:var(--acc)}
+.pin-input-styled{background:var(--s2);border:1.5px solid var(--b2);border-radius:var(--r);padding:13px 20px;color:var(--tx);font-family:var(--mono);font-size:22px;letter-spacing:8px;text-align:center;width:180px;outline:none;transition:border-color .2s}
+.pin-input-styled:focus{border-color:var(--acc)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;text-decoration:none}
+.btn-acc{background:var(--acc);color:var(--bg)}
+.btn-grn{background:var(--grn);color:var(--bg)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+.btn-ghost:hover{background:var(--s3);color:var(--tx);border-color:var(--b2)}
+.btn-sm{padding:7px 16px;font-size:11px}
+.btn-lg{padding:13px 32px;font-size:15px}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 18px;border-radius:var(--r);font-family:var(--mono);font-size:11px;animation:toastIn .2s;max-width:300px}
+.toast.ok{background:var(--grn-d);border:1px solid var(--grn);color:var(--grn)}
+.toast.err{background:var(--red-d);border:1px solid var(--red);color:var(--red)}
+.toast.info{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc)}
+@keyframes toastIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+/* TEACHER BADGE */
+#teacherLoginBtn{position:fixed;bottom:20px;left:20px;z-index:99999;cursor:pointer;display:flex;align-items:center;gap:6px;background:rgba(8,9,13,.95);border:1.5px solid var(--gold);border-radius:20px;padding:8px 16px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);backdrop-filter:blur(12px)}
+#teacherModeBadge{display:none;position:fixed;bottom:20px;left:20px;z-index:99999;cursor:pointer;align-items:center;gap:6px;background:rgba(8,9,13,.95);border:1.5px solid var(--gold);border-radius:20px;padding:8px 16px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);backdrop-filter:blur(12px)}
+.teacher-only{display:none}
+.is-teacher .teacher-only{display:block}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@media(max-width:600px){.hero-title{font-size:28px}.today-steps{grid-template-columns:repeat(3,1fr)}.tools-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MODALS -->
+<!-- Student Code Modal -->
+<div class="modal-overlay" id="codeModal">
+  <div class="modal-box">
+    <div style="font-size:52px;margin-bottom:12px">👋</div>
+    <div class="modal-title">Welcome to CompTIA A+</div>
+    <div class="modal-sub">Enter the student code your teacher gave you.<br>Your code keeps your progress private — no real names stored.</div>
+    <input type="text" id="codeInput" class="code-input" placeholder="STU-001" maxlength="10" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn btn-grn" onclick="saveCode()" style="width:100%;justify-content:center;margin-bottom:10px">Enter Classroom →</button>
+    <button class="btn btn-ghost btn-sm" onclick="openTeacherLogin()" style="width:100%;justify-content:center">I'm the teacher</button>
+  </div>
+</div>
+
+<!-- Teacher PIN Modal -->
+<div class="modal-overlay" id="teacherModal">
+  <div class="modal-box">
+    <div style="font-size:52px;margin-bottom:12px">🔑</div>
+    <div class="modal-title">Teacher Access</div>
+    <div class="modal-sub">Enter your teacher PIN.</div>
+    <input type="password" id="pinInput" class="pin-input-styled" maxlength="8" placeholder="····" onkeydown="if(event.key==='Enter')checkPin()">
+    <div id="pinError" style="font-family:var(--mono);font-size:11px;color:var(--red);min-height:20px;margin:8px 0"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <button class="btn btn-acc" onclick="checkPin()" style="width:100%;justify-content:center">Unlock Teacher Mode →</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeTeacherModal()" style="width:100%;justify-content:center">Back to Student View</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">A+</div>
+  <div style="width:1px;height:20px;background:var(--b2)"></div>
+  <div class="hdr-subtitle">CompTIA A+ · Mission Control</div>
+  <div class="hdr-spacer"></div>
+  <div id="studentCodePill" class="hdr-code" onclick="document.getElementById('codeModal').classList.add('open')">No code set</div>
+  <div id="teacherAnnounce" class="teacher-only" style="cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--tx3);padding:4px 12px;border:1px solid var(--b1);border-radius:20px" onclick="openAnnouncement()">📢 Announce</div>
+</header>
+
+<!-- TEACHER FIXED BUTTON -->
+<div id="teacherLoginBtn" onclick="openTeacherLogin()">🔑 Teacher Login</div>
+<div id="teacherModeBadge" onclick="exitTeacher()">👨‍🏫 Teacher Mode · Exit</div>
+
+<!-- ANNOUNCEMENT -->
+<div class="announcement" id="announcementBar">
+  <div class="announcement-text" id="announcementText"></div>
+  <div class="announcement-meta" id="announcementMeta"></div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div style="max-width:1280px;margin:0 auto">
+    <div class="hero-tag">CompTIA A+ · 220-1201 & 220-1202</div>
+    <div class="hero-title">Active Learning<br><span>Classroom Platform</span></div>
+    <div class="hero-sub">Problem-first lessons mapped to every CompTIA objective. Built-in labs, AI-generated content, and real-time classroom tools — designed for how students actually learn.</div>
+    <div class="hero-actions">
+      <a href="classroom.html" class="btn btn-acc btn-lg">🏫 Enter Classroom</a>
+      <a href="lesson-library.html" class="btn btn-ghost btn-lg">📚 Browse All Objectives</a>
+    </div>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+  <!-- ANNOUNCEMENT EDIT (teacher only) -->
+  <div id="announcementEdit" class="teacher-only" style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:16px 20px;margin-bottom:20px">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;margin-bottom:8px">ANNOUNCEMENT</div>
+    <div style="display:flex;gap:8px">
+      <input id="annInput" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;color:var(--tx);font-size:13px;outline:none" placeholder="Type an announcement for students…">
+      <button class="btn btn-acc btn-sm" onclick="saveAnnouncement()">Post</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearAnnouncement()">Clear</button>
+    </div>
+  </div>
+
+
+  <!-- STUDENT OF THE WEEK -->
+  <div id="sotwDisplay" style="display:none;margin-bottom:24px">
+    <div id="sotwCard" style="background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,184,48,.04));border:1.5px solid var(--gold);border-radius:var(--rl);padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden">
+      <!-- Decorative star burst -->
+      <div style="position:absolute;top:-20px;right:-20px;font-size:80px;opacity:.06;line-height:1;pointer-events:none">⭐</div>
+      <div style="font-size:48px;flex-shrink:0" id="sotwEmoji">🏆</div>
+      <div style="flex:1;min-width:180px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">⭐ Student of the Week</div>
+        <div style="font-family:var(--display);font-size:26px;font-weight:900;letter-spacing:-0.5px;color:var(--tx);margin-bottom:4px" id="sotwName">—</div>
+        <div style="font-size:13px;color:var(--tx2);line-height:1.7" id="sotwNote"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0" id="sotwStats"></div>
+    </div>
+  </div>
+
+  <!-- STUDENT OF THE WEEK EDITOR (teacher only) -->
+  <div id="sotwEditor" class="teacher-only" style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:16px 20px;margin-bottom:20px">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:1px;margin-bottom:10px">⭐ STUDENT OF THE WEEK</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;flex-wrap:wrap">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:5px">STUDENT CODE</div>
+        <input id="sotwCodeInput" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-family:var(--mono);font-size:13px;letter-spacing:1px;outline:none;text-transform:uppercase" placeholder="STU-001" oninput="this.value=this.value.toUpperCase();sotwPreviewCandidates()">
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:5px">PERSONAL NOTE</div>
+        <input id="sotwNoteInput" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:13px;outline:none;font-family:var(--sans)" placeholder="e.g. Scored 100% three days in a row and helped classmates…">
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-acc btn-sm" onclick="saveSotw()" style="white-space:nowrap">⭐ Set</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearSotw()" style="white-space:nowrap">Clear</button>
+      </div>
+    </div>
+
+    <!-- Auto-suggested candidates -->
+    <div id="sotwCandidates" style="margin-top:12px"></div>
+  </div>
+
+  <!-- TODAY'S CLASS -->
+  <div class="section-label">Today's Class Structure</div>
+  <div class="today-strip">
+    <div class="today-strip-header">
+      <div class="today-strip-title">Class Flow</div>
+      <div id="todayObjLabel" style="font-family:var(--mono);font-size:10px;color:var(--acc)">No objective selected</div>
+      <div class="today-strip-date" id="todayDate"></div>
+    </div>
+    <div class="today-steps">
+      <div class="today-step">
+        <div class="today-step-icon">🚨</div>
+        <div class="today-step-name">Hook</div>
+        <div class="today-step-sub">5 min · IT Incident</div>
+      </div>
+      <div class="today-step">
+        <div class="today-step-icon">📖</div>
+        <div class="today-step-name">Concept Brief</div>
+        <div class="today-step-sub">10 min · Read + Terms</div>
+      </div>
+      <div class="today-step">
+        <div class="today-step-icon">🔬</div>
+        <div class="today-step-name">Sandbox Lab</div>
+        <div class="today-step-sub">15 min · Hands-On</div>
+      </div>
+      <div class="today-step">
+        <div class="today-step-icon">💬</div>
+        <div class="today-step-name">Discussion</div>
+        <div class="today-step-sub">10 min · Live Q&amp;A</div>
+      </div>
+      <div class="today-step">
+        <div class="today-step-icon">⏱</div>
+        <div class="today-step-name">Closing Quiz</div>
+        <div class="today-step-sub">5 min · Graded</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK OBJECTIVES -->
+  <div class="section-label">Quick Objective Access</div>
+  <div class="obj-quick">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="obj-quick-title">Core 1 · 220-1201</div>
+      <a href="lesson-library.html" style="font-family:var(--mono);font-size:9px;color:var(--tx3);text-decoration:underline;margin-left:auto">View all 27 →</a>
+    </div>
+    <div class="obj-chips" id="core1Chips"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:16px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="obj-quick-title">Core 2 · 220-1202</div>
+      <a href="lesson-library.html" style="font-family:var(--mono);font-size:9px;color:var(--tx3);text-decoration:underline;margin-left:auto">View all 22 →</a>
+    </div>
+    <div class="obj-chips" id="core2Chips"></div>
+  </div>
+
+  <!-- MAIN TOOLS -->
+  <div class="section-label">Classroom Tools</div>
+  <div class="tools-grid">
+
+    <a href="classroom.html" class="tool-card primary" style="--accent-color:var(--acc)">
+      <div class="tool-card-icon">🏫</div>
+      <div class="tool-card-name">Active Classroom</div>
+      <div class="tool-card-desc">Problem-first daily lessons. Teacher pushes each phase. Students see exactly what you push — nothing else.</div>
+      <div class="tool-card-meta">Hook → Lesson → Lab → Discussion → Quiz</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+    <a href="lesson-library.html" class="tool-card new-feature" style="--accent-color:var(--grn)">
+      <div class="tool-card-icon">📚</div>
+      <div class="tool-card-name">Lesson Library</div>
+      <div class="tool-card-desc">All 49 objectives from both exams. AI generates concept briefs, labs, and quizzes for every single objective.</div>
+      <div class="tool-card-meta">220-1201 · 220-1202 · 49 Objectives</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+    <a href="student-command-center.html" class="tool-card" style="--accent-color:var(--pur)">
+      <div class="tool-card-icon">🎯</div>
+      <div class="tool-card-name">Student Dashboard</div>
+      <div class="tool-card-desc">Grades, PBIS points, study plan, exam readiness. Students see their progress across all objectives.</div>
+      <div class="tool-card-meta">Grades · Study Tonight · Readiness</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+    <a href="pbis-quiz-tools.html" class="tool-card" style="--accent-color:var(--gold)">
+      <div class="tool-card-icon">🏆</div>
+      <div class="tool-card-name">PBIS &amp; Quizzes</div>
+      <div class="tool-card-desc">Points system, manual awards, lockdown quiz, PDF quiz generator.</div>
+      <div class="tool-card-meta">Points · Lockdown · PDF Export</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+    <a href="exam-suite.html" class="tool-card" style="--accent-color:var(--red)">
+      <div class="tool-card-icon">🎓</div>
+      <div class="tool-card-name">Exam Suite</div>
+      <div class="tool-card-desc">90-question exam simulator, micro-lessons, attendance, retake manager, and parent comms.</div>
+      <div class="tool-card-meta">90Q · 90min · 700 Pass Score</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+    <a href="competition-arena.html" class="tool-card" style="--accent-color:var(--amb)">
+      <div class="tool-card-icon">⚔️</div>
+      <div class="tool-card-name">Competition Arena</div>
+      <div class="tool-card-desc">Live leaderboard, weekly challenges, boss battles, and class XP. Makes review sessions competitive.</div>
+      <div class="tool-card-meta">Leaderboard · Challenges · Boss Battles</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+    <a href="pacing-review.html" class="tool-card" style="--accent-color:var(--acc)">
+      <div class="tool-card-icon">📅</div>
+      <div class="tool-card-name">Pacing Guide</div>
+      <div class="tool-card-desc">Course pacing engine, chapter study guides, and review materials mapped to the 68-day calendar.</div>
+      <div class="tool-card-meta">68 Days · 26 Chapters · Study Guides</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+    <a href="setup-wizard.html" class="tool-card teacher-only" style="--accent-color:var(--grn)">
+      <div class="tool-card-icon">⚙️</div>
+      <div class="tool-card-name">Setup Wizard</div>
+      <div class="tool-card-desc">Add API key, generate student codes, configure Google Sheets sync, set your PIN.</div>
+      <div class="tool-card-meta">Teacher Only · PIN Required</div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+  </div>
+
+  <!-- DOMAIN PROGRESS (student) -->
+  <div class="section-label">Exam Domains</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px">
+    <div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1px;margin-bottom:12px">CORE 1 · 220-1201</div>
+      <div class="domain-progress">
+        <div class="dp-row"><div class="dp-label">1.0 Mobile Devices</div><div class="dp-bar"><div class="dp-fill" style="width:13%;background:var(--acc)"></div></div><div class="dp-pct">13%</div></div>
+        <div class="dp-row"><div class="dp-label">2.0 Networking</div><div class="dp-bar"><div class="dp-fill" style="width:23%;background:var(--grn)"></div></div><div class="dp-pct">23%</div></div>
+        <div class="dp-row"><div class="dp-label">3.0 Hardware</div><div class="dp-bar"><div class="dp-fill" style="width:25%;background:var(--pur)"></div></div><div class="dp-pct">25%</div></div>
+        <div class="dp-row"><div class="dp-label">4.0 Virtualization & Cloud</div><div class="dp-bar"><div class="dp-fill" style="width:11%;background:var(--amb)"></div></div><div class="dp-pct">11%</div></div>
+        <div class="dp-row"><div class="dp-label">5.0 HW & Network Troubleshoot</div><div class="dp-bar"><div class="dp-fill" style="width:28%;background:var(--red)"></div></div><div class="dp-pct">28%</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--pur);letter-spacing:1px;margin-bottom:12px">CORE 2 · 220-1202</div>
+      <div class="domain-progress">
+        <div class="dp-row"><div class="dp-label">1.0 Operating Systems</div><div class="dp-bar"><div class="dp-fill" style="width:28%;background:var(--acc)"></div></div><div class="dp-pct">28%</div></div>
+        <div class="dp-row"><div class="dp-label">2.0 Security</div><div class="dp-bar"><div class="dp-fill" style="width:28%;background:var(--red)"></div></div><div class="dp-pct">28%</div></div>
+        <div class="dp-row"><div class="dp-label">3.0 Software Troubleshooting</div><div class="dp-bar"><div class="dp-fill" style="width:23%;background:var(--amb)"></div></div><div class="dp-pct">23%</div></div>
+        <div class="dp-row"><div class="dp-label">4.0 Operational Procedures</div><div class="dp-bar"><div class="dp-fill" style="width:21%;background:var(--pur)"></div></div><div class="dp-pct">21%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="text-align:center;padding:20px 0;border-top:1px solid var(--b1);font-family:var(--mono);font-size:9px;color:var(--tx3)">
+    CompTIA A+ · 220-1201 & 220-1202 · Active Learning Platform
+  </div>
+
+</div>
+
+<script>
+const QUICK_OBJECTIVES = {
+  '1201': [
+    ['1.1','Mobile Hardware'],['1.2','Mobile Connectivity'],['1.3','Mobile Networks'],
+    ['2.1','TCP/UDP Ports'],['2.2','Wireless Networking'],['2.3','Network Hosts'],['2.4','Network Config'],['2.5','Network Hardware'],['2.6','SOHO Networks'],['2.7','Connection Types'],['2.8','Network Tools'],
+    ['3.1','Displays'],['3.2','Cables'],['3.3','RAM'],['3.4','Storage'],['3.5','Motherboards'],['3.6','Power Supply'],['3.7','Printers'],['3.8','Printer Maintenance'],
+    ['4.1','Virtualization'],['4.2','Cloud Computing'],
+    ['5.1','Motherboard Troubleshoot'],['5.2','Drive Troubleshoot'],['5.3','Display Troubleshoot'],['5.4','Mobile Troubleshoot'],['5.5','Network Troubleshoot'],['5.6','Printer Troubleshoot'],
+  ],
+  '1202': [
+    ['C1.1','OS Types'],['C1.2','OS Install'],['C1.3','Windows Editions'],['C1.4','Windows Tools'],['C1.5','CLI Tools'],['C1.6','Windows Settings'],['C1.7','Windows Networking'],['C1.8','macOS'],['C1.9','Linux'],['C1.10','App Install'],['C1.11','Cloud Apps'],
+    ['C2.1','Security Measures'],['C2.2','Windows Security'],['C2.3','Wireless Security'],['C2.4','Malware'],['C2.5','Social Engineering'],['C2.6','Malware Removal'],['C2.7','Workstation Hardening'],['C2.8','Mobile Security'],['C2.9','Data Destruction'],['C2.10','SOHO Security'],['C2.11','Browser Security'],
+    ['C3.1','Windows Troubleshoot'],['C3.2','Mobile App Issues'],['C3.3','Mobile Security Issues'],['C3.4','PC Security Issues'],
+    ['C4.1','Documentation'],['C4.2','Change Management'],['C4.3','Backup & Recovery'],['C4.4','Safety'],['C4.5','Environment'],['C4.6','Privacy & Policy'],['C4.7','Communication'],['C4.8','Scripting'],['C4.9','Remote Access'],['C4.10','AI Concepts'],
+  ]
+};
+
+function init() {
+  if (!localStorage.getItem('teacher_pin')) localStorage.setItem('teacher_pin', '1529');
+  
+  // Check teacher
+  const isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+  if (isTeacher) applyTeacherMode();
+  
+  // Check student code
+  let code = null;
+  try { code = JSON.parse(localStorage.getItem('PLATFORM_CODE')); } catch(e){}
+  if (!code && !isTeacher) {
+    setTimeout(() => document.getElementById('codeModal').classList.add('open'), 500);
+  } else if (code && code !== 'TEACHER') {
+    document.getElementById('studentCodePill').textContent = code;
+  }
+  
+  // Date
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  
+  // Objective
+  try {
+    const obj = JSON.parse(localStorage.getItem('class_objective') || '{}');
+    if (obj.id) document.getElementById('todayObjLabel').textContent = `Obj. ${obj.id}: ${(obj.title||'').substring(0,40)}`;
+  } catch(e){}
+  
+  // Announcement
+  const ann = localStorage.getItem('hub_announcement');
+  if (ann) {
+    document.getElementById('announcementText').textContent = ann;
+    document.getElementById('announcementBar').style.display = 'block';
+  }
+  
+  // Build chips
+  buildChips();
+  
+  // Load Student of the Week
+  loadSotw();
+  if (isTeacher) setTimeout(buildSotwCandidates, 500);
+
+  // Keyboard shortcut T
+  document.addEventListener('keydown', e => {
+    if ((e.key==='t'||e.key==='T') && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+      if (localStorage.getItem('teacher_unlocked') !== 'true') openTeacherLogin();
+    }
+  });
+}
+
+
+// ══════════════════════════════════════════════════════════
+// STUDENT OF THE WEEK
+// ══════════════════════════════════════════════════════════
+
+function loadSotw() {
+  const sotw = JSON.parse(localStorage.getItem('sotw') || 'null');
+  if (!sotw) return;
+
+  // Show the display card
+  document.getElementById('sotwDisplay').style.display = 'block';
+  document.getElementById('sotwName').textContent = sotw.code || '—';
+  document.getElementById('sotwNote').textContent = sotw.note || '';
+  document.getElementById('sotwEmoji').textContent = sotw.emoji || '🏆';
+
+  // Stats chips
+  const stats = document.getElementById('sotwStats');
+  if (stats && sotw.stats) {
+    stats.innerHTML = sotw.stats.map(s =>
+      '<div style="background:rgba(255,215,0,.1);border:1px solid var(--gold);border-radius:6px;padding:5px 12px;font-family:var(--mono);font-size:10px;color:var(--gold);text-align:center">' + s + '</div>'
+    ).join('');
+  }
+
+  // Pre-fill editor inputs if teacher
+  const codeInput = document.getElementById('sotwCodeInput');
+  const noteInput = document.getElementById('sotwNoteInput');
+  if (codeInput && !codeInput.value) codeInput.value = sotw.code || '';
+  if (noteInput && !noteInput.value) noteInput.value = sotw.note || '';
+}
+
+function saveSotw() {
+  const code = document.getElementById('sotwCodeInput').value.trim().toUpperCase();
+  const note = document.getElementById('sotwNoteInput').value.trim();
+  if (!code || code.length < 3) {
+    document.getElementById('sotwCodeInput').style.borderColor = 'var(--red)';
+    setTimeout(() => document.getElementById('sotwCodeInput').style.borderColor = 'var(--b1)', 2000);
+    return;
+  }
+
+  // Pull real stats for this student
+  const stats = getSotwStats(code);
+  const emoji = getSotwEmoji(stats);
+
+  const sotw = { code, note, stats: stats.chips, emoji, setDate: new Date().toDateString() };
+  localStorage.setItem('sotw', JSON.stringify(sotw));
+  loadSotw();
+  toast('Student of the Week set: ' + code, 'ok');
+}
+
+function clearSotw() {
+  localStorage.removeItem('sotw');
+  document.getElementById('sotwDisplay').style.display = 'none';
+  document.getElementById('sotwCodeInput').value = '';
+  document.getElementById('sotwNoteInput').value = '';
+  document.getElementById('sotwCandidates').innerHTML = '';
+  toast('Student of the Week cleared', 'info');
+}
+
+function getSotwStats(code) {
+  const scores  = JSON.parse(localStorage.getItem('classroom_scores') || '{}');
+  const notes   = JSON.parse(localStorage.getItem('classroom_notes')  || '{}');
+  const discAns = JSON.parse(localStorage.getItem('st_ans')           || '{}');
+  const pbis    = parseInt(localStorage.getItem('pbis_' + code)       || '0');
+  const streak  = parseInt(localStorage.getItem('streak_count')       || '0');
+
+  // Quiz average
+  const quizPcts = Object.entries(scores)
+    .filter(([k]) => k.includes(code))
+    .map(([,v]) => v.pct || 0);
+  const quizAvg = quizPcts.length
+    ? Math.round(quizPcts.reduce((a,b) => a+b, 0) / quizPcts.length)
+    : null;
+
+  // Notes completed
+  const notesCount = Object.keys(notes).filter(k => k.includes(code)).length;
+
+  // Discussions answered
+  const discCount = Object.entries(discAns)
+    .filter(([k]) => k.includes(code))
+    .reduce((sum, [,v]) => sum + Object.values(v).filter(r => r && r.trim().length >= 15).length, 0);
+
+  const chips = [];
+  if (quizAvg !== null) chips.push('Quiz avg: ' + quizAvg + '%');
+  if (notesCount > 0)   chips.push(notesCount + ' notes completed');
+  if (discCount > 0)    chips.push(discCount + ' discussions');
+  if (pbis > 0)         chips.push(pbis + ' PBIS pts');
+  if (streak > 1)       chips.push('🔥 ' + streak + '-day streak');
+
+  return { quizAvg, notesCount, discCount, pbis, streak, chips };
+}
+
+function getSotwEmoji(stats) {
+  if (stats.quizAvg >= 90) return '🌟';
+  if (stats.quizAvg >= 80) return '🏆';
+  if (stats.notesCount >= 5) return '📝';
+  if (stats.discCount >= 10) return '💬';
+  if (stats.pbis >= 50) return '⭐';
+  return '🎯';
+}
+
+function sotwPreviewCandidates() {
+  // Only suggest if input is short / empty
+  const val = document.getElementById('sotwCodeInput').value.trim();
+  if (val.length > 3) { document.getElementById('sotwCandidates').innerHTML = ''; return; }
+  buildSotwCandidates();
+}
+
+function buildSotwCandidates() {
+  const scores  = JSON.parse(localStorage.getItem('classroom_scores') || '{}');
+  const codes   = JSON.parse(localStorage.getItem('student_codes') || '[]');
+
+  if (!codes.length) {
+    // Try to extract codes from score keys
+    const codeSet = new Set();
+    Object.keys(scores).forEach(k => {
+      const parts = k.split('_');
+      // key: quiz_OBJID_CODE_ts — code is 3rd part
+      if (parts.length >= 3) codeSet.add(parts[2]);
+    });
+    codes.push(...codeSet);
+  }
+
+  if (!codes.length) return;
+
+  // Score each student
+  const ranked = codes.map(code => {
+    const s = getSotwStats(code);
+    // Composite score: quiz avg (weighted 60%) + notes (20%) + disc (10%) + streak (10%)
+    const score =
+      (s.quizAvg || 0) * 0.6 +
+      (s.notesCount * 5) +
+      (s.discCount * 2) +
+      (s.streak * 3);
+    return { code, score, stats: s };
+  }).filter(s => s.score > 0).sort((a,b) => b.score - a.score).slice(0, 5);
+
+  if (!ranked.length) return;
+
+  const container = document.getElementById('sotwCandidates');
+  container.innerHTML =
+    '<div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.8px;margin-bottom:8px">💡 TOP CANDIDATES BASED ON DATA</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px">' +
+    ranked.map((r, i) => `
+      <div onclick="selectSotwCandidate('${r.code}')"
+        style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:var(--r);border:1px solid var(--b2);background:var(--s2);cursor:pointer;transition:all .15s;font-size:12px"
+        onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--b2)'">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--gold)">#${i+1}</span>
+        <span style="font-family:var(--mono);font-weight:700;color:var(--tx)">${r.code}</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--tx3)">${r.stats.chips.slice(0,2).join(' · ')}</span>
+      </div>`).join('') +
+    '</div>';
+}
+
+function selectSotwCandidate(code) {
+  document.getElementById('sotwCodeInput').value = code;
+  document.getElementById('sotwCandidates').innerHTML = '';
+  // Pre-fill a note suggestion
+  const stats = getSotwStats(code);
+  const noteInput = document.getElementById('sotwNoteInput');
+  if (noteInput && !noteInput.value) {
+    const suggestions = [];
+    if (stats.quizAvg >= 90) suggestions.push('Outstanding quiz performance (' + stats.quizAvg + '% average)');
+    else if (stats.quizAvg >= 80) suggestions.push('Strong quiz scores (' + stats.quizAvg + '% average)');
+    if (stats.notesCount >= 3) suggestions.push('consistently completed Cornell notes');
+    if (stats.discCount >= 5) suggestions.push('actively engaged in discussions');
+    if (stats.streak > 2) suggestions.push(stats.streak + '-day login streak');
+    noteInput.value = suggestions.length
+      ? suggestions[0].charAt(0).toUpperCase() + suggestions[0].slice(1) + (suggestions.length > 1 ? ' and ' + suggestions[1] : '') + '.'
+      : '';
+  }
+  toast('Selected: ' + code, 'info');
+}
+
+
+function buildChips() {
+  document.getElementById('core1Chips').innerHTML = QUICK_OBJECTIVES['1201'].map(([id,label]) =>
+    `<a href="lesson-library.html" class="obj-chip" onclick="setObj('${id}')">${id} · ${label}</a>`
+  ).join('');
+  document.getElementById('core2Chips').innerHTML = QUICK_OBJECTIVES['1202'].map(([id,label]) =>
+    `<a href="lesson-library.html" class="obj-chip core2" onclick="setObj('${id}')">${id.replace('C','')} · ${label}</a>`
+  ).join('');
+}
+
+function setObj(id) {
+  const OBJECTIVES={'1.1':{title:'Monitor mobile device hardware'},'2.1':{title:'TCP/UDP ports'},'C1.1':{title:'OS types'}};
+  localStorage.setItem('class_objective', JSON.stringify({id}));
+}
+
+function applyTeacherMode() {
+  document.body.classList.add('is-teacher');
+  document.getElementById('teacherLoginBtn').style.display = 'none';
+  document.getElementById('teacherModeBadge').style.display = 'flex';
+}
+
+function openTeacherLogin() {
+  const modal = document.getElementById('teacherModal');
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('pinInput').focus(), 50);
+}
+function closeTeacherModal() { document.getElementById('teacherModal').classList.remove('open'); }
+function checkPin() {
+  const pin = document.getElementById('pinInput').value.trim();
+  const saved = localStorage.getItem('teacher_pin') || '1529';
+  if (pin === saved) {
+    localStorage.setItem('teacher_unlocked','true');
+    localStorage.setItem('PLATFORM_CODE',JSON.stringify('TEACHER'));
+    closeTeacherModal();
+    applyTeacherMode();
+    document.getElementById('studentCodePill').textContent = 'Teacher';
+    toast('Teacher mode activated','ok');
+    window.location.href = 'setup-wizard.html';
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN.';
+    document.getElementById('pinInput').value = '';
+    setTimeout(() => document.getElementById('pinError').textContent='',2000);
+  }
+}
+function exitTeacher() {
+  localStorage.removeItem('teacher_unlocked');
+  localStorage.removeItem('PLATFORM_CODE');
+  location.reload();
+}
+
+function saveCode() {
+  const val = document.getElementById('codeInput').value.trim().toUpperCase();
+  if (!val || val.length < 3) { document.getElementById('codeInput').style.borderColor='var(--red)'; return; }
+  
+  const isFirstLogin = !localStorage.getItem('PLATFORM_CODE');
+  localStorage.setItem('PLATFORM_CODE',JSON.stringify(val));
+  document.getElementById('codeModal').classList.remove('open');
+  document.getElementById('studentCodePill').textContent = val;
+  toast('Welcome, ' + val + '!','ok');
+  
+  // Launch onboarding on first login (not if already done or skipped)
+  const hasProfile   = !!localStorage.getItem('student_interests');
+  const hasStyle     = !!localStorage.getItem('student_learning_style');
+  const skipped      = !!localStorage.getItem('onboarding_skipped');
+  if (isFirstLogin && !hasProfile && !skipped) {
+    setTimeout(launchOnboarding, 600);
+  }
+}
+
+function saveAnnouncement() {
+  const val = document.getElementById('annInput').value.trim();
+  if (!val) return;
+  localStorage.setItem('hub_announcement', val);
+  document.getElementById('announcementText').textContent = val;
+  document.getElementById('announcementBar').style.display = 'block';
+  document.getElementById('annInput').value = '';
+  toast('Announcement posted','ok');
+}
+function clearAnnouncement() {
+  localStorage.removeItem('hub_announcement');
+  document.getElementById('announcementBar').style.display = 'none';
+  toast('Announcement cleared','info');
+}
+function openAnnouncement() { document.getElementById('annInput').focus(); }
+
+function toast(msg,type='info'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;t.textContent=msg;
+  c.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+
+
+// ═══════════════════════════════════════════════════════
+// ONBOARDING — Interests + Learning Style
+// ═══════════════════════════════════════════════════════
+
+const INTERESTS = [
+  {id:'gaming',       label:'🎮 Gaming'},
+  {id:'music',        label:'🎵 Music'},
+  {id:'sports',       label:'⚽ Sports'},
+  {id:'art',          label:'🎨 Art & Design'},
+  {id:'cars',         label:'🚗 Cars & Engines'},
+  {id:'cooking',      label:'🍕 Food & Cooking'},
+  {id:'film',         label:'🎬 Movies & TV'},
+  {id:'science',      label:'🔬 Science'},
+  {id:'social_media', label:'📱 Social Media'},
+  {id:'fitness',      label:'💪 Fitness & Health'},
+  {id:'animals',      label:'🐾 Animals'},
+  {id:'travel',       label:'✈️ Travel'},
+  {id:'fashion',      label:'👟 Fashion'},
+  {id:'business',     label:'💼 Business'},
+  {id:'coding',       label:'💻 Coding'},
+  {id:'reading',      label:'📚 Reading'},
+];
+
+const CAREERS = [
+  {id:'help_desk',    label:'🖥️ Help Desk Tech'},
+  {id:'network',      label:'🌐 Network Engineer'},
+  {id:'security',     label:'🛡️ Cybersecurity'},
+  {id:'dev',          label:'👨‍💻 Software Developer'},
+  {id:'data',         label:'📊 Data/AI'},
+  {id:'cloud',        label:'☁️ Cloud Engineer'},
+  {id:'not_sure',     label:'🤷 Not Sure Yet'},
+];
+
+const LS_QUESTIONS = [
+  {
+    q: "You're learning how WiFi security works. Which would help you most?",
+    opts: [
+      {label:'Reading a detailed explanation with diagrams', type:'visual'},
+      {label:'Watching someone set it up step by step',     type:'visual'},
+      {label:'Listening to someone explain it out loud',    type:'auditory'},
+      {label:'Actually configuring a router yourself',      type:'kinesthetic'},
+    ]
+  },
+  {
+    q: "When you're trying to remember something, you usually...",
+    opts: [
+      {label:'Picture it visually in your head',           type:'visual'},
+      {label:'Write it down or draw a diagram',            type:'visual'},
+      {label:'Say it to yourself or explain it to someone',type:'auditory'},
+      {label:'Act it out or connect it to something you've done', type:'kinesthetic'},
+    ]
+  },
+  {
+    q: "You get a new piece of tech. You usually...",
+    opts: [
+      {label:'Read the manual first',                       type:'reading'},
+      {label:'Watch a YouTube tutorial',                    type:'visual'},
+      {label:'Ask a friend to explain it',                  type:'auditory'},
+      {label:'Just start pressing buttons and figure it out',type:'kinesthetic'},
+    ]
+  },
+  {
+    q: "Which type of assignment do you find easiest?",
+    opts: [
+      {label:'Written essays or reports',                   type:'reading'},
+      {label:'Presentations with slides/visuals',           type:'visual'},
+      {label:'Group discussions or debates',                type:'auditory'},
+      {label:'Hands-on projects or labs',                   type:'kinesthetic'},
+    ]
+  },
+  {
+    q: "When you give someone directions, you tend to...",
+    opts: [
+      {label:'Draw a map or show them on Google Maps',      type:'visual'},
+      {label:'Write out step-by-step instructions',         type:'reading'},
+      {label:'Describe landmarks verbally',                 type:'auditory'},
+      {label:'Walk with them and point things out',         type:'kinesthetic'},
+    ]
+  },
+  {
+    q: "In class, you pay most attention when the teacher is...",
+    opts: [
+      {label:'Showing diagrams or visuals on the screen',   type:'visual'},
+      {label:'Telling stories and explaining out loud',     type:'auditory'},
+      {label:'Having students do something hands-on',       type:'kinesthetic'},
+      {label:'Referring to notes or the textbook',          type:'reading'},
+    ]
+  },
+  {
+    q: "You study for a test by...",
+    opts: [
+      {label:'Re-reading notes and textbook chapters',      type:'reading'},
+      {label:'Making flashcards or color-coded charts',     type:'visual'},
+      {label:'Explaining the material out loud to yourself',type:'auditory'},
+      {label:'Doing practice problems or practice tests',   type:'kinesthetic'},
+    ]
+  },
+  {
+    q: "A concept really clicks for you when...",
+    opts: [
+      {label:'You see a clear diagram or animation of it',  type:'visual'},
+      {label:'Someone explains the "why" behind it clearly',type:'auditory'},
+      {label:'You try it yourself and make mistakes',       type:'kinesthetic'},
+      {label:'You read a thorough explanation of it',       type:'reading'},
+    ]
+  },
+];
+
+const STYLE_DESCRIPTIONS = {
+  visual:      {label:'Visual Learner 👁️',      desc:'You learn best through diagrams, charts, and seeing concepts laid out visually. Claude will use more visual analogies and structured breakdowns.'},
+  auditory:    {label:'Auditory Learner 👂',     desc:'You learn best through explanation and discussion. Claude will write lessons in a conversational tone and encourage you to explain concepts out loud.'},
+  kinesthetic: {label:'Hands-On Learner 🔬',    desc:'You learn best by doing. Claude will prioritize lab activities and connect every concept to something you can actually try.'},
+  reading:     {label:'Reading/Writing Learner 📖', desc:'You learn best through text and writing. Claude will give more detailed written explanations and encourage note-taking.'},
+};
+
+let selectedInterests = [];
+let selectedCareer = null;
+let lsAnswers = [];
+let lsCurrentQ = 0;
+
+// ── LAUNCH ONBOARDING ──────────────────────────────────
+function launchOnboarding() {
+  buildInterestChips();
+  buildCareerChips();
+  buildLSQuestions();
+  document.getElementById('interestsModal').classList.add('open');
+}
+
+// ── INTERESTS SCREEN ──────────────────────────────────
+function buildInterestChips() {
+  const container = document.getElementById('interestChips');
+  container.innerHTML = INTERESTS.map(i => `
+    <div id="ic_${i.id}" onclick="toggleInterest('${i.id}')"
+      style="padding:7px 14px;border-radius:20px;border:1.5px solid var(--b2);font-size:12px;color:var(--tx3);cursor:pointer;transition:all .15s;user-select:none;font-family:var(--sans)">
+      ${i.label}
+    </div>`).join('');
+  
+  const careers = document.getElementById('careerChips');
+  careers.innerHTML = CAREERS.map(c => `
+    <div id="cc_${c.id}" onclick="toggleCareer('${c.id}')"
+      style="padding:7px 14px;border-radius:20px;border:1.5px solid var(--b2);font-size:12px;color:var(--tx3);cursor:pointer;transition:all .15s;user-select:none;font-family:var(--sans)">
+      ${c.label}
+    </div>`).join('');
+}
+
+function buildCareerChips() {} // Built in buildInterestChips
+
+function toggleInterest(id) {
+  const el = document.getElementById('ic_' + id);
+  if (selectedInterests.includes(id)) {
+    selectedInterests = selectedInterests.filter(i => i !== id);
+    el.style.borderColor = 'var(--b2)';
+    el.style.color = 'var(--tx3)';
+    el.style.background = 'transparent';
+  } else {
+    selectedInterests.push(id);
+    el.style.borderColor = 'var(--acc)';
+    el.style.color = 'var(--acc)';
+    el.style.background = 'var(--acc-d)';
+  }
+}
+
+function toggleCareer(id) {
+  // Single select
+  if (selectedCareer) {
+    const prev = document.getElementById('cc_' + selectedCareer);
+    if (prev) { prev.style.borderColor='var(--b2)'; prev.style.color='var(--tx3)'; prev.style.background='transparent'; }
+  }
+  selectedCareer = id;
+  const el = document.getElementById('cc_' + id);
+  if (el) { el.style.borderColor='var(--grn)'; el.style.color='var(--grn)'; el.style.background='var(--grn-d)'; }
+}
+
+function saveInterests() {
+  const custom = document.getElementById('interestCustom')?.value.trim() || '';
+  const allInterests = [...selectedInterests];
+  if (custom) allInterests.push('custom:' + custom);
+  
+  const profile = {
+    interests: allInterests,
+    interestLabels: selectedInterests.map(id => INTERESTS.find(i=>i.id===id)?.label || id),
+    customInterest: custom,
+    career: selectedCareer,
+    careerLabel: CAREERS.find(c=>c.id===selectedCareer)?.label || '',
+  };
+  
+  localStorage.setItem('student_interests', JSON.stringify(profile));
+  document.getElementById('interestsModal').classList.remove('open');
+  document.getElementById('learnStyleModal').classList.add('open');
+  lsCurrentQ = 0;
+  renderLSQuestion();
+}
+
+// ── LEARNING STYLE QUIZ ──────────────────────────────────
+function buildLSQuestions() {
+  lsAnswers = new Array(LS_QUESTIONS.length).fill(null);
+}
+
+function renderLSQuestion() {
+  const q = LS_QUESTIONS[lsCurrentQ];
+  const total = LS_QUESTIONS.length;
+  
+  document.getElementById('lsProgress').textContent = `Question ${lsCurrentQ+1} of ${total}`;
+  document.getElementById('lsPrevBtn').style.display = lsCurrentQ > 0 ? 'inline-flex' : 'none';
+  document.getElementById('lsNextBtn').textContent = lsCurrentQ === total-1 ? 'See My Results →' : 'Next →';
+  
+  document.getElementById('lsQuestions').innerHTML = `
+    <div style="margin-bottom:16px">
+      <!-- Progress dots -->
+      <div style="display:flex;gap:4px;margin-bottom:14px">
+        ${Array.from({length:total},(_,i) => `
+          <div style="height:3px;flex:1;border-radius:2px;background:${
+            i < lsCurrentQ ? 'var(--acc)' : i === lsCurrentQ ? 'var(--acc)' : 'var(--b2)'
+          };opacity:${i===lsCurrentQ?1:i<lsCurrentQ?0.7:0.3}"></div>`).join('')}
+      </div>
+      <div style="font-size:15px;font-weight:600;color:var(--tx);line-height:1.6;margin-bottom:14px">${q.q}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${q.opts.map((opt, i) => `
+          <div onclick="pickLSAnswer(${i},'${opt.type}')"
+            id="lsopt_${i}"
+            style="padding:12px 16px;border-radius:var(--r);border:1.5px solid ${lsAnswers[lsCurrentQ]?.idx===i?'var(--acc)':'var(--b2)'};background:${lsAnswers[lsCurrentQ]?.idx===i?'var(--acc-d)':'var(--s2)'};color:${lsAnswers[lsCurrentQ]?.idx===i?'var(--acc)':'var(--tx2)'};cursor:pointer;font-size:13px;line-height:1.5;transition:all .15s">
+            <span style="font-family:var(--mono);font-size:10px;font-weight:700;margin-right:8px;color:inherit">${String.fromCharCode(65+i)}.</span>${opt.label}
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function pickLSAnswer(idx, type) {
+  lsAnswers[lsCurrentQ] = { idx, type };
+  renderLSQuestion(); // re-render to show selection
+}
+
+function lsNav(dir) {
+  if (dir === 1) {
+    // Validate current question answered
+    if (lsAnswers[lsCurrentQ] === null) {
+      // Gently shake the question
+      const qEl = document.getElementById('lsQuestions');
+      if (qEl) { qEl.style.animation='shake .3s'; setTimeout(()=>qEl.style.animation='',300); }
+      return;
+    }
+    if (lsCurrentQ === LS_QUESTIONS.length - 1) {
+      finishLearningStyle();
+      return;
+    }
+    lsCurrentQ++;
+  } else {
+    lsCurrentQ = Math.max(0, lsCurrentQ - 1);
+  }
+  renderLSQuestion();
+}
+
+function finishLearningStyle() {
+  // Tally scores
+  const scores = { visual:0, auditory:0, kinesthetic:0, reading:0 };
+  lsAnswers.forEach(a => { if(a && a.type) scores[a.type]++; });
+  
+  // Determine primary and secondary style
+  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const primary = sorted[0][0];
+  const secondary = sorted[1][0];
+  
+  const profile = { scores, primary, secondary, completedAt: Date.now() };
+  localStorage.setItem('student_learning_style', JSON.stringify(profile));
+  
+  document.getElementById('learnStyleModal').classList.remove('open');
+  
+  // Show done screen
+  const interests = JSON.parse(localStorage.getItem('student_interests')||'{}');
+  const styleInfo = STYLE_DESCRIPTIONS[primary];
+  const secInfo   = STYLE_DESCRIPTIONS[secondary];
+  
+  document.getElementById('doneSummary').innerHTML = `
+    <div style="background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;text-align:left">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:.5px;margin-bottom:4px">PRIMARY STYLE</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:4px">${styleInfo.label}</div>
+      <div style="font-size:12px;color:var(--tx2);line-height:1.6">${styleInfo.desc}</div>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:10px 14px;text-align:left;margin-bottom:10px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--tx3);margin-bottom:2px">SECONDARY STYLE</div>
+      <div style="font-size:13px;color:var(--tx)">${secInfo.label}</div>
+    </div>
+    ${interests.interestLabels?.length ? `
+    <div style="font-size:12px;color:var(--tx2);text-align:left">
+      Your interests: <strong style="color:var(--tx)">${interests.interestLabels.slice(0,4).join(', ')}${interests.interestLabels.length>4?'…':''}</strong><br>
+      Claude will use these to personalize every lesson for you.
+    </div>` : ''}`;
+  
+  document.getElementById('doneModal').classList.add('open');
+}
+
+function finishOnboarding() {
+  document.getElementById('doneModal').classList.remove('open');
+  toast('Profile saved — lessons are now personalized for you!', 'ok');
+}
+
+function skipOnboarding() {
+  document.getElementById('interestsModal').classList.remove('open');
+  document.getElementById('learnStyleModal').classList.remove('open');
+  localStorage.setItem('onboarding_skipped', '1');
+}
+
+// Add shake animation
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
+document.head.appendChild(shakeStyle);
+
+window.addEventListener('DOMContentLoaded',init);
+</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     ONBOARDING FLOW — shown once after first code entry
+═══════════════════════════════════════════════════════ -->
+
+<!-- SCREEN 1: Interests -->
+<div class="modal-overlay" id="interestsModal" style="z-index:1100">
+  <div class="modal-box" style="max-width:520px;text-align:left">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:48px;margin-bottom:10px">🎯</div>
+      <div class="modal-title" style="font-size:22px">What are you into?</div>
+      <div class="modal-sub" style="font-size:13px">Claude will use your interests to make IT concepts click — better examples, better analogies, better content.</div>
+    </div>
+
+    <!-- Interest categories — multi-select chips -->
+    <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Pick everything that applies (choose at least 2)</div>
+    <div id="interestChips" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px">
+      <!-- Generated by JS -->
+    </div>
+
+    <!-- Free text -->
+    <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Anything else? (optional)</div>
+    <input id="interestCustom" style="width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:var(--r);padding:10px 14px;color:var(--tx);font-size:13px;outline:none;margin-bottom:16px;font-family:var(--sans)" placeholder="e.g. anime, cars, making music, cooking…">
+
+    <!-- Career goal -->
+    <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">What IT career sounds coolest to you?</div>
+    <div id="careerChips" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px"></div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="skipOnboarding()">Skip for now</button>
+      <button class="btn btn-acc" onclick="saveInterests()">Next: Learning Style →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Learning Style Quiz -->
+<div class="modal-overlay" id="learnStyleModal" style="z-index:1200">
+  <div class="modal-box" style="max-width:560px;text-align:left">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:48px;margin-bottom:10px">🧠</div>
+      <div class="modal-title" style="font-size:22px">How do you learn best?</div>
+      <div class="modal-sub">8 quick questions — pick the one that sounds most like you. No wrong answers.</div>
+    </div>
+
+    <div id="lsQuestions"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+      <div id="lsProgress" style="font-family:var(--mono);font-size:10px;color:var(--tx3)">Question 1 of 8</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" id="lsPrevBtn" onclick="lsNav(-1)" style="display:none">← Back</button>
+        <button class="btn btn-acc btn-sm" id="lsNextBtn" onclick="lsNav(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: All done -->
+<div class="modal-overlay" id="doneModal" style="z-index:1300">
+  <div class="modal-box" style="text-align:center;max-width:440px">
+    <div style="font-size:64px;margin-bottom:16px">🚀</div>
+    <div class="modal-title">You're all set!</div>
+    <div class="modal-sub" id="doneSummary" style="margin-bottom:20px"></div>
+    <button class="btn btn-acc btn-lg" onclick="finishOnboarding()" style="width:100%;justify-content:center">Enter the Classroom →</button>
+  </div>
+</div>
+
+</body>
+</html>
