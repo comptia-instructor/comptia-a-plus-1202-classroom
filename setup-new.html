@@ -26,25 +26,36 @@ body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100
     Unlock
   </button>
   <div id="gatePinErr" style="color:#ff4560;font-size:11px;height:16px;font-family:'Space Mono',monospace"></div>
-  <a href="hub-new.html" style="color:#5a607a;font-size:11px;text-decoration:underline;margin-top:4px">← Back to Hub</a>
+  <div id="gatePinHint" style="display:none;color:#ffb830;font-size:11px;font-family:'Space Mono',monospace;background:rgba(255,184,48,.1);border:1px solid rgba(255,184,48,.3);border-radius:6px;padding:8px 16px;max-width:300px;text-align:center">First time? Use the default PIN to get in, then change it in Step 2.</div>
+<a href="hub.html" style="color:#5a607a;font-size:11px;text-decoration:underline;margin-top:4px">← Back to Hub</a>
 </div>
 
 <script>
 (function() {
   var isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
+  var hasPin    = !!localStorage.getItem('teacher_pin'); // false = totally fresh install
   if (!isTeacher) {
     var overlay = document.getElementById('pinGateOverlay');
     if (overlay) {
       overlay.style.display = 'flex';
+      // Show a hint only on a truly fresh install
+      if (!hasPin) {
+        var hint = document.getElementById('gatePinHint');
+        if (hint) hint.style.display = 'block';
+      }
       setTimeout(function() { var el=document.getElementById('gatePinInput'); if(el)el.focus(); }, 100);
     }
   }
 })();
 function checkGatePin() {
-  var entered = document.getElementById('gatePinInput').value.trim();
+  var entered  = document.getElementById('gatePinInput').value.trim();
   var savedPin = localStorage.getItem('teacher_pin') || '1529';
   if (entered === savedPin) {
     localStorage.setItem('teacher_unlocked','true');
+    // Ensure PIN is stored so future visits work
+    if (!localStorage.getItem('teacher_pin')) {
+      localStorage.setItem('teacher_pin','1529');
+    }
     document.getElementById('pinGateOverlay').style.display = 'none';
   } else {
     document.getElementById('gatePinInput').value = '';
@@ -115,11 +126,11 @@ document.getElementById('gatePinInput').addEventListener('keydown', function(e) 
 <div class="toast-container" id="toastContainer"></div>
 
 <header class="hdr">
-  <a href="hub-new.html" style="text-decoration:none;font-family:var(--display);font-size:18px;font-weight:800;color:var(--acc)">A+</a>
+  <a href="hub.html" style="text-decoration:none;font-family:var(--display);font-size:18px;font-weight:800;color:var(--acc)">A+</a>
   <div style="width:1px;height:18px;background:var(--b2)"></div>
   <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--tx)">Setup Wizard</div>
   <div style="margin-left:auto;display:flex;gap:8px">
-    <a href="hub-new.html" class="btn btn-ghost btn-sm">← Back to Hub</a>
+    <a href="hub.html" class="btn btn-ghost btn-sm">← Back to Hub</a>
   </div>
 </header>
 
@@ -543,7 +554,7 @@ function buildSummary() {
       ${allGood>=3?'✓ Platform is ready to use! Open the classroom and start teaching.':'Configure the items marked ⚠️ for full functionality.'}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <a href="hub-new.html" class="btn btn-acc">→ Open Hub</a>
+      <a href="hub.html" class="btn btn-acc">→ Open Hub</a>
       <a href="classroom.html" class="btn btn-ghost">→ Open Classroom</a>
       <a href="lesson-library.html" class="btn btn-ghost">→ Lesson Library</a>
     </div>

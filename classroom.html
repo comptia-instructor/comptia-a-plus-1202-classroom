@@ -220,6 +220,8 @@ body { background: var(--bg); color: var(--tx); font-family: var(--sans); min-he
 #teacherModeBadge { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 99999; cursor: pointer; align-items: center; gap: 6px; background: rgba(8,9,13,.95); border: 1.5px solid var(--gold); border-radius: 20px; padding: 8px 16px; font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--gold); backdrop-filter: blur(12px); }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(6px); z-index: 10000; display: none; align-items: center; justify-content: center; }
 .modal-overlay.open { display: flex; }
+#teacherModal { z-index: 99999 !important; }
+.modal-overlay.open { display: flex; }
 .modal-box { background: var(--s1); border: 1px solid var(--b2); border-radius: var(--rxl); padding: 32px; width: 400px; max-width: 90vw; text-align: center; }
 .modal-title { font-family: var(--display); font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: .5px; }
 .modal-sub { font-size: 12px; color: var(--tx2); margin-bottom: 20px; line-height: 1.7; }
@@ -379,8 +381,8 @@ body { background: var(--bg); color: var(--tx); font-family: var(--sans); min-he
 </div>
 
 <!-- TEACHER FIXED BTN -->
-<div id="teacherLoginBtn" onclick="openTeacherLogin()">🔑 Teacher Login</div>
-<div id="teacherModeBadge" onclick="exitTeacher()">👨‍🏫 Teacher Mode · Exit</div>
+<div id="teacherLoginBtn" onclick="openTeacherLogin()" style="z-index:99999;position:fixed;bottom:20px;left:20px;cursor:pointer;display:flex;align-items:center;gap:6px;background:rgba(8,9,13,.97);border:1.5px solid var(--gold);border-radius:20px;padding:8px 16px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);backdrop-filter:blur(12px)">🔑 Teacher Login</div>
+<div id="teacherModeBadge" onclick="exitTeacher()" style="z-index:99999;position:fixed;bottom:20px;left:20px;cursor:pointer;display:none;align-items:center;gap:6px;background:rgba(8,9,13,.97);border:1.5px solid var(--gold);border-radius:20px;padding:8px 16px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);backdrop-filter:blur(12px)">👨‍🏫 Teacher Mode · Exit</div>
 
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
@@ -595,9 +597,12 @@ function init() {
 // TEACHER AUTH
 // ══════════════════════════════════════════════════════════
 function openTeacherLogin() {
+  document.querySelectorAll('.modal-overlay.open').forEach(m => {
+    if (m.id !== 'teacherModal') m.classList.remove('open');
+  });
   const modal = document.getElementById('teacherModal');
   modal.classList.add('open');
-  setTimeout(() => document.getElementById('pinInput').focus(), 50);
+  setTimeout(() => { const p = document.getElementById('pinInput'); if(p) p.focus(); }, 80);
 }
 function closeTeacherModal() {
   document.getElementById('teacherModal').classList.remove('open');
@@ -1035,17 +1040,30 @@ function startPolling() {
 function checkPhaseUpdate() {
   const phase = localStorage.getItem('class_current_phase');
   const discTs = localStorage.getItem('live_disc_ts') || '0';
-  
+
+  // Always sync current objective from localStorage (teacher may have changed it)
+  try {
+    const objData = JSON.parse(localStorage.getItem('class_objective') || '{}');
+    if (objData.id && objData.id !== ST.objId) {
+      ST.objId = objData.id;
+      document.getElementById('hdrObj').textContent = objData.id + ': ' + (objData.title || '').substring(0,50);
+      document.getElementById('currentObjDisplay').innerHTML =
+        '<div style="color:var(--acc);font-weight:700;margin-bottom:4px">' + objData.id + '</div>' +
+        '<div style="color:var(--tx2)">' + (objData.title||'') + '</div>' +
+        '<div style="color:var(--tx3);margin-top:4px">' + (objData.domain||'') + '</div>';
+    }
+  } catch(e) {}
+
   // Check for disc update within same phase
   if (phase === 'disc' && phase === lastPhase && discTs !== lastDiscTs) {
     lastDiscTs = discTs;
     renderStudentPhase('disc');
     return;
   }
-  
+
   if (phase === lastPhase) return;
   lastPhase = phase;
-  
+
   if (!phase) {
     showWaiting();
     return;
@@ -1246,7 +1264,7 @@ function renderLab(c, preview) {
             </div>
             <div style="background:#0a0c0a;padding:8px 16px;border-top:1px solid #1a2a1a;display:flex;gap:8px;align-items:center">
               <span style="color:#3dd68c;font-family:var(--mono);font-size:12px">$</span>
-              <input id="termInput" class="terminal-input" placeholder="Type a command…" onkeydown="if(event.key==='Enter')runTerminalCommand(this.value,${JSON.stringify(c.terminal_commands||[]).replace(/"/g,"'")})">
+              <input id="termInput" class="terminal-input" placeholder="Type a command and press Enter…">
             </div>
           </div>` : ''}
         <div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:10px 14px;margin-top:12px;font-size:12px;color:var(--tx)">
@@ -1794,10 +1812,16 @@ ${recent.filter(f=>f.comment).slice(0,3).map(f=>'• '+f.comment).join('
 // TERMINAL SIMULATOR
 // ══════════════════════════════════════════════════════════
 const TERMINAL_RESPONSES = {
-  'ipconfig': `Windows IP Configuration\n\nEthernet adapter Ethernet:\n   IPv4 Address. . . . . : 192.168.1.105\n   Subnet Mask . . . . . : 255.255.255.0\n   Default Gateway . . . : 192.168.1.1`,
-  'ipconfig /all': `Windows IP Configuration\n   Host Name . . . . . . : DESKTOP-ABC123\n   DNS Servers . . . . . : 8.8.8.8\n   DHCP Enabled. . . . . : Yes\n   IPv4 Address. . . . . : 192.168.1.105`,
-  'ping google.com': `Pinging google.com [142.250.80.46] with 32 bytes of data:\nReply from 142.250.80.46: bytes=32 time=12ms TTL=115\nReply from 142.250.80.46: bytes=32 time=11ms TTL=115\nPing statistics: Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)`,
-  'ping 192.168.1.1': `Pinging 192.168.1.1 with 32 bytes of data:\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\nPing statistics: Packets: Sent = 4, Received = 4, Lost = 0`,
+  'ipconfig': 'Windows IP Configuration\n\nEthernet adapter Ethernet0:\n   Connection-specific DNS Suffix: local\n   IPv4 Address. . . . . . . . . : 192.168.1.105\n   Subnet Mask . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . : 192.168.1.1',
+  'ipconfig /all': 'Windows IP Configuration\n\n   Host Name . . . . . . . . . . : DESKTOP-CTE01\n   Primary Dns Suffix. . . . . . :\n   Node Type . . . . . . . . . . : Hybrid\n   DHCP Enabled. . . . . . . . . : Yes\n   DNS Servers . . . . . . . . . : 8.8.8.8\n                                   8.8.4.4\n   IPv4 Address. . . . . . . . . : 192.168.1.105\n   Subnet Mask . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . : 192.168.1.1\n   Physical Address. . . . . . . : A4-C3-F0-85-2D-11',
+  'ipconfig /release': 'Windows IP Configuration\n\nNo operation can be performed on Ethernet0 while it has its media disconnected.\nEthernet adapter Ethernet0:\n   Media State . . . . . . . . . : Media disconnected',
+  'ipconfig /renew': 'Windows IP Configuration\n\nEthernet adapter Ethernet0:\n   Connection-specific DNS Suffix : local\n   IPv4 Address. . . . . . . . . : 192.168.1.106\n   Subnet Mask . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . : 192.168.1.1',
+  'ipconfig /flushdns': 'Windows IP Configuration\n\nSuccessfully flushed the DNS Resolver Cache.',
+  'ping': 'Usage: ping <hostname or IP>\nExample: ping google.com\nExample: ping 192.168.1.1',
+  'ping google.com': 'Pinging google.com [142.250.80.46] with 32 bytes of data:\nReply from 142.250.80.46: bytes=32 time=12ms TTL=115\nReply from 142.250.80.46: bytes=32 time=14ms TTL=115\nReply from 142.250.80.46: bytes=32 time=11ms TTL=115\nReply from 142.250.80.46: bytes=32 time=13ms TTL=115\n\nPing statistics for 142.250.80.46:\n    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)\nApproximate round trip times in milli-seconds:\n    Minimum = 11ms, Maximum = 14ms, Average = 12ms',
+  'ping 192.168.1.1': 'Pinging 192.168.1.1 with 32 bytes of data:\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\nReply from 192.168.1.1: bytes=32 time=2ms TTL=64\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\n\nPing statistics for 192.168.1.1:\n    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)',
+  'ping 8.8.8.8': 'Pinging 8.8.8.8 with 32 bytes of data:\nReply from 8.8.8.8: bytes=32 time=9ms TTL=118\nReply from 8.8.8.8: bytes=32 time=8ms TTL=118\n\nPing statistics for 8.8.8.8:\n    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)',
+  'ping -t 192.168.1.1': 'Pinging 192.168.1.1 continuously... (Ctrl+C to stop)\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\nReply from 192.168.1.1: bytes=32 time=1ms TTL=64\n[Simulated: continuous ping running — type clear to reset]',
   'netstat': `Proto  Local Address         Foreign Address       State\nTCP    0.0.0.0:80            0.0.0.0:0             LISTENING\nTCP    0.0.0.0:443           0.0.0.0:0             LISTENING\nTCP    192.168.1.105:49152   172.217.4.46:443      ESTABLISHED`,
   'nslookup google.com': `Server: 8.8.8.8\nAddress: 8.8.8.8#53\nNon-authoritative answer:\nName: google.com\nAddress: 142.250.80.46`,
   'dir': ` Directory of C:\\Users\\Student\n10/15/2024  09:22 AM    <DIR>  Desktop\n10/15/2024  09:22 AM    <DIR>  Documents\n10/15/2024  09:22 AM    <DIR>  Downloads\n               0 File(s)              0 bytes\n               3 Dir(s)  125,432,123,456 bytes free`,
@@ -1815,57 +1839,86 @@ const TERMINAL_RESPONSES = {
   'pwd': `/home/student`,
   'ip addr': `1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536\n    inet 127.0.0.1/8 scope host lo\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n    inet 192.168.1.105/24 brd 192.168.1.255 scope global eth0`,
   'clear': '__clear__',
-  'help': `Available commands: ipconfig, ping, netstat, nslookup, dir, cd, hostname, whoami, winver, sfc /scannow, chkdsk, diskpart, gpupdate, tasklist, net user, ls, pwd, ip addr, clear`,
+  'tracert': 'Tracing route to google.com [142.250.80.46]\nover a maximum of 30 hops:\n\n  1    1 ms    1 ms    1 ms  192.168.1.1\n  2   12 ms   11 ms   13 ms  10.0.0.1\n  3   14 ms   13 ms   12 ms  142.250.80.46\n\nTrace complete.',
+  'tracert google.com': 'Tracing route to google.com [142.250.80.46]\nover a maximum of 30 hops:\n\n  1    1 ms    1 ms    1 ms  192.168.1.1 [Gateway]\n  2   12 ms   11 ms   13 ms  10.0.0.1\n  3   14 ms   13 ms   12 ms  142.250.80.46\n\nTrace complete.',
+  'nbtstat': 'Displays protocol statistics and current TCP/IP connections.\nUsage: nbtstat [-a RemoteName] [-A IP address] [-n] [-r]\n  -n  Lists local NetBIOS names\n  -r  Lists names resolved by broadcast\n  -A  Lists remote machine name table',
+  'nbtstat -n': 'Local Area Connection:\nNode IpAddress: [192.168.1.105] Scope Id: []\n\n                NetBIOS Local Name Table\n       Name               Type         Status\n    DESKTOP-CTE01  <00>  UNIQUE      Registered\n    WORKGROUP      <00>  GROUP       Registered',
+  'net user': 'User accounts for \\DESKTOP-CTE01\n-------------------------------------------------------------------------------\nAdministrator            DefaultAccount           Guest\nStudent                  WDAGUtilityAccount\nThe command completed successfully.',
+  'net user student': 'User name                    Student\nFull Name\nAccount active               Yes\nAccount expires              Never\nPassword last set            10/1/2024\nPassword expires             Never\nLocal Group Memberships      *Users\nGlobal Group memberships     *None\nThe command completed successfully.',
+  'netstat -an': 'Active Connections\n\n  Proto  Local Address          Foreign Address        State\n  TCP    0.0.0.0:80             0.0.0.0:0              LISTENING\n  TCP    0.0.0.0:443            0.0.0.0:0              LISTENING\n  TCP    0.0.0.0:3389           0.0.0.0:0              LISTENING\n  TCP    192.168.1.105:49152    142.250.80.46:443      ESTABLISHED\n  TCP    192.168.1.105:49153    52.109.4.47:443        ESTABLISHED\n  UDP    0.0.0.0:5353           *:*',
+  'systeminfo': 'Host Name:                 DESKTOP-CTE01\nOS Name:                   Microsoft Windows 11 Pro\nOS Version:                10.0.22631 N/A Build 22631\nSystem Type:               x64-based PC\nProcessor:                 Intel(R) Core(TM) i5-12400\nTotal Physical Memory:     16,384 MB\nAvailable Physical Memory: 8,192 MB\nDomain:                    WORKGROUP',
+  'gpupdate /force': 'Updating policy...\n\nComputer Policy update has completed successfully.\nUser Policy update has completed successfully.',
+  'shutdown /r /t 0': 'Simulated: System would restart now. (This is a simulator — no actual restart)',
+  'shutdown /s /t 60': 'Simulated: System will shut down in 60 seconds.',
+  'taskkill /f /im notepad.exe': 'SUCCESS: The process "notepad.exe" with PID 4892 has been terminated.',
+  'sc query': 'SERVICE_NAME: WinDefend\n   TYPE               : 10  WIN32_OWN_PROCESS\n   STATE              : 4  RUNNING\nSERVICE_NAME: wuauserv\n   TYPE               : 20  WIN32_SHARE_PROCESS\n   STATE              : 1  STOPPED',
+  'net start': 'These Windows services are started:\n   Application Information\n   Background Intelligent Transfer Service\n   Cryptographic Services\n   DHCP Client\n   DNS Client\n   Windows Defender Antivirus Service\n   Windows Update\nThe command completed successfully.',
+  'regedit': 'Simulated: Registry Editor would open here.\nKey paths to know:\nHKEY_LOCAL_MACHINE\\SOFTWARE — installed software\nHKEY_CURRENT_USER\\SOFTWARE — user settings\nHKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services — services',
+    'help': 'Available commands:\nipconfig  ipconfig /all  ipconfig /release  ipconfig /renew  ipconfig /flushdns\nping <host>  tracert <host>  netstat  netstat -an  nslookup <host>\ndir  cd <path>  hostname  whoami  systeminfo  winver\nsfc /scannow  chkdsk  diskpart  gpupdate  gpupdate /force\ntasklist  taskkill  net user  net start  sc query\nls  pwd  ip addr  regedit  clear  help',
 };
 
 function setupTerminal() {
   const inp = document.getElementById('termInput');
-  if (inp) inp.focus();
+  if (!inp) return;
+  inp.focus();
+  // Remove any existing listeners to prevent duplication
+  const newInp = inp.cloneNode(true);
+  inp.parentNode.replaceChild(newInp, inp);
+  newInp.focus();
+  newInp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const cmd = this.value.trim();
+      if (cmd) {
+        runTerminalCommand(cmd);
+        this.value = '';
+      }
+    }
+  });
 }
 
-function runTerminalCommand(cmd, validCmds) {
+function runTerminalCommand(cmd) {
   const terminal = document.getElementById('terminalOutput');
-  const input = document.getElementById('termInput');
-  if (!terminal || !cmd.trim()) return;
-  
-  // Add command line
+  if (!terminal || !cmd || !cmd.trim()) return;
+  const cmdTrimmed = cmd.trim();
+
+  // Render typed command
   const cmdLine = document.createElement('div');
-  cmdLine.className = 'terminal-line';
-  cmdLine.innerHTML = `<span class="terminal-prompt">$</span><span style="color:#e8eaf0">${cmd}</span>`;
+  cmdLine.style.cssText = 'display:flex;gap:8px;padding:1px 0';
+  cmdLine.innerHTML = '<span style="color:#3dd68c;font-family:var(--mono);font-size:12px;flex-shrink:0">$</span><span style="color:#e8eaf0;font-family:var(--mono);font-size:12px">' + cmdTrimmed.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>';
   terminal.appendChild(cmdLine);
-  
-  // Get response
-  const cmdLower = cmd.toLowerCase().trim();
-  let response = TERMINAL_RESPONSES[cmdLower] || TERMINAL_RESPONSES[cmd.split(' ')[0].toLowerCase()];
-  
-  if (!response) {
-    // Check if it's close to a valid command
-    const closeTo = Object.keys(TERMINAL_RESPONSES).find(k => cmdLower.startsWith(k.split(' ')[0]));
-    if (closeTo) {
-      response = TERMINAL_RESPONSES[closeTo];
-    } else {
-      response = `'${cmd}' is not recognized as a command. Type 'help' to see available commands.`;
-    }
+
+  // Match command (case-insensitive, also match prefix for flags like ipconfig /all)
+  const cmdLower = cmdTrimmed.toLowerCase();
+  let response = null;
+
+  // Exact match first
+  if (TERMINAL_RESPONSES[cmdLower]) {
+    response = TERMINAL_RESPONSES[cmdLower];
+  } else {
+    // Try matching first word only (e.g. "ping" matches "ping 8.8.8.8")
+    const firstWord = cmdLower.split(/\s+/)[0];
+    const matchKey = Object.keys(TERMINAL_RESPONSES).find(k => {
+      const kFirst = k.split(/\s+/)[0];
+      return kFirst === firstWord;
+    });
+    if (matchKey) response = TERMINAL_RESPONSES[matchKey];
   }
-  
+
+  if (!response) {
+    response = "'" + cmdTrimmed + "' is not recognized. Type 'help' for available commands.";
+  }
+
   if (response === '__clear__') {
-    terminal.innerHTML = '<div class="terminal-output">$ # Terminal cleared</div>';
-    if (input) input.value = '';
+    terminal.innerHTML = '<div style="color:#9ab8a0;font-family:var(--mono);font-size:12px">Terminal cleared. Type 'help' for commands.</div>';
     return;
   }
-  
+
   const out = document.createElement('div');
-  out.className = 'terminal-output';
+  out.style.cssText = 'color:#9ab8a0;font-family:var(--mono);font-size:12px;padding:2px 0;white-space:pre-wrap;line-height:1.6';
+  if (response.includes('not recognized')) out.style.color = '#ff6b7a';
   out.textContent = response;
-  
-  // Check if command was in the valid list for this lab
-  if (validCmds && Array.isArray(validCmds) && validCmds.some(v => cmdLower.includes(v.toLowerCase().split(' ')[0]))) {
-    out.classList.add('terminal-success');
-  }
-  
   terminal.appendChild(out);
   terminal.scrollTop = terminal.scrollHeight;
-  if (input) input.value = '';
 }
 
 function toggleHint(n) {
