@@ -32,8 +32,9 @@ body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100
 
 <script>
 (function() {
-  var isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
-  var hasPin    = !!localStorage.getItem('teacher_pin'); // false = totally fresh install
+  var isTeacher = sessionStorage.getItem('teacher_unlocked') === 'true'
+               || localStorage.getItem('teacher_unlocked') === 'true';
+  var hasPin    = !!localStorage.getItem('teacher_pin');
   if (!isTeacher) {
     var overlay = document.getElementById('pinGateOverlay');
     if (overlay) {
@@ -51,8 +52,9 @@ function checkGatePin() {
   var entered  = document.getElementById('gatePinInput').value.trim();
   var savedPin = localStorage.getItem('teacher_pin') || '1529';
   if (entered === savedPin) {
+    sessionStorage.setItem('teacher_unlocked','true');
     localStorage.setItem('teacher_unlocked','true');
-    // Ensure PIN is stored so future visits work
+    // Set default PIN only if never configured
     if (!localStorage.getItem('teacher_pin')) {
       localStorage.setItem('teacher_pin','1529');
     }
@@ -328,7 +330,7 @@ function getOrCreate(ss,name){
 <script>
 // ── INIT ──────────────────────────────────────────────────
 function init() {
-  if (!localStorage.getItem('teacher_pin')) localStorage.setItem('teacher_pin','1529');
+  // PIN defaults to 1529 only if never set - do NOT overwrite existing PIN
   checkStatuses();
   buildSummary();
   
@@ -396,6 +398,8 @@ function saveApiKey() {
     return;
   }
   localStorage.setItem('PLATFORM_API_KEY', val);
+  localStorage.setItem('class_api_key', val);  // shared for student browsers
+  sessionStorage.setItem('class_api_key', val);
   markComplete('step1');
   checkStatuses();
   toast('API key saved','ok');

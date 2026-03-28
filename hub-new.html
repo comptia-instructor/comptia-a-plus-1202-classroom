@@ -306,7 +306,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100
       <div class="tool-card-arrow">→</div>
     </a>
 
-    <a href="student-dashboard.html" class="tool-card" style="--accent-color:var(--pur)">
+    <a href="student-command-center.html" class="tool-card" style="--accent-color:var(--pur)">
       <div class="tool-card-icon">🎯</div>
       <div class="tool-card-name">Student Dashboard</div>
       <div class="tool-card-desc">Grades, PBIS points, study plan, exam readiness. Students see their progress across all objectives.</div>
@@ -408,7 +408,7 @@ function init() {
   if (!localStorage.getItem('teacher_pin')) localStorage.setItem('teacher_pin', '1529');
   
   // Check teacher
-  const isTeacher = localStorage.getItem('teacher_unlocked') === 'true' || sessionStorage.getItem('teacher_unlocked') === 'true';
+  const isTeacher = localStorage.getItem('teacher_unlocked') === 'true';
   if (isTeacher) applyTeacherMode();
   
   // Check student code
@@ -660,7 +660,6 @@ function checkPin() {
   const saved = localStorage.getItem('teacher_pin') || '1529';
   if (pin === saved) {
     localStorage.setItem('teacher_unlocked','true');
-    sessionStorage.setItem('teacher_unlocked','true');
     localStorage.setItem('PLATFORM_CODE',JSON.stringify('TEACHER'));
     closeTeacherModal();
     applyTeacherMode();
@@ -677,7 +676,6 @@ function checkPin() {
 }
 function exitTeacher() {
   localStorage.removeItem('teacher_unlocked');
-  sessionStorage.removeItem('teacher_unlocked');
   localStorage.removeItem('PLATFORM_CODE');
   location.reload();
 }

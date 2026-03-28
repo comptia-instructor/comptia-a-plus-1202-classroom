@@ -383,6 +383,7 @@ function renderDetail(id) {
       <button class="content-tab active" id="tab_hook" onclick="switchTab('hook')">🚨 Hook</button>
       <button class="content-tab" id="tab_lesson" onclick="switchTab('lesson')">📖 Concept Brief</button>
       <button class="content-tab" id="tab_lab" onclick="switchTab('lab')">🔬 Sandbox Lab</button>
+      <button class="content-tab" id="tab_disc" onclick="switchTab('disc')">💬 Discussion</button>
       <button class="content-tab" id="tab_quiz" onclick="switchTab('quiz')">⏱ Practice Quiz</button>
     </div>
     
@@ -417,7 +418,15 @@ function renderDetail(id) {
       </div>
       <div id="content_quiz"><div style="font-family:var(--mono);font-size:12px;color:var(--tx3);padding:40px;text-align:center;border:1px dashed var(--b2);border-radius:var(--rl)">Click "Generate Quiz" to create 5 exam-quality practice questions for this objective.</div></div>
     </div>
-  `;
+
+    <div id="panel_disc" class="content-panel">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn btn-acc btn-sm" onclick="generateContent('${id}','disc')">⚡ Generate Discussion Questions</button>
+        <div id="gen_status_disc" style="font-family:var(--mono);font-size:10px;color:var(--tx3);display:flex;align-items:center"></div>
+      </div>
+      <div id="content_disc"><div style="font-family:var(--mono);font-size:12px;color:var(--tx3);padding:40px;text-align:center;border:1px dashed var(--b2);border-radius:var(--rl)">Click "Generate Discussion Questions" to create 3 prompts for classroom discussion on this objective.</div></div>
+    </div>
+  \`;
   
   // Auto-generate hook and lesson on open
   setTimeout(() => generateContent(id, 'hook'), 100);
@@ -425,7 +434,7 @@ function renderDetail(id) {
 }
 
 function switchTab(tab) {
-  ['hook','lesson','lab','quiz'].forEach(t => {
+  ['hook','lesson','lab','disc','quiz'].forEach(t => {
     document.getElementById(`tab_${t}`)?.classList.toggle('active',t===tab);
     document.getElementById(`panel_${t}`)?.classList.toggle('active',t===tab);
   });
@@ -441,7 +450,8 @@ function backToGrid() {
 function setAsToday(id) {
   const obj = OBJECTIVES[id];
   localStorage.setItem('class_objective', JSON.stringify({id,...obj}));
-  toast(`${id} set as today's objective`, 'ok');
+  toast(`${id} set as today's objective — returning to hub…`, 'ok');
+  setTimeout(() => { window.location.href = 'hub.html'; }, 1200);
 }
 
 
@@ -476,7 +486,9 @@ async function generateContent(id, type) {
     return;
   }
   
-  const apiKey = localStorage.getItem('PLATFORM_API_KEY');
+  const apiKey = localStorage.getItem('PLATFORM_API_KEY')
+             || localStorage.getItem('class_api_key')
+             || sessionStorage.getItem('class_api_key');
   if (!apiKey) {
     contentEl.innerHTML = `<div style="background:var(--amb-d);border:1px solid var(--amb);border-radius:var(--r);padding:16px;font-size:13px;color:var(--tx)">
       <strong>API key required.</strong> Go to <a href="hub.html" style="color:var(--acc)">Hub → Setup Wizard</a> to add your Anthropic API key. Content will generate automatically once configured.
@@ -509,6 +521,13 @@ ${getStudentProfileContext()}
 
 Return ONLY valid JSON:
 {"title":"Short lab title","scenario":"2-3 sentence IT scenario","objective":"What student learns","lab_type":"terminal or ticket","steps":[{"num":1,"instruction":"What to do","hint":"Help if stuck","expected":"What success looks like"},{"num":2,"instruction":"...","hint":"...","expected":"..."},{"num":3,"instruction":"...","hint":"...","expected":"..."},{"num":4,"instruction":"...","hint":"...","expected":"..."},{"num":5,"instruction":"...","hint":"...","expected":"..."}],"terminal_commands":["cmd1","cmd2","cmd3"],"success_message":"What they should understand when done","real_job_connection":"How this maps to an actual IT technician task"}`;
+  } else if (type === 'disc') {
+    prompt = `Generate 3 discussion questions for CompTIA A+ objective ${id}: "${obj.title}" (${obj.exam==='1201'?'220-1201':'220-1202'} exam).
+
+Questions should promote critical thinking and real-world connection. Not simple recall — make students think and debate.
+
+Return ONLY valid JSON array:
+[{"q":"Question 1","purpose":"Why this question matters for understanding","followup":"A follow-up to deepen discussion"},{"q":"Question 2","purpose":"...","followup":"..."},{"q":"Question 3","purpose":"...","followup":"..."}]`;
   } else if (type === 'quiz') {
     prompt = `Write 5 CompTIA A+ exam-quality questions for objective ${id}: "${obj.title}" (${obj.exam==='1201'?'220-1201 exam':'220-1202 exam'}, ${obj.pct} weight).
 
@@ -545,6 +564,7 @@ function renderLibContent(type, data, el) {
   if (type==='hook') el.innerHTML = renderHook(data);
   else if (type==='lesson') el.innerHTML = renderLesson(data);
   else if (type==='lab') el.innerHTML = renderLab(data);
+  else if (type==='disc') el.innerHTML = renderDisc(data);
   else if (type==='quiz') el.innerHTML = renderQuiz(data);
 }
 
@@ -607,6 +627,19 @@ function renderLab(c) {
   </div>`:''}
   ${c.real_job_connection?`<div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:10px 14px;margin-top:12px;font-size:12px;color:var(--tx)"><strong style="color:var(--grn)">Real Job Connection:</strong> ${c.real_job_connection}</div>`:''}
   <div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:var(--r);padding:10px 14px;margin-top:8px;font-size:12px;color:var(--tx)"><strong style="color:var(--grn)">✓ Success:</strong> ${c.success_message}</div>`;
+}
+
+function renderDisc(c) {
+  if (!Array.isArray(c)) return '<div style="color:var(--red)">Invalid discussion data</div>';
+  return c.map((q,i) => `
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:28px;height:28px;background:var(--amb-d);border:1px solid var(--amb);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amb);flex-shrink:0">${i+1}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--tx);line-height:1.6">${q.q}</div>
+      </div>
+      ${q.purpose ? `<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-bottom:6px">WHY: ${q.purpose}</div>` : ''}
+      ${q.followup ? `<div style="background:var(--s3);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--tx2)">💬 Follow-up: <em>${q.followup}</em></div>` : ''}
+    </div>`).join('');
 }
 
 function renderQuiz(c) {

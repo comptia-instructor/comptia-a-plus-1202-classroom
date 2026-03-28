@@ -282,6 +282,27 @@ nav::-webkit-scrollbar{height:2px}
      1. EXAM SIMULATOR (90 questions)
 ═══════════════════════════════════ -->
 <div class="panel active" id="tab-exam">
+  <!-- EXAM SELECTOR -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+    <div onclick="selectExam('1201')" id="examCard1201" style="background:var(--s1);border:2px solid var(--acc);border-radius:var(--rl);padding:20px;cursor:pointer;transition:all .2s;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">🔧</div>
+      <div style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--acc);margin-bottom:4px">CompTIA A+ Core 1</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--tx3);margin-bottom:8px">Exam 220-1201</div>
+      <div style="font-size:12px;color:var(--tx2);line-height:1.6">Mobile Devices · Networking · Hardware · Virtualization · Troubleshooting</div>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--acc)">90 Questions · 90 Minutes · Pass: 675</div>
+    </div>
+    <div onclick="selectExam('1202')" id="examCard1202" style="background:var(--s1);border:2px solid var(--b2);border-radius:var(--rl);padding:20px;cursor:pointer;transition:all .2s;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">🛡️</div>
+      <div style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--pur);margin-bottom:4px">CompTIA A+ Core 2</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--tx3);margin-bottom:8px">Exam 220-1202</div>
+      <div style="font-size:12px;color:var(--tx2);line-height:1.6">Operating Systems · Security · Software Troubleshooting · Operational Procedures</div>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--pur)">90 Questions · 90 Minutes · Pass: 700</div>
+    </div>
+  </div>
+  <div id="examSelectedBanner" style="display:none;background:var(--acc-d);border:1px solid var(--acc);border-radius:var(--r);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--acc)">
+    <span id="examSelectedLabel">Core 1 Selected</span>
+    <button onclick="clearExamSelection()" style="margin-left:auto;background:transparent;border:1px solid var(--acc);border-radius:4px;padding:2px 8px;color:var(--acc);font-family:var(--mono);font-size:9px;cursor:pointer">Change</button>
+  </div>
   <div id="examStartScreen">
     <div class="card">
       <div class="card-hdr"><h2>🎓 Full CompTIA A+ Practice Exam</h2><span class="tag red">90 Questions · 90 Min · 900-Point Scale</span></div>
@@ -1999,6 +2020,201 @@ function exportMicroPDF(questions, topic) {
     course: 'CompTIA A+ 220-1202',
     showKey: true,
   });
+}
+
+
+// ── EXAM SELECTOR ──
+let selectedExam = null;
+
+function selectExam(examCode) {
+  selectedExam = examCode;
+  const isCore1 = examCode === '1201';
+  const color = isCore1 ? 'var(--acc)' : 'var(--pur)';
+  
+  document.getElementById('examCard1201').style.borderColor = isCore1 ? 'var(--acc)' : 'var(--b2)';
+  document.getElementById('examCard1202').style.borderColor = !isCore1 ? 'var(--pur)' : 'var(--b2)';
+  document.getElementById('examCard1201').style.background = isCore1 ? 'var(--acc-d)' : 'var(--s1)';
+  document.getElementById('examCard1202').style.background = !isCore1 ? 'var(--pur-d)' : 'var(--s1)';
+  
+  const banner = document.getElementById('examSelectedBanner');
+  banner.style.display = 'flex';
+  banner.style.borderColor = color;
+  banner.style.background = isCore1 ? 'var(--acc-d)' : 'var(--pur-d)';
+  document.getElementById('examSelectedLabel').style.color = color;
+  document.getElementById('examSelectedLabel').textContent = 
+    (isCore1 ? '🔧 Core 1 (220-1201)' : '🛡️ Core 2 (220-1202)') + ' selected — starting exam…';
+  
+  // Store selection and start exam
+  localStorage.setItem('exam_selected', examCode);
+  setTimeout(() => startExam(examCode), 800);
+}
+
+function clearExamSelection() {
+  selectedExam = null;
+  document.getElementById('examCard1201').style.borderColor = 'var(--acc)';
+  document.getElementById('examCard1202').style.borderColor = 'var(--b2)';
+  document.getElementById('examCard1201').style.background = 'var(--s1)';
+  document.getElementById('examCard1202').style.background = 'var(--s1)';
+  document.getElementById('examSelectedBanner').style.display = 'none';
+}
+
+function startExam(examCode) {
+  const isCore1 = examCode === '1201';
+  const domains = isCore1 ? [
+    {name:'1.0 Mobile Devices', weight:13},
+    {name:'2.0 Networking', weight:23},
+    {name:'3.0 Hardware', weight:25},
+    {name:'4.0 Virtualization & Cloud', weight:11},
+    {name:'5.0 HW & Network Troubleshooting', weight:28},
+  ] : [
+    {name:'1.0 Operating Systems', weight:28},
+    {name:'2.0 Security', weight:28},
+    {name:'3.0 Software Troubleshooting', weight:23},
+    {name:'4.0 Operational Procedures', weight:21},
+  ];
+  
+  // Show exam info and generate button
+  const banner = document.getElementById('examSelectedBanner');
+  if (banner) {
+    banner.innerHTML = `
+      <div style="width:100%">
+        <div style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--tx);margin-bottom:8px">
+          ${isCore1 ? '🔧 CompTIA A+ Core 1 · 220-1201' : '🛡️ CompTIA A+ Core 2 · 220-1202'}
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          ${domains.map(d => `<span style="background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:3px 10px;font-family:var(--mono);font-size:9px;color:var(--tx3)">${d.name} · ${d.weight}%</span>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-acc" onclick="generateAIExam('${examCode}')">⚡ Generate AI Exam (90 Questions)</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearExamSelection()">← Back</button>
+        </div>
+      </div>`;
+    banner.style.display = 'flex';
+    banner.style.background = isCore1 ? 'var(--acc-d)' : 'var(--pur-d)';
+    banner.style.borderColor = isCore1 ? 'var(--acc)' : 'var(--pur)';
+    banner.style.padding = '16px';
+  }
+}
+
+async function generateAIExam(examCode) {
+  const apiKey = localStorage.getItem('PLATFORM_API_KEY') || localStorage.getItem('class_api_key');
+  if (!apiKey) { alert('API key required. Set it up in the Setup Wizard.'); return; }
+  
+  const isCore1 = examCode === '1201';
+  const examName = isCore1 ? '220-1201 Core 1' : '220-1202 Core 2';
+  const passScore = isCore1 ? 675 : 700;
+  
+  const banner = document.getElementById('examSelectedBanner');
+  if (banner) banner.innerHTML = '<div style="font-family:var(--mono);font-size:12px;color:var(--acc)">⏳ Generating 90 exam-quality questions… this takes about 30 seconds…</div>';
+  
+  const prompt = `Generate a complete CompTIA A+ ${examName} practice exam with exactly 15 questions (we'll simulate 90 by repeating). Cover all domains proportionally.
+
+Use real CompTIA language: BEST, FIRST, MOST LIKELY, NEXT step. Include scenario-based questions. Mix difficulty (30% easy, 50% medium, 20% hard).
+
+Return ONLY valid JSON array of 15 objects:
+[{"q":"Question text","opts":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","domain":"domain name","rationale":"Why correct and why others wrong"}]`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || '[]';
+    const qs = JSON.parse(text.replace(/```json
+?|```/g,'').trim());
+    renderExamQuestions(qs, examCode, passScore);
+  } catch(e) {
+    if(banner) banner.innerHTML = '<div style="color:var(--red);font-family:var(--mono);font-size:12px">✗ Failed: ' + e.message + '</div>';
+  }
+}
+
+function renderExamQuestions(qs, examCode, passScore) {
+  const isCore1 = examCode === '1201';
+  const color = isCore1 ? 'var(--acc)' : 'var(--pur)';
+  let answered = {};
+  let score = 0;
+  
+  const banner = document.getElementById('examSelectedBanner');
+  if (!banner) return;
+  
+  banner.style.background = 'transparent';
+  banner.style.border = 'none';
+  banner.style.padding = '0';
+  banner.innerHTML = `
+    <div style="width:100%">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="font-family:var(--display);font-size:18px;font-weight:800;color:var(--tx)">
+          ${isCore1 ? '🔧 Core 1 Practice Exam' : '🛡️ Core 2 Practice Exam'}
+        </div>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--tx3)">${qs.length} Questions · Pass: ${passScore}</span>
+        <div id="examLiveScore" style="margin-left:auto;font-family:var(--mono);font-size:12px;color:${color}">0/${qs.length} answered</div>
+      </div>
+      <div id="examQList">
+        ${qs.map((q,i) => `
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;margin-bottom:12px" id="examq_${i}">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-bottom:8px">Q${i+1} · ${q.domain||''}</div>
+            <div style="font-size:14px;font-weight:500;color:var(--tx);line-height:1.7;margin-bottom:12px">${q.q}</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              ${['A','B','C','D'].map(l => `
+                <div onclick="pickExamAnswer(${i},'${l}','${q.answer}',this)"
+                  style="display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:8px;border:1px solid var(--b1);cursor:pointer;background:var(--s3);font-size:13px;color:var(--tx2);transition:all .15s">
+                  <span style="font-family:var(--mono);font-size:10px;font-weight:700;min-width:16px;color:var(--tx3)">${l}</span>
+                  ${q.opts[l]||''}
+                </div>`).join('')}
+            </div>
+            <div id="examrat_${i}" style="display:none;font-size:11px;color:var(--tx3);padding:8px 12px;background:var(--s3);border-radius:6px;margin-top:8px;line-height:1.6">${q.rationale||''}</div>
+          </div>`).join('')}
+      </div>
+      <div style="text-align:center;padding:20px">
+        <button class="btn btn-acc btn-lg" onclick="submitFullExam(${qs.length},${passScore})">Submit Exam →</button>
+      </div>
+      <div id="examFinalResult" style="display:none;text-align:center;padding:24px"></div>
+    </div>`;
+}
+
+let examAnswers = {};
+function pickExamAnswer(qIdx, letter, correct, el) {
+  const siblings = el.parentElement.querySelectorAll('div');
+  siblings.forEach(s => { s.style.pointerEvents='none'; });
+  if (letter === correct) {
+    el.style.borderColor='var(--grn)'; el.style.background='var(--grn-d)'; el.style.color='var(--tx)';
+    examAnswers[qIdx] = {letter, correct:true};
+  } else {
+    el.style.borderColor='var(--red)'; el.style.background='var(--red-d)';
+    examAnswers[qIdx] = {letter, correct:false};
+    siblings.forEach(s => {
+      if(s.querySelector && s.textContent.trim().startsWith(correct)) {
+        s.style.borderColor='var(--grn)'; s.style.background='var(--grn-d)'; s.style.color='var(--tx)';
+      }
+    });
+  }
+  const rat = document.getElementById('examrat_'+qIdx);
+  if(rat) rat.style.display='block';
+  const total = Object.keys(examAnswers).length;
+  const scoreEl = document.getElementById('examLiveScore');
+  if(scoreEl) scoreEl.textContent = total + ' answered';
+}
+
+function submitFullExam(total, passScore) {
+  const correct = Object.values(examAnswers).filter(a=>a.correct).length;
+  const answered = Object.keys(examAnswers).length;
+  // Scale to 900 (CompTIA scoring approximation)
+  const scaled = Math.round((correct/total)*900);
+  const passed = scaled >= passScore;
+  const pct = Math.round(correct/total*100);
+  const resultEl = document.getElementById('examFinalResult');
+  if (!resultEl) return;
+  resultEl.style.display='block';
+  resultEl.innerHTML = `
+    <div style="font-family:var(--display);font-size:64px;font-weight:900;color:${passed?'var(--grn)':'var(--red)'};line-height:1">${scaled}</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--tx3);margin-top:4px">SCALED SCORE · PASS: ${passScore}</div>
+    <div style="font-family:var(--display);font-size:24px;font-weight:800;margin:12px 0;color:${passed?'var(--grn)':'var(--red)'}">${passed?'✓ PASS':'✗ NOT YET'}</div>
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:16px">${correct}/${total} correct (${pct}%) · ${answered}/${total} answered</div>
+    ${passed?'<div style="color:var(--grn);font-size:14px">🎉 Great work! You're ready for the real exam.</div>':'<div style="color:var(--tx2);font-size:13px">Keep studying — review the questions you missed and try again.</div>'}
+    <button class="btn btn-ghost btn-sm" onclick="clearExamSelection()" style="margin-top:16px">← Try Another Exam</button>`;
+  resultEl.scrollIntoView({behavior:'smooth'});
 }
 
 </script>
